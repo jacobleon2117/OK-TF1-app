@@ -10,9 +10,12 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../context/AuthContext';
 
 const SignupScreen = ({ navigation }: { navigation: any }) => {
   const [name, setName] = useState('');
@@ -22,10 +25,51 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
   const [organizationCode, setOrganizationCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { signup, error, setError } = useAuth();
 
-  const handleSignup = () => {
-    console.log('Signup with:', { name, email, password, confirmPassword, organizationCode });
-    // Add Firebase authentication here
+  const validateForm = () => {
+    if (!name.trim()) {
+      Alert.alert('Error', 'Please enter your name');
+      return false;
+    }
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return false;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter a password');
+      return false;
+    }
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
+      return false;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return false;
+    }
+    if (!organizationCode.trim()) {
+      Alert.alert('Error', 'Please enter your organization code');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSignup = async () => {
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    try {
+      await signup(name, email, password, organizationCode);
+      Alert.alert('Success', 'Account created successfully!');
+      // Navigation will automatically redirect based on auth state
+    } catch (err: any) {
+      Alert.alert('Signup Failed', error || 'An error occurred during signup');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,7 +99,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="John Doe"
                 value={name}
-                onChangeText={setName}
+                onChangeText={(text) => {
+                  setName(text);
+                  setError(null);
+                }}
                 placeholderTextColor="#888"
               />
               <Ionicons name="person-outline" size={20} color="#888" />
@@ -68,7 +115,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="example@gmail.com"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setError(null);
+                }}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 placeholderTextColor="#888"
@@ -83,7 +133,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="Password"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setError(null);
+                }}
                 secureTextEntry={!showPassword}
                 placeholderTextColor="#888"
               />
@@ -103,7 +156,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="Confirm Password"
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  setError(null);
+                }}
                 secureTextEntry={!showConfirmPassword}
                 placeholderTextColor="#888"
               />
@@ -123,7 +179,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="6-digit code"
                 value={organizationCode}
-                onChangeText={(text) => setOrganizationCode(text.replace(/[^0-9]/g, ''))}
+                onChangeText={(text) => {
+                  setOrganizationCode(text.replace(/[^0-9]/g, ''));
+                  setError(null);
+                }}
                 keyboardType="number-pad"
                 maxLength={6}
                 placeholderTextColor="#888"
@@ -131,12 +190,20 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
               <Ionicons name="chevron-forward-outline" size={20} color="#888" />
             </View>
             
+            {/* Error message */}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            
             {/* Signup button */}
             <TouchableOpacity
               style={styles.button}
               onPress={handleSignup}
+              disabled={isLoading}
             >
-              <Text style={styles.buttonText}>Sign Up</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Sign Up</Text>
+              )}
             </TouchableOpacity>
             
             {/* Sign in link */}
@@ -229,6 +296,11 @@ const styles = StyleSheet.create({
   whiteText: {
     color: 'white',
   },
+  errorText: {
+    color: '#ff6b6b',
+    marginBottom: 10,
+    textAlign: 'center',
+  }
 });
 
 export default SignupScreen;

@@ -9,19 +9,45 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../context/AuthContext';
 
 const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
   const [email, setEmail] = useState('');
   const [organizationCode, setOrganizationCode] = useState('');
   const [emailSent, setEmailSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { resetPassword, error, setError } = useAuth();
 
-  const handleResetPassword = () => {
-    console.log('Reset password for:', { email, organizationCode });
-    // Call Firebase password reset here
-    setEmailSent(true);
+  const validateForm = () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return false;
+    }
+    if (!organizationCode.trim()) {
+      Alert.alert('Error', 'Please enter your organization code');
+      return false;
+    }
+    return true;
+  };
+
+  const handleResetPassword = async () => {
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    try {
+      await resetPassword(email, organizationCode);
+      setEmailSent(true);
+    } catch (err: any) {
+      Alert.alert('Reset Password Failed', error || 'An error occurred while sending reset email');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,7 +99,10 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
                     style={styles.input}
                     placeholder="example@gmail.com"
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      setError(null);
+                    }}
                     autoCapitalize="none"
                     keyboardType="email-address"
                     placeholderTextColor="#888"
@@ -88,7 +117,10 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
                     style={styles.input}
                     placeholder="6-digit code"
                     value={organizationCode}
-                    onChangeText={(text) => setOrganizationCode(text.replace(/[^0-9]/g, ''))}
+                    onChangeText={(text) => {
+                      setOrganizationCode(text.replace(/[^0-9]/g, ''));
+                      setError(null);
+                    }}
                     keyboardType="number-pad"
                     maxLength={6}
                     placeholderTextColor="#888"
@@ -96,12 +128,20 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
                   <Ionicons name="chevron-forward-outline" size={20} color="#888" />
                 </View>
                 
+                {/* Error message */}
+                {error && <Text style={styles.errorText}>{error}</Text>}
+                
                 {/* Reset button */}
                 <TouchableOpacity
                   style={styles.button}
                   onPress={handleResetPassword}
+                  disabled={isLoading}
                 >
-                  <Text style={styles.buttonText}>Reset Password</Text>
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Reset Password</Text>
+                  )}
                 </TouchableOpacity>
                 
                 {/* Back to login link */}
@@ -218,6 +258,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  errorText: {
+    color: '#ff6b6b', 
+    marginBottom: 10,
+    textAlign: 'center',
+  }
 });
 
 export default ForgotPasswordScreen;

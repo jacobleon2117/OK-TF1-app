@@ -10,19 +10,50 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginScreen = ({ navigation }: { navigation: any }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [organizationCode, setOrganizationCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { login, error, setError } = useAuth();
 
-  const handleLogin = () => {
-    console.log('Login with:', { email, password, organizationCode });
-    // Add Firebase authentication here
+  const validateForm = () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return false;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return false;
+    }
+    if (!organizationCode.trim()) {
+      Alert.alert('Error', 'Please enter your organization code');
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    try {
+      await login(email, password, organizationCode);
+      // If successful, the auth state will change and navigation will redirect
+    } catch (err: any) {
+      Alert.alert('Login Failed', error || 'An error occurred during login');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,7 +83,10 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="example@gmail.com"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setError(null); // Clear errors when user types
+                }}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 placeholderTextColor="#888"
@@ -61,13 +95,15 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
             </View>
             
             {/* Password input */}
-            <Text style={styles.label}>Password</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
                 placeholder="Password"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setError(null);
+                }}
                 secureTextEntry={!showPassword}
                 placeholderTextColor="#888"
               />
@@ -87,7 +123,10 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
                 style={styles.input}
                 placeholder="6-digit code"
                 value={organizationCode}
-                onChangeText={(text) => setOrganizationCode(text.replace(/[^0-9]/g, ''))}
+                onChangeText={(text) => {
+                  setOrganizationCode(text.replace(/[^0-9]/g, ''));
+                  setError(null);
+                }}
                 keyboardType="number-pad"
                 maxLength={6}
                 placeholderTextColor="#888"
@@ -95,12 +134,20 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
               <Ionicons name="chevron-forward-outline" size={20} color="#888" />
             </View>
             
+            {/* Error message */}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            
             {/* Login button */}
             <TouchableOpacity
               style={styles.button}
               onPress={handleLogin}
+              disabled={isLoading}
             >
-              <Text style={styles.buttonText}>Login</Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
             </TouchableOpacity>
             
             {/* Forgot password link */}
@@ -207,6 +254,11 @@ const styles = StyleSheet.create({
   whiteText: {
     color: 'white',
   },
+  errorText: {
+    color: '#ff6b6b',
+    marginBottom: 10,
+    textAlign: 'center',
+  }
 });
 
 export default LoginScreen;
