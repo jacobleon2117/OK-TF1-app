@@ -3,129 +3,246 @@
 // 
 // I changed the file extension to ".ts" already, need to change the code to TypeScript.
 // 
-import { db } from './firebase';
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  getDocs, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query,
+  where,
+  Timestamp,
+  arrayUnion,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { db } from '../../config/firebase'; 
 
-export const addAvailability = (userId, date, availabilityData) => {
-  const availabilityRef = db.collection('schedules')
+export interface AvailabilityData {
+  status: string;
+  startTime: string; // e.g., "09:00"
+  endTime: string;   // e.g., "17:00"
+}
+
+export interface ShiftData {
+  name: string;
+  description: string;
+  missionId?: string;
+  startTime: firebase.firestore.Timestamp;
+  endTime: firebase.firestore.Timestamp;
+  location: {
+    name: string;
+    address?: string;
+  };
+  assignedUsers?: Array<{
+    userId: string;
+    name: string;
+    role: string;
+    status: string;
+    assignedAt: firebase.firestore.FieldValue;
+    checkedIn?: boolean;
+    checkedInAt?: firebase.firestore.FieldValue | null;
+  }>;
+  requiredRoles?: Array<{
+    role: string;
+    count: number;
+    filled: number;
+  }>;
+  status: string;
+  createdBy: string;
+  createdAt: firebase.firestore.FieldValue;
+  updatedAt: firebase.firestore.FieldValue;
+  notes?: string;
+}
+
+export interface ShiftTemplateData {
+  name: string;
+  description: string;
+  duration: number; // in hours
+  requiredRoles: Array<{ role: string; count: number }>;
+  defaultLocation: {
+    name: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  createdBy: string;
+  createdAt: firebase.firestore.FieldValue;
+  updatedAt: firebase.firestore.FieldValue;
+}
+
+//=====================================
+// AVAILABILITY functions
+//=====================================
+
+export const addAvailability = (
+  userId: string,
+  date: string,
+  availabilityData: AvailabilityData
+): Promise<void> => {
+  const availabilityRef = db
+    .collection('schedules')
     .doc(userId)
     .collection('availability')
     .doc(date);
-
-  return availabilityRef.set(availabilityData, { merge: true }); // merge updates existing data
+  return availabilityRef.set(availabilityData, { merge: true });
 };
 
-export const getAvailability = (userId, date) => {
-  const availabilityRef = db.collection('schedules')
+export const getAvailability = (
+  userId: string,
+  date: string
+): Promise<firebase.firestore.DocumentSnapshot> => {
+  const availabilityRef = db
+    .collection('schedules')
     .doc(userId)
     .collection('availability')
     .doc(date);
-
   return availabilityRef.get();
 };
 
-export const addShift = (shiftData) => {
-  return db.collection('shifts')
-    .add(shiftData);
+// ================================================
+// Shift Functions
+// =================================================
+
+export const addShift = (
+  shiftData: ShiftData
+): Promise<firebase.firestore.DocumentReference> => {
+  return db.collection('shifts').add(shiftData);
 };
 
-export const getShiftsForDate = (date) => {
-  return db.collection('shifts')
-    .where('startTime', '>=', firebase.firestore.Timestamp.fromDate(new Date(date)))
-    .where('endTime', '<=', firebase.firestore.Timestamp.fromDate(new Date(date)))
+export const getShiftsForDate = (
+  date: string
+): Promise<firebase.firestore.QuerySnapshot> => {
+  return db
+    .collection('shifts')
+    .where(
+      'startTime',
+      '>=',
+      firebase.firestore.Timestamp.fromDate(new Date(date))
+    )
+    .where(
+      'startTime',
+      '<=',
+      firebase.firestore.Timestamp.fromDate(new Date(date))
+    )
     .get();
 };
 
-export const updateShiftStatus = (shiftId, status) => {
-  return db.collection('shifts')
-    .doc(shiftId)
-    .update({
-      status,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+export const updateShiftStatus = (
+  shiftId: string,
+  status: string
+): Promise<void> => {
+  return db.collection('shifts').doc(shiftId).update({
+    status,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
 };
 
-export const assignUserToShift = (shiftId, userData) => {
+export const assignUserToShift = (
+  shiftId: string,
+  userData: {
+    userId: string;
+    name: string;
+    role: string;
+    status: string;
+    assignedAt: firebase.firestore.FieldValue;
+    checkedIn?: boolean;
+    checkedInAt?: firebase.firestore.FieldValue | null;
+  }
+): Promise<void> => {
   const shiftRef = db.collection('shifts').doc(shiftId);
   return shiftRef.update({
     assignedUsers: firebase.firestore.FieldValue.arrayUnion(userData)
   });
 };
 
-export const getShiftById = (shiftId) => {
+export const getShiftById = (
+  shiftId: string
+): Promise<firebase.firestore.DocumentSnapshot> => {
   return db.collection('shifts').doc(shiftId).get();
 };
 
-export const deleteShift = (shiftId) => {
+export const deleteShift = (shiftId: string): Promise<void> => {
   return db.collection('shifts').doc(shiftId).delete();
 };
 
-export const createTimeOffRequest = (timeOffData) => {
-  return db.collection('timeOffRequests').add(timeOffData);
-};
-
-export const getTimeOffRequestsForUser = (userId) => {
-  return db.collection('timeOffRequests')
-    .where('userId', '==', userId)
-    .get();
-};
-
-export const updateTimeOffRequest = (requestId, updatedData) => {
-  return db.collection('timeOffRequests')
-    .doc(requestId)
-    .update(updatedData);
-};
-
-export const deleteTimeOffRequest = (requestId) => {
-  return db.collection('timeOffRequests')
-    .doc(requestId)
-    .delete();
-};
-
-export const createRecurringShift = (recurringShiftData) => {
+// ================================================
+// Recurring Shifts Functions
+// ===============================================
+/*
+export const createRecurringShift = (
+  recurringShiftData: RecurringShiftData
+): Promise<firebase.firestore.DocumentReference> => {
   return db.collection('recurringShifts').add(recurringShiftData);
 };
 
-export const getRecurringShiftsForTeam = (teamId) => {
-  return db.collection('recurringShifts')
+export const getRecurringShiftsForTeam = (
+  teamId: string
+): Promise<firebase.firestore.QuerySnapshot> => {
+  return db
+    .collection('recurringShifts')
     .where('teamId', '==', teamId)
     .where('active', '==', true)
     .get();
 };
 
-export const updateRecurringShift = (recurringShiftId, updatedData) => {
-  return db.collection('recurringShifts')
-    .doc(recurringShiftId)
-    .update(updatedData);
+export const updateRecurringShift = (
+  recurringShiftId: string,
+  updatedData: Partial<RecurringShiftData>
+): Promise<void> => {
+  return db.collection('recurringShifts').doc(recurringShiftId).update(updatedData);
 };
 
-export const deleteRecurringShift = (recurringShiftId) => {
-  return db.collection('recurringShifts')
-    .doc(recurringShiftId)
-    .delete();
+export const deleteRecurringShift = (
+  recurringShiftId: string
+): Promise<void> => {
+  return db.collection('recurringShifts').doc(recurringShiftId).delete();
 };
+*/
 
-// Create a shift template
-export const createShiftTemplate = (templateData) => {
+
+// =================================================
+// Shift Template Functions
+// =================================================
+
+export const createShiftTemplate = (
+  templateData: ShiftTemplateData
+): Promise<firebase.firestore.DocumentReference> => {
   return db.collection('shiftTemplates').add(templateData);
 };
 
-export const getShiftTemplateById = (templateId) => {
+export const getShiftTemplateById = (
+  templateId: string
+): Promise<firebase.firestore.DocumentSnapshot> => {
   return db.collection('shiftTemplates').doc(templateId).get();
 };
 
-export const updateShiftTemplate = (templateId, updatedData) => {
+export const updateShiftTemplate = (
+  templateId: string,
+  updatedData: Partial<ShiftTemplateData>
+): Promise<void> => {
   return db.collection('shiftTemplates').doc(templateId).update({
     ...updatedData,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 };
 
-export const deleteShiftTemplate = (templateId) => {
+export const deleteShiftTemplate = (
+  templateId: string
+): Promise<void> => {
   return db.collection('shiftTemplates').doc(templateId).delete();
 };
 
-// Performins a batch update with array of updates
-export const performBatchUpdate = async (updates) => {
+// =================================================
+// Batch Operations
+// =================================================
+
+export const performBatchUpdate = async (
+  updates: Array<{ ref: firebase.firestore.DocumentReference; data: Object }>
+): Promise<void> => {
   const batch = db.batch();
   updates.forEach(({ ref, data }) => {
     batch.update(ref, data);
