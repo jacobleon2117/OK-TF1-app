@@ -17,6 +17,12 @@ import {
   Timestamp,
   arrayUnion,
   serverTimestamp,
+  DocumentReference,
+  DocumentSnapshot,
+  QuerySnapshot,
+  FieldValue,
+  writeBatch,
+  DocumentData,
 } from 'firebase/firestore';
 import { db } from '../../config/firebase'; 
 
@@ -27,51 +33,22 @@ export interface AvailabilityData {
 }
 
 export interface ShiftData {
-  name: string;
   description: string;
   missionId?: string;
-  startTime: firebase.firestore.Timestamp;
-  endTime: firebase.firestore.Timestamp;
+  startTime: Timestamp;
+  endTime: Timestamp;
   location: {
     name: string;
     address?: string;
-  };
-  assignedUsers?: Array<{
-    userId: string;
-    name: string;
-    role: string;
-    status: string;
-    assignedAt: firebase.firestore.FieldValue;
-    checkedIn?: boolean;
-    checkedInAt?: firebase.firestore.FieldValue | null;
-  }>;
-  requiredRoles?: Array<{
-    role: string;
-    count: number;
-    filled: number;
-  }>;
+  },
   status: string;
-  createdBy: string;
-  createdAt: firebase.firestore.FieldValue;
-  updatedAt: firebase.firestore.FieldValue;
-  notes?: string;
-}
+} 
 
 export interface ShiftTemplateData {
-  name: string;
-  description: string;
-  duration: number; // in hours
-  requiredRoles: Array<{ role: string; count: number }>;
-  defaultLocation: {
-    name: string;
-    coordinates: {
-      latitude: number;
-      longitude: number;
-    };
-  };
-  createdBy: string;
-  createdAt: firebase.firestore.FieldValue;
-  updatedAt: firebase.firestore.FieldValue;
+  templateName: string;
+  shiftType: string;
+  startTime: Timestamp;
+  endTime: Timestamp;
 }
 
 //=====================================
@@ -83,24 +60,22 @@ export const addAvailability = (
   date: string,
   availabilityData: AvailabilityData
 ): Promise<void> => {
-  const availabilityRef = db
-    .collection('schedules')
-    .doc(userId)
-    .collection('availability')
-    .doc(date);
-  return availabilityRef.set(availabilityData, { merge: true });
+  const availabilityRef = doc(
+    collection(db, 'schedules', userId, 'availability'),
+    date
+  );
+  return setDoc(availabilityRef, availabilityData, { merge: true });
 };
 
 export const getAvailability = (
   userId: string,
   date: string
-): Promise<firebase.firestore.DocumentSnapshot> => {
-  const availabilityRef = db
-    .collection('schedules')
-    .doc(userId)
-    .collection('availability')
-    .doc(date);
-  return availabilityRef.get();
+): Promise<DocumentSnapshot> => {
+  const availabilityRef: DocumentReference = doc(
+    collection(db, 'schedules', userId, 'availability'),
+    date
+  );
+  return getDoc(availabilityRef);
 };
 
 // ================================================
@@ -109,36 +84,30 @@ export const getAvailability = (
 
 export const addShift = (
   shiftData: ShiftData
-): Promise<firebase.firestore.DocumentReference> => {
-  return db.collection('shifts').add(shiftData);
+): Promise<DocumentReference> => {
+  return addDoc(collection(db,'shifts'), shiftData);
 };
 
 export const getShiftsForDate = (
   date: string
-): Promise<firebase.firestore.QuerySnapshot> => {
-  return db
-    .collection('shifts')
-    .where(
-      'startTime',
-      '>=',
-      firebase.firestore.Timestamp.fromDate(new Date(date))
-    )
-    .where(
-      'startTime',
-      '<=',
-      firebase.firestore.Timestamp.fromDate(new Date(date))
-    )
-    .get();
+): Promise<QuerySnapshot> => {
+  const shiftsQuery = query(
+    collection(db, 'shifts'),
+    where('startTime', '>=', Timestamp.fromDate(new Date(date))),
+    where('startTime', '<=', Timestamp.fromDate(new Date(date)))
+  );
+  return getDocs(shiftsQuery);
 };
 
 export const updateShiftStatus = (
   shiftId: string,
   status: string
 ): Promise<void> => {
-  return db.collection('shifts').doc(shiftId).update({
+  const shiftRef: DocumentReference = doc(db, 'shifts', shiftId);
+  return updateDoc(shiftRef, {
     status,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
+    updatedAt: serverTimestamp()
+  })
 };
 
 export const assignUserToShift = (
@@ -148,25 +117,27 @@ export const assignUserToShift = (
     name: string;
     role: string;
     status: string;
-    assignedAt: firebase.firestore.FieldValue;
+    assignedAt: FieldValue;
     checkedIn?: boolean;
-    checkedInAt?: firebase.firestore.FieldValue | null;
+    checkedInAt?: FieldValue | null;
   }
 ): Promise<void> => {
-  const shiftRef = db.collection('shifts').doc(shiftId);
-  return shiftRef.update({
-    assignedUsers: firebase.firestore.FieldValue.arrayUnion(userData)
+  const shiftRef: DocumentReference = doc(db, 'shifts', shiftId);
+  return updateDoc(shiftRef, {
+    assignedUsers: arrayUnion(userData)
   });
 };
 
 export const getShiftById = (
   shiftId: string
-): Promise<firebase.firestore.DocumentSnapshot> => {
-  return db.collection('shifts').doc(shiftId).get();
+): Promise<DocumentSnapshot> => {
+  const shiftRef: DocumentReference = doc(db, 'shifts', shiftId);
+  return getDoc(shiftRef);
 };
 
 export const deleteShift = (shiftId: string): Promise<void> => {
-  return db.collection('shifts').doc(shiftId).delete();
+  const shiftRef: DocumentReference = doc(db, 'shifts', shiftId);
+  return deleteDoc(shiftRef);
 };
 
 // ================================================
@@ -210,30 +181,33 @@ export const deleteRecurringShift = (
 
 export const createShiftTemplate = (
   templateData: ShiftTemplateData
-): Promise<firebase.firestore.DocumentReference> => {
-  return db.collection('shiftTemplates').add(templateData);
+): Promise<DocumentReference> => {
+  return addDoc(collection(db, 'shiftTemplates'), templateData)
 };
 
 export const getShiftTemplateById = (
   templateId: string
-): Promise<firebase.firestore.DocumentSnapshot> => {
-  return db.collection('shiftTemplates').doc(templateId).get();
+): Promise<DocumentSnapshot> => {
+  const shiftTemplateRef: DocumentReference = doc(db, 'shiftTemplates', templateId);
+  return getDoc(shiftTemplateRef);
 };
 
 export const updateShiftTemplate = (
   templateId: string,
   updatedData: Partial<ShiftTemplateData>
 ): Promise<void> => {
-  return db.collection('shiftTemplates').doc(templateId).update({
+  const shiftTemplateRef: DocumentReference = doc(db, 'shiftTemplates', templateId);
+  return updateDoc(shiftTemplateRef, {
     ...updatedData,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    updatedAt: serverTimestamp()
   });
 };
 
 export const deleteShiftTemplate = (
   templateId: string
 ): Promise<void> => {
-  return db.collection('shiftTemplates').doc(templateId).delete();
+  const shiftTemplateRef: DocumentReference = doc(db, 'shiftTemplates', templateId);
+  return deleteDoc(shiftTemplateRef);
 };
 
 // =================================================
@@ -241,9 +215,9 @@ export const deleteShiftTemplate = (
 // =================================================
 
 export const performBatchUpdate = async (
-  updates: Array<{ ref: firebase.firestore.DocumentReference; data: Object }>
+  updates: Array<{ ref: DocumentReference; data: DocumentData }>
 ): Promise<void> => {
-  const batch = db.batch();
+  const batch = writeBatch(db);
   updates.forEach(({ ref, data }) => {
     batch.update(ref, data);
   });
