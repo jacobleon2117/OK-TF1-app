@@ -1,13 +1,20 @@
-# Steps for testing branch
+# OK-TF1 Scheduling App
 
-Don't push .env file to Github!
+## Quick Start
+1. Clone the repo
+2. Run `npm install`
+3. Create a `.env` file (see FIREBASE-SETUP.md)
+4. Run `npx expo start`
 
-Run "npm install"
+## Organization Code
+Use code `123456` for testing
 
-To start EXPO run, "npx expo start"
+## Documentation
+- FIREBASE-SETUP.md - Firebase configuration
+- CONTRIBUTING.md - Branch workflow and code standards
+- DB-MAPPING.md - Database structure
+- CHANGELOG.md - Track feature additions
+- INSTALLATION.md - Setup guide
 
-To see live view on mobile press "I" or scan QR code.
-
-You can create an account with any email and password.
-
-The organization code is "123456".
+## Current Branch: feature/dashboard-scheduling
+This branch contains the scheduling interface and functionality.

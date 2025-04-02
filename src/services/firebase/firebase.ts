@@ -1,3 +1,8 @@
+// 
+// import { db } from './config/firebase'; // keep this import at the top of the file, This connects your database operations to our Firebase configuration.
+// 
+// I changed the file extension to ".ts" already, need to change the code to TypeScript.
+// 
 import { db } from './firebase';
 
 export const addAvailability = (userId, date, availabilityData) => {
