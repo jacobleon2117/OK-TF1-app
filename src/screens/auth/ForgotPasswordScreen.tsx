@@ -1,7 +1,7 @@
 // src/screens/auth/ForgotPasswordScreen.tsx
 import React, { useState } from 'react';
 import { 
-  View, 
+  View,
   Text, 
   TextInput, 
   TouchableOpacity,
