@@ -30,7 +30,7 @@ const TabBar = ({ onHomePress, onSchedulePress, onMapPress }) => {
         <Ionicons 
           name={activeTab === 'home' ? 'home' : 'home-outline'} 
           size={24} 
-          color={activeTab === 'home' ? '#ff6b6b' : '#333'} 
+          color={activeTab === 'home' ? '#ff6b6b' : '#999'} 
         />
         <Text 
           style={[styles.tabText, activeTab === 'home' && styles.activeTabText]}
@@ -46,7 +46,7 @@ const TabBar = ({ onHomePress, onSchedulePress, onMapPress }) => {
         <Ionicons 
           name={activeTab === 'schedule' ? 'calendar' : 'calendar-outline'} 
           size={24} 
-          color={activeTab === 'schedule' ? '#ff6b6b' : '#333'} 
+          color={activeTab === 'schedule' ? '#ff6b6b' : '#999'} 
         />
         <Text 
           style={[styles.tabText, activeTab === 'schedule' && styles.activeTabText]}
@@ -62,7 +62,7 @@ const TabBar = ({ onHomePress, onSchedulePress, onMapPress }) => {
         <Ionicons 
           name={activeTab === 'map' ? 'map' : 'map-outline'} 
           size={24} 
-          color={activeTab === 'map' ? '#ff6b6b' : '#333'} 
+          color={activeTab === 'map' ? '#ff6b6b' : '#999'} 
         />
         <Text 
           style={[styles.tabText, activeTab === 'map' && styles.activeTabText]}
@@ -78,12 +78,9 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: 5, 
+    backgroundColor: '#111',
+    width: '100%',
+    height: '100%',
   },
   tab: {
     alignItems: 'center',
@@ -98,6 +95,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 12,
     marginTop: 2,
+    color: '#999',
   },
   activeTabText: {
     color: '#ff6b6b',
