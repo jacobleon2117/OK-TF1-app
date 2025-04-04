@@ -8,11 +8,11 @@ export default function MapWidget({ onPress }: { onPress?: () => void }) {
   // Demo data
   const data = {
     location: {
-      latlong: "36.1386/-95.9882",
+      latlong: "lat/long 36.1386/-95.9882",
       address: "DS CoffeeCo.",
       fullAddress: "1633 South Boulder Avenue",
       cityState: "Tulsa, OK 74119",
-      what3words: "///salads.strut.family", // Optional what3words address -- 
+      what3words: "w3w ///salads.strut.family", // Optional what3words address -- 
     },
     team: {
       nearbyMembers: 4,
@@ -83,7 +83,7 @@ export default function MapWidget({ onPress }: { onPress?: () => void }) {
             </Text>
 
             <Text style={styles.locationText} numberOfLines={1}>
-                <Ionicons name="location" size={12} color="#ff3b30" style={styles.locationIcon} />
+                <Ionicons name="location" size={12} color="#ff3b30" />
                   {data.location.what3words}
             </Text>
             
