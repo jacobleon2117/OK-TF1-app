@@ -22,7 +22,7 @@ export default function WidgetContainer({
     <Container 
       style={styles.container} 
       onPress={onPress}
-      activeOpacity={onPress ? 0.8 : 1}
+      activeOpacity={onPress ? 0.7 : 1}
     >
       <View style={styles.content}>
         <View style={styles.headerContainer}>
@@ -31,7 +31,7 @@ export default function WidgetContainer({
             <Text style={styles.title}>{title}</Text>
           </View>
           {onPress && (
-            <Ionicons name="chevron-forward" size={18} color="#777" />
+            <Ionicons name="chevron-forward" size={14} color="#aaa" />
           )}
         </View>
         <View style={styles.childrenContainer}>
@@ -44,43 +44,46 @@ export default function WidgetContainer({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
+    marginHorizontal: 8,
+    marginVertical: 4,
+    borderRadius: 10,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    backgroundColor: '#333333', // Dark gray that contrasts with black
+    height: 140, // More compact height
   },
   content: {
-    borderRadius: 16,
+    flex: 1,
+    borderRadius: 10,
     overflow: 'hidden',
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconContainer: {
-    marginRight: 8,
+    marginRight: 6,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
-    color: '#444',
+    color: '#fff',
   },
   childrenContainer: {
-    padding: 16,
+    padding: 8,
+    flex: 1,
   },
 });
