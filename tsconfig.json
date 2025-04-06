@@ -21,4 +21,6 @@
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
+    "esModuleInterop": true
+  }
 }
