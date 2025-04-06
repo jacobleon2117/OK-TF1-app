@@ -19,7 +19,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ children }) => {
         <Image source={require('../../assets/bg-img-5.jpg')} style={styles.gridImage} />
         <Image source={require('../../assets/bg-img-6.jpg')} style={styles.gridImage} />
         <Image source={require('../../assets/bg-img-7.jpg')} style={styles.gridImage} />
-        {/* Special handling for image 8 with the dog */}
+        {/* Special handling for image 8 */}
         <View style={styles.specialImageContainer}>
           <Image 
             source={require('../../assets/bg-img-8.jpg')} 
@@ -29,7 +29,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ children }) => {
         </View>
       </View>
       
-      {/* Semi-transparent overlay */}
+      {/* transparent overlay */}
       <View style={styles.overlay} />
       
       {/* Content container with higher z-index */}
@@ -59,26 +59,26 @@ const styles = StyleSheet.create({
     width: width / 2,
     height: height / 4,
   },
-  // Special container for the 8th image
+  // special container for the 8th image with dog + handler
   specialImageContainer: {
     width: width / 2,
     height: height / 4,
     overflow: 'hidden',
   },
-  // Special styling for the 8th image
+  // special styling for the 8th image with dog + handler
   specialImage: {
-    width: width / 2 + 50, // Make the image wider
+    width: width / 2 + 50, // wider image
     height: height / 4,
-    marginLeft: -50, // Shift the image more to the left
+    marginLeft: -50, // shift the image more to the left, since the image is wider than rest of images
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // dark overlay
     zIndex: 2,
   },
   contentContainer: {
     flex: 1,
-    zIndex: 3, // Higher than overlay and background
+    zIndex: 3, // higher than overlay and background, so fields/buttons/text are visable and can be used
   }
 });
 

@@ -41,7 +41,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     if (Platform.OS === 'ios') {
       // This timeout helps ensure the keyboard shows properly on iOS
       const timer = setTimeout(() => {
-        // You could focus a specific input here if needed
       }, 100);
       
       return () => clearTimeout(timer);
@@ -217,7 +216,7 @@ inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: 25, // Rounded corners as per Figma
+    borderRadius: 25, // rounded corners as per Figma
     marginBottom: 16,
     paddingHorizontal: 16,
   },
@@ -226,9 +225,9 @@ inputContainer: {
     paddingVertical: 12,
   },
   button: {
-    backgroundColor: '#F09737', // Orange accent color
+    backgroundColor: '#F09737', // orange accent color
     paddingVertical: 12,
-    borderRadius: 25, // Rounded corners as per Figma
+    borderRadius: 25, // rounded corners as per Figma
     alignItems: 'center',
     marginTop: 24,
     marginBottom: 16,

@@ -34,7 +34,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   // Verify organization code
   const verifyOrganizationCode = (code: string): boolean => {
     // For now, we'll just check if it's "123456"
-    // In a real app, you'd verify this against your database
     return code === "123456";
   };
 
@@ -91,7 +90,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       
       // Here you would also store additional user data in Firestore
       // For example, the user's organization code
-      // This requires adding Firestore to your project
+      // This requires adding Firestore
       
       return userCredential;
     } catch (err: any) {
