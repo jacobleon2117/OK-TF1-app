@@ -8,6 +8,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import LoadingScreen from '../components/LoadingScreen';
 
 // Import auth context
 import { useAuth } from '../context/AuthContext';
@@ -56,9 +57,7 @@ const AppNavigator = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
+      <LoadingScreen visible={true} overlay={false} message="Loading..." />
     );
   }
 
@@ -70,11 +69,6 @@ const AppNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   placeholderContainer: {
     flex: 1,
     justifyContent: 'center',

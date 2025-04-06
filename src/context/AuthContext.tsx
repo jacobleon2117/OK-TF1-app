@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { 
   createUserWithEmailAndPassword,
@@ -6,6 +5,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
   signOut,
+  updateProfile,
   User,
   UserCredential
 } from 'firebase/auth';
@@ -28,7 +28,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Verify organization code
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   }, []);
 
   // Login function
-  const login = async (email: string, password: string, organizationCode: string) => {
+  const login = async (email: string, password: string, organizationCode: string): Promise<void> => {
     setError(null);
     try {
       // Verify organization code first
@@ -60,13 +60,20 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       // Then attempt login
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err: any) {
-      setError(err.message);
+      // Handle specific error types
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError("Invalid email or password. Please try again.");
+      } else if (err.code === 'auth/too-many-requests') {
+        setError("Too many failed login attempts. Please try again later or reset your password.");
+      } else {
+        setError(err.message);
+      }
       throw err;
     }
   };
 
   // Signup function
-  const signup = async (name: string, email: string, password: string, organizationCode: string) => {
+  const signup = async (name: string, email: string, password: string, organizationCode: string): Promise<UserCredential> => {
     setError(null);
     try {
       // Verify organization code first
@@ -77,22 +84,31 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       // Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Here you would also store additional user data in Firestore
-      // For example, the user's name and organization code
-      // This requires adding Firestore to your project
+      // Store the user's display name
+      await updateProfile(userCredential.user, { 
+        displayName: name 
+      });
       
-      // For now, we'll just update the user's display name
-      // await updateProfile(userCredential.user, { displayName: name });
+      // Here you would also store additional user data in Firestore
+      // For example, the user's organization code
+      // This requires adding Firestore to your project
       
       return userCredential;
     } catch (err: any) {
-      setError(err.message);
+      // Handle specific error types
+      if (err.code === 'auth/email-already-in-use') {
+        setError('An account with this email already exists. Please use a different email or try to log in.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password is too weak. Please choose a stronger password.');
+      } else {
+        setError(err.message);
+      }
       throw err;
     }
   };
 
   // Logout function
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     setError(null);
     try {
       await signOut(auth);
@@ -103,7 +119,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   };
 
   // Reset password function
-  const resetPassword = async (email: string, organizationCode: string) => {
+  const resetPassword = async (email: string, organizationCode: string): Promise<void> => {
     setError(null);
     try {
       // Verify organization code first
@@ -113,7 +129,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
       await sendPasswordResetEmail(auth, email);
     } catch (err: any) {
-      setError(err.message);
+      // Handle specific error types
+      if (err.code === 'auth/user-not-found') {
+        setError('No account found with this email address.');
+      } else {
+        setError(err.message);
+      }
       throw err;
     }
   };
