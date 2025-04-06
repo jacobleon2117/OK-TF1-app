@@ -63,3 +63,5 @@ const styles = StyleSheet.create({
 });
 
 export default AppNavigator;
+
+export default AppNavigator;
