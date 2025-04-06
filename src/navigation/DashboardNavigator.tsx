@@ -1,17 +1,16 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-
-// Import dashboard screens
-import MessagesScreen from '../screens/dashboard/MessagesScreen';
-// These imports would be added when those screens are implemented
-// import DashboardHomeScreen from '../screens/dashboard/DashboardHomeScreen';
-// import CalendarScreen from '../screens/dashboard/CalendarScreen';
-// import MapScreen from '../screens/dashboard/MapScreen';
-// import ProfileScreen from '../screens/dashboard/ProfileScreen';
-
-// Temporary placeholder for screens not yet implemented
 import { View, Text, StyleSheet } from 'react-native';
 
+// Import dashboard screens using path aliases
+import MessagesScreen from '@screens/dashboard/MessagesScreen';
+// These imports would be added when those screens are implemented
+// import DashboardHomeScreen from '@screens/dashboard/DashboardHomeScreen';
+// import CalendarScreen from '@screens/dashboard/CalendarScreen';
+// import MapScreen from '@screens/dashboard/MapScreen';
+// import ProfileScreen from '@screens/dashboard/ProfileScreen';
+
+// Temporary placeholder for screens not yet implemented
 const PlaceholderScreen = ({ route }: any) => (
   <View style={styles.container}>
     <Text style={styles.text}>{route.name} Screen</Text>
