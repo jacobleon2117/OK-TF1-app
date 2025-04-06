@@ -4,16 +4,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet } from 'react-native';
 
-// Import auth screens using path aliases
-import LoginScreen from '@screens/auth/LoginScreen';
-import SignupScreen from '@screens/auth/SignupScreen';
-import ForgotPasswordScreen from '@screens/auth/ForgotPasswordScreen';
+// Import auth screens
+import LoginScreen from '../screens/auth/LoginScreen';
+import SignupScreen from '../screens/auth/SignupScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 
 // Import Dashboard Navigator
-import DashboardNavigator from '@navigation/DashboardNavigator';
+import DashboardNavigator from './DashboardNavigator';
 
 // Import auth context
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 // Create stack navigator
 const Stack = createStackNavigator();

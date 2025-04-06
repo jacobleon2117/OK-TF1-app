@@ -19,7 +19,7 @@ module.exports = function (api) {
           },
         },
       ],
-    ],
-    plugins: ["module:react-native-dotenv"],
+      "module:react-native-dotenv"
+    ]
   };
 };
