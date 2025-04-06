@@ -1,7 +1,7 @@
 // App.jsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import HomeScreen from './src/screens/home/HomeScreen';
+import HomeScreen from './src/screens/dashboard/HomeScreen';
 
 export default function App() {
   return (

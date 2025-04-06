@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Alert, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TabBar from './components/TabBar';
-import Header from './components/Header';
+import TabBar from '../../components/TabBar';
+import Header from '../../components/Header';
 import { 
   StatusWidget, 
   WeatherTempWidget,
   MapWidget,
   InfoWidget
-} from './components/widgets';
+} from '../../components/widgets';
 
 const HomeScreen = () => {
   const [username, setUsername] = useState('');
