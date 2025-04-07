@@ -11,7 +11,7 @@ Currently, on 4/3 I have a page with a picture in the background and header and 
 * included widget boxes for weather
 * changed the app.json to comply with the icon removal
 * changed the background from a picture to a black background 
-*included the avatar path for logging in
+* included the avatar path for logging in
 
 
 **NEXT**

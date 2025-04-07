@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Alert, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TabBar from './components/TabBar';
-import Header from './components/Header';
+import TabBar from '../../components/TabBar';
+import Header from '../../components/Header';
 import { 
   StatusWidget, 
   WeatherTempWidget,
   MapWidget,
   InfoWidget
+<<<<<<< HEAD:src/screens/home/HomeScreen.tsx
 } from './components/widgets';
 // navigation is to other screens 
 const HomeScreen = ( { navigation }) => {
+=======
+} from '../../components/widgets';
+
+const HomeScreen = () => {
+>>>>>>> 941706e83563cef2c40dcf360922c38cc02f2c23:src/screens/dashboard/HomeScreen.tsx
   const [username, setUsername] = useState('');
 
   useEffect(() => {
