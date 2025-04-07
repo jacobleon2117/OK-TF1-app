@@ -17,10 +17,12 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "checkJs": false,
-    "jsx": "react-native"
+    "jsx": "react-native",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "lib": ["dom", "esnext"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
-    "esModuleInterop": true
-  }
+  "include": ["**/*.ts", "**/*.tsx", "src/@types/**/*.ts"],
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
 }
