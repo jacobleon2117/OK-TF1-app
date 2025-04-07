@@ -6,8 +6,8 @@ import TabBar from '../../components/TabBar';
 import Header from '../../components/Header';
 import { 
   StatusWidget, 
-  WeatherTempWidget,
-  MapWidget,
+  ScheduleCard,
+  MessageCard,
   InfoWidget
 } from '../../components/widgets';
 
@@ -64,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
     // navigation.navigate('Map');
   };
 
-  const handleMapWidgetPress = () => {
+  const handleMessageCardPress = () => {
     handleMapPress();
     // navigation.navigate('Map');
   };
@@ -85,20 +85,25 @@ const HomeScreen = ({ navigation }) => {
         
         {/* Content with scrolling */}
         <View style={styles.content}>
-          <View style={styles.fullWidthItem}>
-            <MapWidget onPress={handleMapWidgetPress} />
+          {/* Top row - 1/5 of the available space */}
+          <View style={styles.topCardItem}>
+            <MessageCard onPress={handleMessageCardPress} />
           </View>
           
-          <View style={styles.fullWidthItem}>
-            <WeatherTempWidget />
+          {/* Middle row - 2/5 of the available space (twice the height of top/bottom) */}
+          <View style={styles.middleCardItem}>
+            <ScheduleCard />
           </View>
           
-          <View style={styles.fullWidthItem}>
-            <StatusWidget />
-          </View>
-          
-          <View style={styles.fullWidthItem}>
-            <InfoWidget />
+          {/* Bottom row - 1/5 of the available space, split into two equal columns */}
+          <View style={styles.bottomRowContainer}>
+            <View style={styles.bottomColumn}>
+              <StatusWidget />
+            </View>
+            
+            <View style={styles.bottomColumn}>
+              <InfoWidget />
+            </View>
           </View>
         </View>
         
@@ -135,11 +140,22 @@ const styles = StyleSheet.create({
     paddingTop: 60, // Provide space for header
     paddingBottom: 60, // Provide space for tab bar
     paddingHorizontal: 8,
-    justifyContent: 'space-around', // Distribute space evenly, not center
   },
-  fullWidthItem: {
+  topCardItem: {
     width: '100%',
-    marginBottom: 2,
+    flex: 1, // 1/5 of the available space
+  },
+  middleCardItem: {
+    width: '100%',
+    flex: 2, // 2/5 of the available space (twice the height of top/bottom)
+  },
+  bottomRowContainer: {
+    width: '100%',
+    flex: 1, // 1/5 of the available space
+    flexDirection: 'row', // Arrange children horizontally
+  },
+  bottomColumn: {
+    flex: 1, // Each column takes 50% of the parent width
   },
   footerContainer: {
     width: '100%',

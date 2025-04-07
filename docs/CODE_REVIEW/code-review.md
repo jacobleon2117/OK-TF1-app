@@ -95,7 +95,7 @@ avatarUri={avatarUri}
 
 -------------------
 
-## File MapWidget.tsx has an error:
+## File MessageCard.tsx has an error:
 On line 172 the error code is:
 Type '"right"' is not assignable to type 'FlexAlignType | undefined'
 

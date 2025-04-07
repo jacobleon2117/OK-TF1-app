@@ -1,107 +1,54 @@
 // src/components/widgets/StatusWidget.tsx
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardContainer from './CardContainer';
 
 export default function StatusWidget() {
-  // Demo status data
-  const statusData = {
-    system: 'online',
-    components: [
-      { name: 'Station 01', status: 'online' },
-      { name: 'Station 02', status: 'online' },
-      { name: 'Command', status: 'warning' },
-    ]
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'online':
-        return { name: 'checkmark-circle', color: '#2ecc71' };
-      case 'offline':
-        return { name: 'close-circle', color: '#e74c3c' };
-      case 'warning':
-        return { name: 'warning', color: '#f39c12' };
-      default:
-        return { name: 'help-circle', color: '#95a5a6' };
-    }
-  };
-
-  const mainStatus = getStatusIcon(statusData.system);
-
   return (
     <CardContainer
-      title="System Status" 
-      icon={<Ionicons name="pulse" size={14} color="#2ecc71" />}
+      title=""
+      icon={
+        <View style={styles.iconContainer}>
+          <View style={styles.iconBackground} />
+          <Ionicons 
+            name="walk-outline" 
+            size={64} 
+            color="#fff" 
+            style={styles.walkIcon} 
+          />
+        </View>
+      }
     >
-      <View style={styles.statusContent}>
-        <View style={styles.topSection}>
-          <View style={styles.mainStatus}>
-            <Ionicons 
-              name={mainStatus.name as any} 
-              size={18} 
-              color={mainStatus.color}
-              style={styles.statusIcon} 
-            />
-            <Text style={styles.statusText}>All Stations Operational</Text>
-          </View>
-        </View>
-        
-        <View style={styles.componentList}>
-          {statusData.components.map((component, index) => {
-            const { name, color } = getStatusIcon(component.status);
-            return (
-              <View key={index} style={styles.componentItem}>
-                <Ionicons name={name as any} size={12} color={color} />
-                <Text style={styles.componentName}>{component.name}</Text>
-                <Text style={[styles.componentStatus, { color }]}>
-                  {component.status.toUpperCase()}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      </View>
+      {/* Empty content or you can add other content here */}
+      <View style={styles.emptyContent} />
     </CardContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  statusContent: {
-    flex: 1,
-  },
-  topSection: {
-    marginBottom: 4,
-  },
-  mainStatus: {
-    flexDirection: 'row',
+  iconContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  statusIcon: {
+    position: 'relative',
     marginRight: 6,
   },
-  statusText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#fff',
+  iconBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    backgroundColor: 'rgba(247, 148, 29, 0.7)', // F7941D with alpha 0.7
+    borderWidth: 4,
+    borderColor: '#D47A0A', // Darker orange border
   },
-  componentList: {
+  walkIcon: {
+    zIndex: 1,
+    fontSize: 24,
+  },
+  emptyContent: {
     flex: 1,
-  },
-  componentItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 2,
-  },
-  componentName: {
-    flex: 1,
-    marginLeft: 6,
-    fontSize: 11,
-    color: '#ccc',
-  },
-  componentStatus: {
-    fontSize: 10,
-    fontWeight: '500',
-  },
+  }
 });
