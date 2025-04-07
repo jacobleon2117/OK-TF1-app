@@ -12,7 +12,6 @@ import {
   QuerySnapshot
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { getMissionById } from './missionService';
 
 export interface MissionLocation {
   userId: string;
@@ -26,7 +25,7 @@ export interface MissionLocation {
   speed: number;
   heading: number;
   roadType: 'paved' | 'dirt' | 'off-road' | 'trail';
-
+  id?: string;
 }
 
 //=============================================

@@ -6,6 +6,7 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  setDoc,
   Timestamp,
   DocumentReference,
   DocumentSnapshot,
@@ -28,6 +29,7 @@ export interface MissionPin {
     rescueCount?: number;
     fireIntensity?: string;
   };
+  id?: string;
 }
 
 

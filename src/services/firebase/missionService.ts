@@ -1,16 +1,19 @@
 import { 
   collection, 
   doc, 
-  addDoc, 
   getDoc, 
+  getDocs, 
+  addDoc, 
   updateDoc, 
   deleteDoc, 
+  query,
+  where,
   Timestamp,
   DocumentReference,
-  DocumentSnapshot
+  DocumentSnapshot,
+  QuerySnapshot
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-
 
 export interface Coordinates {
   latitude: number;
@@ -58,6 +61,7 @@ export interface MissionData {
   location: Location;
   missionMetrics: MissionMetrics;
   reportSummary: ReportSummary; 
+  id?: string;
 }
 
 // CREATE NEW MISSION
@@ -88,3 +92,53 @@ export const deleteMission = async (
   const missionRef = doc(db, 'missions', missionId);
   await deleteDoc(missionRef);
 }
+
+// For test compatibility
+export const getMission = async (
+  missionId: string
+): Promise<MissionData | null> => {
+  const missionRef = doc(db, 'missions', missionId);
+  const missionDoc = await getDoc(missionRef);
+  
+  if (missionDoc.exists()) {
+    const data = missionDoc.data();
+    return { id: missionId, ...data } as MissionData;
+  }
+  
+  return null;
+};
+
+export const getAllMissions = async (): Promise<MissionData[]> => {
+  const missionsSnapshot = await getDocs(collection(db, 'missions'));
+  return missionsSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return { id: doc.id, ...data } as MissionData;
+  });
+};
+
+export const getActiveMissions = async (): Promise<MissionData[]> => {
+  const missionsQuery = query(
+    collection(db, 'missions'),
+    where('status', '==', 'active')
+  );
+  
+  const missionsSnapshot = await getDocs(missionsQuery);
+  return missionsSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return { id: doc.id, ...data } as MissionData;
+  });
+};
+
+export const getMissionTeams = async (
+  missionId: string
+): Promise<string[]> => {
+  const missionRef = doc(db, 'missions', missionId);
+  const missionDoc = await getDoc(missionRef);
+  
+  if (missionDoc.exists()) {
+    const data = missionDoc.data() as MissionData;
+    return data.teamId ? [data.teamId] : [];
+  }
+  
+  return [];
+};

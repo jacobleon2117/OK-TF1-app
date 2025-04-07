@@ -19,6 +19,7 @@ export interface MissionTeamAssignment {
   status: 'active' | 'injured' | 'evacuated';
   checkinTime: Timestamp;
   checkoutTime: Timestamp;
+  id?: string;
 }
 
 //=========================================
