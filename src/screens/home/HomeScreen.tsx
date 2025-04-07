@@ -10,8 +10,8 @@ import {
   MapWidget,
   InfoWidget
 } from './components/widgets';
-
-const HomeScreen = () => {
+// navigation is to other screens 
+const HomeScreen = ( { navigation }) => {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
@@ -33,30 +33,37 @@ const HomeScreen = () => {
   // Handler functions for touchable components
   const handleProfilePress = () => {
     Alert.alert('Profile', 'You pressed the profile tab');
+    // navigation.navigate('Profile');
   };
 
   const handleNotificationsPress = () => {
     Alert.alert('Notifications', 'You pressed the notifications tab');
+    // navigation.navigate('Notifications');
   };
 
   const handleMenuPress = () => {
     Alert.alert('Menu', 'You pressed the menu tab');
+    // navigation.navigate('Menu');
   };
 
   const handleHomePress = () => {
     Alert.alert('Home', 'You pressed the Home tab');
+    // navigation.navigate('Home');
   };
 
   const handleSchedulePress = () => {
     Alert.alert('Schedule', 'You pressed the Schedule tab');
+    // navigation.navigate('Schedule');
   };
 
   const handleMapPress = () => {
-    Alert.alert('Map', 'You pressed the Map tab');
+    setCurrentScreen('Map');
+    // navigation.navigate('Map');
   };
 
   const handleMapWidgetPress = () => {
     handleMapPress();
+    // navigation.navigate('Map');
   };
 
   return (

@@ -1,4 +1,4 @@
-// src/components/TabBar.jsx
+// src/components/TabBar.tsx
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
