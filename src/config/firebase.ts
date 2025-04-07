@@ -10,7 +10,7 @@ import {
   FIREBASE_APP_ID 
 } from '@env';
 
-// Comprehensive Firebase configuration object
+// Firebase configuration object
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
   authDomain: FIREBASE_AUTH_DOMAIN,

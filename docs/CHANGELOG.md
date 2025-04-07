@@ -5,30 +5,49 @@
 ## [2025-04-06] - Jacob Leon
 
 ### Added
-- Created new folder structure /src/services/firebase/ for better organization
-- Added new TypeScript file /src/services/firebase/auth.ts for authentication services
-- Cleaned up Firebase package dependencies
-- Updated Firebase configuration to use latest Firebase SDK
-- Implemented environment variable-based configuration
-- Created type definitions for environment variables
+- Comprehensive unit testing for authentication services
+- Jest configuration for React Native testing
+- Test scripts for running authentication tests
+- Test coverage for login, signup, password reset, and logout functionality
+- Mocking strategy for Firebase authentication services
+- Added new dev dependencies for testing:
+  - @testing-library/jest-native
+  - @testing-library/react-native
+  - @types/jest
+  - jest
+  - jest-expo
+- Created new test files:
+  - src/__tests__/auth.test.ts
+  - src/__tests__/AuthContext.test.tsx
+- Updated package.json with test scripts and jest configuration
+- Implemented robust error handling in authentication context
+- Added Firestore user document creation during signup
+- Improved type safety for authentication methods
 
 ### Changed
-- Changed file extension for firebase.js to firebase.ts (no changes to file content)
-- Moved firebase.ts to /src/services/firebase/firebase.ts
-- Updated src/config/firebase.ts to initialize and export Firestore db
-- Standardized Firebase package versions
-- Removed conflicting Firebase package installations
+- Refactored authentication service methods
+- Updated Firebase authentication approach
+- Modified AuthContext to use direct Firebase methods
+- Replaced `updateProfile` with Firestore user document creation
+- Added comprehensive type definitions
+- Enhanced error handling across authentication flows
+- Added test scripts for running and managing tests
+- Configured Jest with support for React Native and TypeScript
 
 ### Fixed
-- Resolved Firebase configuration and package version conflicts
-- Established proper file organization for future development
-- Implemented more robust Firebase initialization process
+- Resolved Firebase authentication type inconsistencies
+- Improved type safety in authentication test suites
+- Ensured proper mocking of Firebase authentication methods
+- Added test coverage for critical authentication flows
+- Corrected authentication context type definitions
 
 ### Comments
-- This restructuring creates a more maintainable TypeScript codebase
-- The new documentation establishes clear workflow and standards for the team
-- Improved Firebase configuration supports better type checking and environment management
-- Simplified Firebase setup reduces potential configuration errors
+- Established a robust testing framework for authentication
+- Improved code quality and reliability through comprehensive testing
+- Created separate test suites for services and context
+- Added coverage reporting to track test completeness
+- Simplified test setup and execution with new scripts
+- Enhanced security and flexibility of user authentication process
 
 ## [2025-04-01] - Jacob Leon
 

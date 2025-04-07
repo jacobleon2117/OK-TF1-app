@@ -1,0 +1,16 @@
+{
+  "presets": ["babel-preset-expo", "@babel/preset-typescript"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "@": "./src"
+        }
+      }
+    ],
+    "react-native-reanimated/plugin",
+    "./babel-plugin-expo-module-transform.js"
+  ]
+}
