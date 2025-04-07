@@ -1,10 +1,9 @@
-//ProfileIcon.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native'; 
 import { Ionicons } from '@expo/vector-icons';
-import iconStyle from './IconStyle';
+import { iconStyle } from './IconStyle';
 
-interface ProfileIconProps {
+interface MessageIconProps {
   active: boolean;
   size?: number;
   showLabel?: boolean;
@@ -12,47 +11,48 @@ interface ProfileIconProps {
   inactiveColor?: string;
   label?: string;
 }
-const ProfileIcon = ({  
+
+const MessageIcon = ({ 
   active,
   size = iconStyle.sizes.default,
   showLabel = iconStyle.showLabel,
   activeColor = iconStyle.active,
   inactiveColor = iconStyle.inactive,
-  label = "Profile"
+  label = "Messages"
+ }: MessageIconProps) => ( 
 
- }: ProfileIconProps) => ( 
-  
   <View style={styles.tab}>
     <Ionicons 
-              name={active ? 'person-circle' : 'person-circle-outline'} 
-              size={size} 
-              color={active ? activeColor : inactiveColor}
-              />
-            {showLabel && (
-            <Text 
-              style={[
-                styles.tabText, 
-                active && styles.activeTabText,
-                { 
-                  color: active ? activeColor : inactiveColor 
-                }
-            ]}
-          >
+      name={active ? 'chatbox' : 'chatbox-outline'}
+      size={size}
+      color={active ? activeColor : inactiveColor} 
+    />
+    {showLabel && (
+      <Text 
+        style={[
+          styles.tabText, 
+          active && styles.activeTabText,
+          { 
+            color: active ? activeColor : inactiveColor 
+          }
+        ]}
+      >
         {label}
       </Text>
-     )}
+    )}
   </View>
 );
+
 
 const styles = StyleSheet.create({
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 2
+    padding: 1
   },
   activeTab: {
     borderTopWidth: 2,
-    borderTopColor: iconStyle.active, 
+    borderTopColor: iconStyle.active
   },
   tabText: {
     fontSize: iconStyle.fontSizes.label,
@@ -65,4 +65,4 @@ const styles = StyleSheet.create({
   }
 }); 
 
-export default ProfileIcon;
+export default MessageIcon;

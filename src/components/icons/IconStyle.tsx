@@ -1,4 +1,4 @@
-// src/styles/theme.js
+// src/components/icons/IconStyle.tsx
 export const iconStyle = {
     active: "#F7941D",      // Orange 
     inactive: "#0047AB",    // Blue, #777777 #999999 #666666
