@@ -31,6 +31,11 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
+
+# Jest
+coverage/
+jest-test-results.json
