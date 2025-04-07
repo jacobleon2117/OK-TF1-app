@@ -1,46 +1,28 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const Header = ({ 
-  username,
-  avatarUri, 
-  onNotificationsPress, 
-  onMenuPress, 
-  onProfilePress 
-}) => {
+const Header = () => {
+  // Fake username
+  const username = "Jacob";
+  
+  const onNotificationsPress = () => {
+    // Future implementation: Navigate to notifications page
+    console.log("Navigate to notifications");
+  };
+  
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={onMenuPress} style={styles.iconButton}>
-        <Ionicons name="menu" size={24} color="white" />
-      </TouchableOpacity>
-      
-      <View style={styles.userContainer}>
-        {avatarUri ? (
-          <Image 
-            source={{ uri: avatarUri }} 
-            style={styles.avatar} 
-          />
-        ) : (
-          <View style={styles.defaultAvatar}>
-            <Text style={styles.avatarText}>
-              {username ? username.charAt(0).toUpperCase() : '?'}
-            </Text>
-          </View>
-        )}
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeText}>Welcome back,</Text>
         <Text style={styles.username}>
-          {username || 'User'}
+          {username}
         </Text>
       </View>
       
-      <View style={styles.rightIcons}>
-        <TouchableOpacity onPress={onNotificationsPress} style={styles.iconButton}>
-          <Ionicons name="notifications" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onProfilePress} style={styles.iconButton}>
-          <Ionicons name="person" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={onNotificationsPress} style={styles.iconButton}>
+        <Ionicons name="notifications-outline" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -50,46 +32,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#111',
+    backgroundColor: '#000', // Changed to pure black
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingLeft: 25,
+    paddingRight: 35, // Increased margin on the outside edges
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#000',
   },
-  iconButton: {
-    padding: 5,
-  },
-  userContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 8,
-  },
-  defaultAvatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#444',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  avatarText: {
-    color: 'white',
+  welcomeContainer: {
     fontWeight: 'bold',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  welcomeText: {
+    color: 'white',
+    fontSize: 18,
   },
   username: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
-  rightIcons: {
-    flexDirection: 'row',
-  },
+  iconButton: {
+    padding: 5,
+  }
 });
 
 export default Header;

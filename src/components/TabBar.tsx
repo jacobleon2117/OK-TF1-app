@@ -2,9 +2,24 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ProfileIcon from './icons/ProfileIcon';
+import iconStyle from './icons/IconStyle';
 
-const TabBar = ({ onHomePress, onSchedulePress, onMapPress }) => {
+// Default no-op function to prevent undefined errors
+const noop = () => {};
+
+const TabBar = ({ 
+  onHomePress = noop, 
+  onSchedulePress = noop, 
+  onMapPress = noop, 
+  onProfilePress = noop,
+  style = {},
+  iconProps = {}
+ }) => {
   const [activeTab, setActiveTab] = useState('home');
+
+  // Helper function to determine if a tab is active
+  const isActive = (tabName) => activeTab === tabName;
 
   const handleHomePress = () => {
     setActiveTab('home');
@@ -21,54 +36,71 @@ const TabBar = ({ onHomePress, onSchedulePress, onMapPress }) => {
     onMapPress();
   };
 
+  const handleProfilePress = () => {
+    setActiveTab('profile');
+    onProfilePress();
+  };
+
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, style]}>
       <TouchableOpacity 
-        style={[styles.tab, activeTab === 'home' && styles.activeTab]} 
+        style={[styles.tab, isActive('home') && styles.activeTab]} 
         onPress={handleHomePress}
       >
         <Ionicons 
-          name={activeTab === 'home' ? 'home' : 'home-outline'} 
-          size={24} 
-          color={activeTab === 'home' ? '#ff6b6b' : '#999'} 
+          name={isActive('home') ? 'home' : 'home-outline'} 
+          size={iconStyle.sizes.default} 
+          color={isActive('home') ? iconStyle.active : iconStyle.inactive} 
         />
         <Text 
-          style={[styles.tabText, activeTab === 'home' && styles.activeTabText]}
+          style={[styles.tabText, isActive('home') && styles.activeTabText]}
         >
           Home
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.tab, activeTab === 'schedule' && styles.activeTab]} 
+        style={[styles.tab, isActive('schedule') && styles.activeTab]} 
         onPress={handleSchedulePress}
       >
         <Ionicons 
-          name={activeTab === 'schedule' ? 'calendar' : 'calendar-outline'} 
-          size={24} 
-          color={activeTab === 'schedule' ? '#ff6b6b' : '#999'} 
+          name={isActive('schedule') ? 'calendar' : 'calendar-outline'} 
+          size={iconStyle.sizes.default} 
+          color={isActive('schedule') ? iconStyle.active : iconStyle.inactive} 
         />
         <Text 
-          style={[styles.tabText, activeTab === 'schedule' && styles.activeTabText]}
+          style={[styles.tabText, isActive('schedule') && styles.activeTabText]}
         >
           Schedule
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
-        style={[styles.tab, activeTab === 'map' && styles.activeTab]} 
+        style={[styles.tab, isActive('map') && styles.activeTab]} 
         onPress={handleMapPress}
       >
         <Ionicons 
-          name={activeTab === 'map' ? 'map' : 'map-outline'} 
-          size={24} 
-          color={activeTab === 'map' ? '#ff6b6b' : '#999'} 
+          name={isActive('map') ? 'map' : 'map-outline'} 
+          size={iconStyle.sizes.default} 
+          color={isActive('map') ? iconStyle.active : iconStyle.inactive} 
         />
         <Text 
-          style={[styles.tabText, activeTab === 'map' && styles.activeTabText]}
+          style={[styles.tabText, isActive('map') && styles.activeTabText]}
         >
           Map
         </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity 
+        style={[styles.tab, isActive('profile') && styles.activeTab]} 
+        onPress={handleProfilePress}
+      >
+        <ProfileIcon 
+          active={isActive('profile')}
+          showLabel={true}
+          label="Profile"
+          {...iconProps}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -90,17 +122,18 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderTopWidth: 2,
-    borderTopColor: '#ff6b6b',
+    borderTopColor: iconStyle.active, // Using theme orange color
   },
   tabText: {
-    fontSize: 12,
+    fontSize: iconStyle.fontSizes.label,
     marginTop: 2,
-    color: '#999',
+    color: iconStyle.inactive, // Using theme blue color
   },
   activeTabText: {
-    color: '#ff6b6b',
+    color: iconStyle.active, // Using theme orange color
     fontWeight: 'bold',
   }
 });
 
 export default TabBar;
+

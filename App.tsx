@@ -8,8 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Import your screens here and add them to the stack navigator below
-import HomeScreen from './src/screens/home/HomeScreen';
-import MapScreen from './src/screens/map/MapScreen';
+import HomeScreen from './src/screens/dashboard/HomeScreen';// import MapScreen from './src/screens/map/MapScreen';
 // Import other screens as you create them
 
 // Create a stack navigator
@@ -25,7 +24,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Map" component={MapScreen} />
+        {/* <Stack.Screen name="Map" component={MapScreen} /> */}
         {/* Add other screens here as you create them */}
       </Stack.Navigator>
     </NavigationContainer>

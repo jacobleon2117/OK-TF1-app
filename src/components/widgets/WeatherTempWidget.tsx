@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import WidgetContainer from './WidgetContainer';
+import CardContainer from './CardContainer';
 
 export default function WeatherTempWidget() {
   // Demo data
@@ -49,7 +49,7 @@ export default function WeatherTempWidget() {
   const sensorHeatColor = getHeatColor(data.sensors.localTemp);
 
   return (
-    <WidgetContainer 
+    <CardContainer 
       title="Weather & Temperature" 
       icon={<Ionicons name="thermometer-outline" size={14} color="#4da6ff" />}
     >
@@ -88,7 +88,7 @@ export default function WeatherTempWidget() {
           </View>
         </View>
       </View>
-    </WidgetContainer>
+    </CardContainer>
   );
 }
 

@@ -9,16 +9,13 @@ import {
   WeatherTempWidget,
   MapWidget,
   InfoWidget
-<<<<<<< HEAD:src/screens/home/HomeScreen.tsx
-} from './components/widgets';
-// navigation is to other screens 
-const HomeScreen = ( { navigation }) => {
-=======
 } from '../../components/widgets';
 
-const HomeScreen = () => {
->>>>>>> 941706e83563cef2c40dcf360922c38cc02f2c23:src/screens/dashboard/HomeScreen.tsx
+// navigation is to other screens 
+const HomeScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
+  // Add state for current screen since it's used in handleMapPress
+  const [currentScreen, setCurrentScreen] = useState('Home');
 
   useEffect(() => {
     // Try to get username from AsyncStorage
@@ -99,8 +96,6 @@ const HomeScreen = () => {
           <View style={styles.fullWidthItem}>
             <StatusWidget />
           </View>
-          
-          
           
           <View style={styles.fullWidthItem}>
             <InfoWidget />

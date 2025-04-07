@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import WidgetContainer from './WidgetContainer';
+import CardContainer from './CardContainer';
 
 export default function StatusWidget() {
   // Demo status data
@@ -31,7 +31,7 @@ export default function StatusWidget() {
   const mainStatus = getStatusIcon(statusData.system);
 
   return (
-    <WidgetContainer 
+    <CardContainer
       title="System Status" 
       icon={<Ionicons name="pulse" size={14} color="#2ecc71" />}
     >
@@ -63,7 +63,7 @@ export default function StatusWidget() {
           })}
         </View>
       </View>
-    </WidgetContainer>
+    </CardContainer>
   );
 }
 

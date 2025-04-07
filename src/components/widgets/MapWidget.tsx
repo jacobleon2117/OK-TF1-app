@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import WidgetContainer from './WidgetContainer';
+import CardContainer from './CardContainer';
 
 export default function MapWidget({ onPress }: { onPress?: () => void }) {
   // Demo data
@@ -40,7 +40,7 @@ export default function MapWidget({ onPress }: { onPress?: () => void }) {
   
 
   return (
-    <WidgetContainer 
+    <CardContainer 
       title="Location & Map" 
       icon={<Ionicons name="map" size={14} color="#4cd964" />}
       onPress={onPress}
@@ -101,7 +101,7 @@ export default function MapWidget({ onPress }: { onPress?: () => void }) {
         
       </View>
       </View>
-    </WidgetContainer>
+    </CardContainer>
   );
 }
 

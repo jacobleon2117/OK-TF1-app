@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import WidgetContainer from './WidgetContainer';
+import CardContainer from './CardContainer';
 
 export default function InfoWidget() {
   // Demo notification data
@@ -58,7 +58,7 @@ export default function InfoWidget() {
   };
 
   return (
-    <WidgetContainer 
+    <CardContainer 
       title="Notifications" 
       icon={<Ionicons name="notifications" size={14} color="#9b59b6" />}
     >
@@ -96,7 +96,7 @@ export default function InfoWidget() {
           </View>
         )}
       </View>
-    </WidgetContainer>
+    </CardContainer>
   );
 }
 

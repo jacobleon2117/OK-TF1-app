@@ -1,21 +1,24 @@
-// src/components/widgets/WidgetContainer.tsx
+// src/components/widgets/CardContainer.tsx
 import React, { ReactNode } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface WidgetContainerProps {
+interface CardContainerProps {
   title: string;
   icon?: ReactNode;
   children: ReactNode;
   onPress?: () => void;
+  hideChevron?: boolean; // New prop to optionally hide chevron
 }
 
-export default function WidgetContainer({
+// This component should be saved at: src/components/widgets/CardContainer.tsx
+export default function CardContainer({
   title,
   icon,
   children,
-  onPress
-}: WidgetContainerProps) {
+  onPress,
+  hideChevron = false // Default to showing chevron
+}: CardContainerProps) {
   const Container = onPress ? TouchableOpacity : View;
   
   return (
@@ -30,7 +33,7 @@ export default function WidgetContainer({
             {icon && <View style={styles.iconContainer}>{icon}</View>}
             <Text style={styles.title}>{title}</Text>
           </View>
-          {onPress && (
+          {!hideChevron && ( // Always show chevron unless explicitly hidden
             <Ionicons name="chevron-forward" size={14} color="#aaa" />
           )}
         </View>
