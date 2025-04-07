@@ -9,7 +9,7 @@ import {
   FIREBASE_STORAGE_BUCKET,
   FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID,
-} from 'react-native-dotenv';
+} from '@/env';s
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
