@@ -12,17 +12,17 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ children }) => {
     <View style={styles.container}>
       {/* Background grid images */}
       <View style={styles.backgroundGrid}>
-        <Image source={require('../../assets/bg-img-1.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-2.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-3.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-4.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-5.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-6.jpg')} style={styles.gridImage} />
-        <Image source={require('../../assets/bg-img-7.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-1.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-2.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-3.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-4.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-5.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-6.jpg')} style={styles.gridImage} />
+        <Image source={require('../../assets/images/bg-img-7.jpg')} style={styles.gridImage} />
         {/* Special handling for image 8 */}
         <View style={styles.specialImageContainer}>
           <Image 
-            source={require('../../assets/bg-img-8.jpg')} 
+            source={require('../../assets/images/bg-img-8.jpg')} 
             style={styles.specialImage} 
             resizeMode="cover"
           />

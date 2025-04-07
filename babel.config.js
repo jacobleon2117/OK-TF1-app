@@ -20,7 +20,7 @@ module.exports = function (api) {
           },
         },
       ],
-      'module:react-native-dotenv',
+      // Remove 'module:react-native-dotenv',
       'react-native-reanimated/plugin',
     ],
   };
