@@ -1,13 +1,17 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { User, UserCredential, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../config/firebase';
 import { 
-  loginWithEmailAndPassword, 
-  registerUser, 
-  logoutUser, 
-  sendPasswordReset 
-} from '../services/firebase/auth';
+  User, 
+  UserCredential, 
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 
+// Define types for the AuthContext
 type AuthContextType = {
   user: User | null;
   loading: boolean;
@@ -19,11 +23,20 @@ type AuthContextType = {
   setError: (error: string | null) => void;
 };
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+// Export the AuthContext to be used in other parts of the app
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+// Create a custom hook for using AuthContext
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+// The AuthProvider component provides the context value to its children
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +44,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   // Verify organization code
   const verifyOrganizationCode = (code: string): boolean => {
     // For now, we'll just check if it's "123456"
-    // In a dev, we need to verify this against our database
     return code === "123456";
   };
 
@@ -45,71 +57,82 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     return () => unsubscribe();
   }, []);
 
-// Login function
-const login = async (email: string, password: string, organizationCode: string) => {
-  setError(null);
-  try {
-    // Verify organization code first
-    if (!verifyOrganizationCode(organizationCode)) {
-      throw new Error("Invalid organization code");
-    }
-
-    // Then attempt login
-    await loginWithEmailAndPassword(email, password);
-  } catch (err: any) {
-    setError(err.message);
-    throw err;
-  }
-};
-
-// Signup function
-const signup = async (name: string, email: string, password: string, organizationCode: string) => {
-  setError(null);
-  try {
-    // Verify organization code first
-    if (!verifyOrganizationCode(organizationCode)) {
-      throw new Error("Invalid organization code");
-    }
-
-    // Create user in Firebase Auth
-    const user = await registerUser(email, password, name);
+  // Login function
+  const login = async (email: string, password: string, organizationCode: string) => {
+    setError(null); // Clear previous errors
     
-    // Create a user credential object to match the return type
-    const userCredential = { user, providerId: null, operationType: "signIn" };
-    
-    return userCredential as UserCredential;
-  } catch (err: any) {
-    setError(err.message);
-    throw err;
-  }
-};
+    try {
+      if (!verifyOrganizationCode(organizationCode)) {
+        throw new Error("Invalid organization code");
+      }
 
-// Logout function
-const logout = async () => {
-  setError(null);
-  try {
-    await logoutUser();
-  } catch (err: any) {
-    setError(err.message);
-    throw err;
-  }
-};
-
-// Reset password function
-const resetPassword = async (email: string, organizationCode: string) => {
-  setError(null);
-  try {
-    // Verify organization code first
-    if (!verifyOrganizationCode(organizationCode)) {
-      throw new Error("Invalid organization code");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential.user);
+    } catch (err: any) {
+      const errorMessage = err.message || "Login failed";
+      setError(errorMessage);
+      throw err; // Re-throw to allow caller to handle
     }
+  };
 
-    await sendPasswordReset(email);
-  } catch (err: any) {
-    setError(err.message);
-    throw err;
-  }
-};
+  // Signup function
+  const signup = async (name: string, email: string, password: string, organizationCode: string): Promise<UserCredential> => {
+    setError(null); // Clear previous errors
+    
+    try {
+      if (!verifyOrganizationCode(organizationCode)) {
+        throw new Error("Invalid organization code");
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        displayName: name,
+        email: email,
+        organizationCode: organizationCode,
+        role: 'employee', // default role
+        createdAt: new Date(),
+      });
+
+      setUser(userCredential.user);
+      return userCredential;
+    } catch (err: any) {
+      const errorMessage = err.message || "Signup failed";
+      setError(errorMessage);
+      throw err; // Re-throw to allow caller to handle
+    }
+  };
+
+  // Logout function
+  const logout = async () => {
+    setError(null); // Clear previous errors
+    
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (err: any) {
+      const errorMessage = err.message || "Logout failed";
+      setError(errorMessage);
+      throw err; // Re-throw to allow caller to handle
+    }
+  };
+
+  // Reset password function
+  const resetPassword = async (email: string, organizationCode: string) => {
+    setError(null); // Clear previous errors
+    
+    try {
+      if (!verifyOrganizationCode(organizationCode)) {
+        throw new Error("Invalid organization code");
+      }
+
+      await sendPasswordResetEmail(auth, email);
+    } catch (err: any) {
+      const errorMessage = err.message || "Password reset failed";
+      setError(errorMessage);
+      throw err; // Re-throw to allow caller to handle
+    }
+  };
 
   const value = {
     user,
