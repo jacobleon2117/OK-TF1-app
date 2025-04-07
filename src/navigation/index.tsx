@@ -1,55 +1,65 @@
+// src/navigation/index.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
-// Import screens
-import MessagesScreen from '../screens/dashboard/MessagesScreen';
-// Import other screens as needed
-// import DashboardScreen from '../screens/dashboard/DashboardScreen';
-// import CalendarScreen from '../screens/dashboard/CalendarScreen';
-// import MapScreen from '../screens/dashboard/MapScreen';
-// import ProfileScreen from '../screens/dashboard/ProfileScreen';
+// Import auth screens
+import LoginScreen from '../screens/auth/LoginScreen';
+import SignupScreen from '../screens/auth/SignupScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 
-// Define the navigation type
-export type RootStackParamList = {
-  Dashboard: undefined;
-  Messages: undefined;
-  Calendar: undefined;
-  Map: undefined;
-  Profile: undefined;
+// Import Dashboard Navigator
+import DashboardNavigator from './DashboardNavigator';
+
+// Import auth context
+import { useAuth } from '../context/AuthContext';
+
+// Create stack navigator
+const Stack = createStackNavigator();
+
+// Auth navigator - for unauthenticated users
+const AuthNavigator = () => {
+  return (
+    <Stack.Navigator 
+      initialRouteName="Login"
+      screenOptions={{ 
+        headerShown: false,
+        presentation: 'card'
+      }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+    </Stack.Navigator>
+  );
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+// Root navigator - decides which navigator to show based on auth state
+const AppNavigator = () => {
+  const { user, loading } = useAuth();
 
-// Placeholder screens for testing
-const PlaceholderScreen = ({ route }: any) => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
-    <Text style={{ color: '#fff', fontSize: 24 }}>{route.name} Screen</Text>
-  </View>
-);
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
-const DashboardScreen = () => <PlaceholderScreen route={{ name: 'Dashboard' }} />;
-const CalendarScreen = () => <PlaceholderScreen route={{ name: 'Calendar' }} />;
-const MapScreen = () => <PlaceholderScreen route={{ name: 'Map' }} />;
-const ProfileScreen = () => <PlaceholderScreen route={{ name: 'Profile' }} />;
-
-export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Messages"
-        screenOptions={{
-          headerShown: false,
-          cardStyle: { backgroundColor: '#000' },
-        }}
-      >
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-        <Stack.Screen name="Messages" component={MessagesScreen} />
-        <Stack.Screen name="Calendar" component={CalendarScreen} />
-        <Stack.Screen name="Map" component={MapScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-      </Stack.Navigator>
+      {user ? <DashboardNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+export default AppNavigator;
