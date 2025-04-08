@@ -227,8 +227,4 @@ export const performBatchUpdate = async (
   } catch (error) {
     console.error('Batch update failed:', error);
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> feature/dashboard-scheduling
