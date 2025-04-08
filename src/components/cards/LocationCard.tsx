@@ -1,12 +1,17 @@
-// src/components/widgets/StatusWidget.tsx
+// src/components/cards/LocationCard.tsx
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardContainer from './CardContainer';
 
-export default function StatusWidget() {
+interface LocationCardProps {
+  onPress?: () => void;
+}
+
+export default function LocationCard({ onPress }: LocationCardProps) {
   return (
     <CardContainer
+      style={styles.container}
       title=""
       icon={
         <View style={styles.iconContainer}>
@@ -19,17 +24,38 @@ export default function StatusWidget() {
           />
         </View>
       }
+      onPress={onPress}
     >
-      {/* Empty content or you can add other content here */}
-      <View style={styles.emptyContent} />
+      
+      <View style={styles.content}>
+        <Text style={styles.text}>
+          Connect to ... 
+        </Text>
+        </View>
     </CardContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#fff',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  
   iconContainer: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',

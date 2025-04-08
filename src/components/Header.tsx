@@ -1,22 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Header = () => {
-  // Fake username
-  const username = "Jacob";
+// Default no-op function to prevent undefined errors
+const noop = () => {};
+
+const Header = ({
+  onProfilePress = noop,
+  onNotificationsPress = noop,
+  style = {},
+  iconProps = {}
+}) => {
+  const [username, setUsername] = useState('');
   
-  const onNotificationsPress = () => {
-    // Future implementation: Navigate to notifications page
-    console.log("Navigate to notifications");
-  };
+  useEffect(() => {
+    // Try to get username from AsyncStorage
+    const getUsername = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      } catch (error) {
+        console.error('Failed to load username', error);
+      }
+    };
+
+    getUsername();
+  }, []);
   
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, style]}>
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Welcome back,</Text>
         <Text style={styles.username}>
-          {username}
+          {username || 'Jacob'}
         </Text>
       </View>
       
@@ -46,12 +65,12 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 15,
   },
   username: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 15
   },
   iconButton: {
     padding: 5,

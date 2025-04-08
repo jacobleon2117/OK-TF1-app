@@ -6,7 +6,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import Toast from 'react-native-toast-message';
 // Import your screens here and add them to the stack navigator below
 import HomeScreen from './src/screens/dashboard/HomeScreen';// import MapScreen from './src/screens/map/MapScreen';
 // Import other screens as you create them
@@ -16,6 +16,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    <>
     <NavigationContainer>
       <Stack.Navigator 
         initialRouteName="Home"
@@ -28,6 +29,8 @@ export default function App() {
         {/* Add other screens here as you create them */}
       </Stack.Navigator>
     </NavigationContainer>
+     <Toast />
+     </>
   );
 }
 

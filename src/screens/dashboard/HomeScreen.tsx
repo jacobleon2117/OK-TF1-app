@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, SafeAreaView, Alert, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TabBar from '../../components/TabBar';
 import Header from '../../components/Header';
+import Toast from 'react-native-toast-message';
 import { 
-  StatusWidget, 
+  LocationCard, 
   ScheduleCard,
   MessageCard,
-  InfoWidget
-} from '../../components/widgets';
+  StatusCard,
+} from '../../components/cards';
 
 // navigation is to other screens 
 const HomeScreen = ({ navigation }) => {
@@ -34,39 +35,134 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   // Handler functions for touchable components
-  const handleProfilePress = () => {
-    Alert.alert('Profile', 'You pressed the profile tab');
-    // navigation.navigate('Profile');
-  };
-
+  // In the header
   const handleNotificationsPress = () => {
-    Alert.alert('Notifications', 'You pressed the notifications tab');
+    Toast.show({
+      type: 'info',
+      text1: 'Notification',
+      text2: 'You pressed the notification tab',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
     // navigation.navigate('Notifications');
   };
-
-  const handleMenuPress = () => {
-    Alert.alert('Menu', 'You pressed the menu tab');
-    // navigation.navigate('Menu');
+  
+  // For cards
+  const handleMessageCardPress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Message Card',
+      text2: 'You pressed the message card',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
   };
 
+  const handleScheduleCardPress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Schedule Card',
+      text2: 'You pressed the schedule card',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
+  };
+  
+  const handleLocationCardPress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Location Card',
+      text2: 'You pressed the location card',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
+  };
+  
+  const handleStatusCardPress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Status Card',
+      text2: 'You pressed the status card',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
+  };
+  
+
+  // In the footer
   const handleHomePress = () => {
-    Alert.alert('Home', 'You pressed the Home tab');
+    Toast.show({
+      type: 'info',
+      text1: 'Home',
+      text2: 'You pressed the home tab',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
     // navigation.navigate('Home');
   };
-
+  
   const handleSchedulePress = () => {
-    Alert.alert('Schedule', 'You pressed the Schedule tab');
+    Toast.show({
+      type: 'success',
+      text1: 'Schedule',
+      text2: 'You pressed the Schedule tab',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
     // navigation.navigate('Schedule');
   };
 
   const handleMapPress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Map',
+      text2: 'You pressed the Map tab',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
     setCurrentScreen('Map');
     // navigation.navigate('Map');
   };
 
-  const handleMessageCardPress = () => {
-    handleMapPress();
-    // navigation.navigate('Map');
+  const handleMessagePress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Message',
+      text2: 'You pressed the message button',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
+  };
+
+  const handleProfilePress = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Profile',
+      text2: 'You pressed the profile tab',
+      visibilityTime: 1000,
+      autoHide: true,
+      position: 'bottom',
+      bottomOffset: 300,
+    });
+    // navigation.navigate('Profile');
   };
 
   return (
@@ -79,33 +175,29 @@ const HomeScreen = ({ navigation }) => {
             username={username} 
             onProfilePress={handleProfilePress}
             onNotificationsPress={handleNotificationsPress}
-            onMenuPress={handleMenuPress}
           />
         </View>
         
         {/* Content with scrolling */}
         <View style={styles.content}>
-          {/* Top row - 1/5 of the available space */}
           <View style={styles.topCardItem}>
             <MessageCard onPress={handleMessageCardPress} />
           </View>
-          
-          {/* Middle row - 2/5 of the available space (twice the height of top/bottom) */}
+  
           <View style={styles.middleCardItem}>
-            <ScheduleCard />
+            <ScheduleCard onPress={handleScheduleCardPress} />
           </View>
-          
-          {/* Bottom row - 1/5 of the available space, split into two equal columns */}
+  
           <View style={styles.bottomRowContainer}>
             <View style={styles.bottomColumn}>
-              <StatusWidget />
+              <LocationCard onPress={handleLocationCardPress} />
             </View>
-            
+    
             <View style={styles.bottomColumn}>
-              <InfoWidget />
+              <StatusCard onPress={handleStatusCardPress} />
             </View>
-          </View>
         </View>
+      </View>
         
         {/* Footer fixed at bottom */}
         <View style={styles.footerContainer}>
@@ -113,6 +205,8 @@ const HomeScreen = ({ navigation }) => {
             onHomePress={handleHomePress}
             onSchedulePress={handleSchedulePress}
             onMapPress={handleMapPress}
+            onProfilePress={handleProfilePress}
+            onMessagePress={handleMessagePress}
           />
         </View>
       </View>

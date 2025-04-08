@@ -6,7 +6,7 @@ Currently, on 4/3 I have a page with a picture in the background and header and 
 ### Changes:
 
 
-* included widget boxes for weather
+* included card boxes for weather
 * changed the app.json to comply with the icon removal
 * changed the background from a picture to a black background 
 * included the avatar path for logging in
@@ -55,7 +55,7 @@ OK-TF1-root/
 │       │   ├── assets/  # Home screen assets
 │       │   │   └── images/
 │       │   ├── components/ # Home screen components
-│       │   │   └── widgets/
+│       │   │   └── cards/
 │       │   └── HomeScreen.tsx
 │       └── [other screens being built by team members]
 ├── App.tsx              # Main App component

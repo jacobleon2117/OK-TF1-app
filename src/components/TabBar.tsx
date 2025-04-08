@@ -60,9 +60,9 @@ const TabBar = ({
       onPress: handleSchedulePress
     },
     {
-      name: 'Message',
+      name: 'messages',
       icon: MessageIcon,
-      label: 'Message',
+      label: 'Messages',
       onPress: handleMessagePress
     },
     {

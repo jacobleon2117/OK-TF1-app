@@ -1,4 +1,4 @@
-// src/components/widgets/CardContainer.tsx
+// src/components/cards/CardContainer.tsx
 import React, { ReactNode } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,8 +49,8 @@ export default function CardContainer({
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 8,
-    marginVertical: 4,
-    borderRadius: 10,
+    marginVertical: 5,
+    borderRadius: 19,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
     backgroundColor: '#333333', // Dark gray that contrasts with black
-    // Removed fixed height of 140px to allow container to expand
     flex: 1, // Added flex: 1 to allow container to fill available space
     
   },
@@ -71,9 +70,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 9,
+    borderBottomWidth: 0,
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   titleContainer: {

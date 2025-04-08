@@ -1,6 +1,6 @@
-// src/components/widgets/index.ts
+// src/components/cards/index.ts
 export { default as ScheduleCard } from './ScheduleCard';
-export { default as StatusWidget } from './StatusWidget';
+export { default as LocationCard } from './LocationCard';
 export { default as MessageCard } from './MessageCard';
-export { default as InfoWidget } from './InfoWidget';
+export { default as StatusCard } from './StatusCard';
 export { default as CardContainer } from './CardContainer';
