@@ -9,10 +9,9 @@ interface CardContainerProps {
   children: ReactNode;
   onPress?: () => void;
   hideChevron?: boolean; // New prop to optionally hide chevron
-  style?: object; // Added style prop to allow custom styling
+  style?: object; //allows custom styling
 }
 
-// This component should be saved at: src/components/widgets/CardContainer.tsx
 export default function CardContainer({
   title,
   icon,
@@ -27,7 +26,7 @@ export default function CardContainer({
     <Container 
       style={[styles.container, style]} // Merge default and custom styles
       onPress={onPress}
-      activeOpacity={onPress ? 0.7 : 1}
+      activeOpacity={onPress ? 0.4 : 1}
     >
       <View style={styles.content}>
         <View style={styles.headerContainer}>
@@ -61,6 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333', // Dark gray that contrasts with black
     // Removed fixed height of 140px to allow container to expand
     flex: 1, // Added flex: 1 to allow container to fill available space
+    
   },
   content: {
     flex: 1,

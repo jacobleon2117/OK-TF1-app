@@ -13,7 +13,7 @@ export default function StatusWidget() {
           <View style={styles.iconBackground} />
           <Ionicons 
             name="walk-outline" 
-            size={64} 
+            size={64} //icon height controlled by style:walkIcon
             color="#fff" 
             style={styles.walkIcon} 
           />
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   walkIcon: {
     zIndex: 1,
-    fontSize: 24,
+    fontSize: 24,  //controls walker icon height
   },
   emptyContent: {
     flex: 1,

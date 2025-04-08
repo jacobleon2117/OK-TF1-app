@@ -152,10 +152,10 @@ const styles = StyleSheet.create({
   bottomRowContainer: {
     width: '100%',
     flex: 1, // 1/5 of the available space
-    flexDirection: 'row', // Arrange children horizontally
+    flexDirection: 'row', // Arrange horizontally
   },
   bottomColumn: {
-    flex: 1, // Each column takes 50% of the parent width
+    flex: 1, // Each column takes 50% of the width
   },
   footerContainer: {
     width: '100%',
