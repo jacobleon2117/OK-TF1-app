@@ -3,12 +3,13 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardContainer from './CardContainer';
+import NavigationService from '../../services/NavigationService';
 
-interface LocationCardProps {
-  onPress?: () => void;
-}
+export default function LocationCard() {
+  const handlePress = () => {
+    NavigationService.handleLocationCardPress();
+  };
 
-export default function LocationCard({ onPress }: LocationCardProps) {
   return (
     <CardContainer
       style={styles.container}
@@ -16,22 +17,21 @@ export default function LocationCard({ onPress }: LocationCardProps) {
       icon={
         <View style={styles.iconContainer}>
           <View style={styles.iconBackground} />
-          <Ionicons 
-            name="walk-outline" 
+          <Ionicons
+            name="walk-outline"
             size={64} //icon height controlled by style:walkIcon
-            color="#fff" 
-            style={styles.walkIcon} 
+            color="#fff"
+            style={styles.walkIcon}
           />
         </View>
       }
-      onPress={onPress}
+      onPress={handlePress}
     >
-      
       <View style={styles.content}>
         <Text style={styles.text}>
-          Connect to ... 
+          Connect to ...
         </Text>
-        </View>
+      </View>
     </CardContainer>
   );
 }
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flex: 1,
   },
-  
   iconContainer: {
     width: 30,
     height: 30,

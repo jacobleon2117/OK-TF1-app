@@ -1,51 +1,63 @@
-// src/components/TabBar.tsx
-import React, { useState } from 'react';
+// src/components/navigation/TabBar.tsx
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import HomeIcon from './icons/HomeIcon';
 import ScheduleIcon from './icons/ScheduleIcon';
 import MessageIcon from './icons/MessageIcon';
 import MapIcon from './icons/MapIcon';
 import ProfileIcon from './icons/ProfileIcon';
+import NavigationService from '../../services/NavigationService';
 
 // Default no-op function to prevent undefined errors
 const noop = () => {};
 
 const TabBar = ({ 
-  onHomePress = noop, 
-  onSchedulePress = noop, 
-  onMessagePress = noop, 
-  onMapPress = noop, 
-  onProfilePress = noop,
+  currentScreen,
+  onScreenChange = noop,
   style = {},
   iconProps = {} 
 }) => {
-  const [activeTab, setActiveTab] = useState('home');
+  // Initialize activeTab state from currentScreen prop or default to 'home'
+  const [activeTab, setActiveTab] = useState(currentScreen?.toLowerCase() || 'home');
+  
+  // Update activeTab when currentScreen prop changes
+  useEffect(() => {
+    if (currentScreen) {
+      setActiveTab(currentScreen.toLowerCase());
+    }
+  }, [currentScreen]);
 
+  // Tab press handlers that update state and call NavigationService
   const handleHomePress = () => {
     setActiveTab('home');
-    onHomePress();
+    NavigationService.handleHomePress();
+    onScreenChange('Home');
   };
 
   const handleSchedulePress = () => {
     setActiveTab('schedule');
-    onSchedulePress();
+    NavigationService.handleSchedulePress();
+    onScreenChange('Schedule');
   };
 
   const handleMessagePress = () => {
     setActiveTab('messages');
-    onMessagePress();
+    NavigationService.handleMessagePress();
   };
   
   const handleMapPress = () => {
     setActiveTab('map');
-    onMapPress();
+    NavigationService.handleMapPress();
+    onScreenChange('Map');
   };
   
   const handleProfilePress = () => {
     setActiveTab('profile');
-    onProfilePress();
+    NavigationService.handleProfilePress();
+    onScreenChange('Profile');
   };
 
+  // Tab configuration array
   const tabs = [
     {
       name: 'home',

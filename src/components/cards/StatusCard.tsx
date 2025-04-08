@@ -3,22 +3,23 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardContainer from './CardContainer';
+import NavigationService from '../../services/NavigationService';
 
-interface StatusCard {
-  onPress?: () => void;
-}
-
-export default function StatusCard({ onPress}: StatusCardProps) {
+export default function StatusCard() {
+  const handlePress = () => {
+    NavigationService.handleStatusCardPress();
+  };
+  
   return (
     <CardContainer 
       style={styles.container}
-      title="Status" 
+      title="" 
       icon={<Ionicons 
         name="notifications" 
         size={25} 
         color="#9b59b6" />}
-      onPress={onPress}  
-    >
+        onPress={handlePress}
+        >
       <View style={styles.content}>
         <Text style={styles.text}>
           Connect to ...

@@ -1,17 +1,11 @@
+// src/components/layout/Header.tsx
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NavigationService from '../../services/NavigationService';
 
-// Default no-op function to prevent undefined errors
-const noop = () => {};
-
-const Header = ({
-  onProfilePress = noop,
-  onNotificationsPress = noop,
-  style = {},
-  iconProps = {}
-}) => {
+const Header = ({ style = {} }) => {
   const [username, setUsername] = useState('');
   
   useEffect(() => {
@@ -30,16 +24,24 @@ const Header = ({
     getUsername();
   }, []);
   
+  const handleNotificationsPress = () => {
+    NavigationService.handleNotificationsPress();
+  };
+
+  const handleProfilePress = () => {
+    NavigationService.handleProfilePress();
+  };
+  
   return (
     <View style={[styles.header, style]}>
-      <View style={styles.welcomeContainer}>
+      <TouchableOpacity onPress={handleProfilePress} style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Welcome back,</Text>
         <Text style={styles.username}>
           {username || 'Jacob'}
         </Text>
-      </View>
+      </TouchableOpacity>
       
-      <TouchableOpacity onPress={onNotificationsPress} style={styles.iconButton}>
+      <TouchableOpacity onPress={handleNotificationsPress} style={styles.iconButton}>
         <Ionicons name="notifications-outline" size={24} color="white" />
       </TouchableOpacity>
     </View>
@@ -51,10 +53,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#000', // Changed to pure black
+    backgroundColor: '#000',
     paddingVertical: 10,
     paddingLeft: 25,
-    paddingRight: 35, // Increased margin on the outside edges
+    paddingRight: 35,
     borderBottomWidth: 1,
     borderBottomColor: '#000',
   },

@@ -8,7 +8,7 @@ interface CardContainerProps {
   icon?: ReactNode;
   children: ReactNode;
   onPress?: () => void;
-  hideChevron?: boolean; // New prop to optionally hide chevron
+  hideChevron?: boolean; //cheveron prop
   style?: object; //allows custom styling
 }
 
