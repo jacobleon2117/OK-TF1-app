@@ -1,12 +1,10 @@
-// src/screens/auth/SignupScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity,
   Pressable,
-  ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -16,26 +14,55 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { StackNavigationProp } from '@react-navigation/stack';
+import BackgroundGrid from '../../components/BackgroundGrid';
+import CircularLogo from '../../components/CircularLogo';
+import LoadingScreen from '../../components/LoadingScreen';
 
-const SignupScreen = ({ navigation }: { navigation: any }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [organizationCode, setOrganizationCode] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+type AuthStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  ForgotPassword: undefined;
+};
+
+type SignupScreenProps = {
+  navigation: StackNavigationProp<AuthStackParamList, 'Signup'>;
+};
+
+const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [organizationCode, setOrganizationCode] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const { signup, error, setError } = useAuth();
 
-  const validateForm = () => {
+  // Fix for keyboard not showing up on initial load
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // This timeout helps ensure the keyboard shows properly on iOS
+      const timer = setTimeout(() => {
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const validateForm = (): boolean => {
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter your name');
+      Alert.alert('Error', 'Please enter your full name');
       return false;
     }
     if (!email.trim()) {
       Alert.alert('Error', 'Please enter your email');
+      return false;
+    }
+    if (!organizationCode.trim()) {
+      Alert.alert('Error', 'Please enter your organization code');
       return false;
     }
     if (!password.trim()) {
@@ -50,14 +77,10 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
       Alert.alert('Error', 'Passwords do not match');
       return false;
     }
-    if (!organizationCode.trim()) {
-      Alert.alert('Error', 'Please enter your organization code');
-      return false;
-    }
     return true;
   };
 
-  const handleSignup = async () => {
+  const handleSignup = async (): Promise<void> => {
     if (!validateForm()) return;
     
     setIsLoading(true);
@@ -72,14 +95,18 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
+  // Clear form data before navigation to prevent password save prompt
+  const navigateToLogin = () => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setOrganizationCode('');
+    navigation.navigate('Login');
+  };
+
   return (
-    <ImageBackground 
-      source={require('../../../assets/background-login.jpg')} 
-      style={styles.backgroundImage}
-    >
-      {/* Semi-transparent overlay */}
-      <View style={styles.overlay} />
-      
+    <BackgroundGrid>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -89,23 +116,26 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            {/* Title */}
+            {/* Circular Logo */}
+            <CircularLogo size={80} />
+            
+            {/* Title and Subtitle */}
             <Text style={styles.title}>OK-TF1</Text>
+            <Text style={styles.subtitle}>Urban Search and Rescue Foundation</Text>
             
             {/* Full Name input */}
-            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.label}>Full name</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="John Doe"
+                placeholder="Enter your full name"
                 value={name}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setName(text);
                   setError(null);
                 }}
                 placeholderTextColor="#888"
               />
-              <Ionicons name="person-outline" size={20} color="#888" />
             </View>
             
             {/* Email input */}
@@ -113,9 +143,9 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="example@gmail.com"
+                placeholder="Enter your email address"
                 value={email}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setEmail(text);
                   setError(null);
                 }}
@@ -126,14 +156,31 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
               <Ionicons name="mail-outline" size={20} color="#888" />
             </View>
             
+            {/* Organization code */}
+            <Text style={styles.label}>Organization code</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your organization code"
+                value={organizationCode}
+                onChangeText={(text: string) => {
+                  setOrganizationCode(text.replace(/[^0-9]/g, ''));
+                  setError(null);
+                }}
+                keyboardType="number-pad"
+                maxLength={6}
+                placeholderTextColor="#888"
+              />
+            </View>
+            
             {/* Password input */}
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder="Create a password"
                 value={password}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setPassword(text);
                   setError(null);
                 }}
@@ -154,9 +201,9 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Confirm Password"
+                placeholder="Confirm your password"
                 value={confirmPassword}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setConfirmPassword(text);
                   setError(null);
                 }}
@@ -172,26 +219,15 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
               </Pressable>
             </View>
             
-            {/* Organization code */}
-            <Text style={styles.label}>Organization code</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="6-digit code"
-                value={organizationCode}
-                onChangeText={(text) => {
-                  setOrganizationCode(text.replace(/[^0-9]/g, ''));
-                  setError(null);
-                }}
-                keyboardType="number-pad"
-                maxLength={6}
-                placeholderTextColor="#888"
-              />
-              <Ionicons name="chevron-forward-outline" size={20} color="#888" />
-            </View>
-            
             {/* Error message */}
             {error && <Text style={styles.errorText}>{error}</Text>}
+            
+            {/* Back to login link */}
+            <View style={styles.forgotContainer}>
+              <TouchableOpacity onPress={navigateToLogin}>
+                <Text style={styles.linkText}>Back to login</Text>
+              </TouchableOpacity>
+            </View>
             
             {/* Signup button */}
             <TouchableOpacity
@@ -205,34 +241,15 @@ const SignupScreen = ({ navigation }: { navigation: any }) => {
                 <Text style={styles.buttonText}>Sign Up</Text>
               )}
             </TouchableOpacity>
-            
-            {/* Sign in link */}
-            <View style={styles.signupContainer}>
-              <Text style={styles.whiteText}>Already have an account?</Text>
-              <TouchableOpacity 
-                style={styles.signupButton}
-                onPress={() => navigation.navigate('Login')}
-              >
-                <Text style={styles.boldLinkText}>Log in</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </ImageBackground>
+      <LoadingScreen visible={isLoading} message="Creating account..." overlay={true} />
+    </BackgroundGrid>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
-  },
   keyboardAvoid: {
     flex: 1,
   },
@@ -243,11 +260,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    zIndex: 1, // Ensure content is above the overlay
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 16,
     color: 'white',
     textAlign: 'center',
     marginBottom: 32,
@@ -261,7 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 25, // rounded corners as per Figma
     marginBottom: 16,
     paddingHorizontal: 16,
   },
@@ -270,10 +292,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   button: {
-    backgroundColor: '#5C0002', // Main red color
+    backgroundColor: '#F09737', // orange accent color
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 25, // rounded corners as per Figma
     alignItems: 'center',
+    marginTop: 24,
     marginBottom: 16,
   },
   buttonText: {
@@ -281,19 +304,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  signupContainer: {
+  forgotContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
+    justifyContent: 'flex-end',
+    marginTop: 8,
   },
-  signupButton: {
-    marginLeft: 4,
-  },
-  boldLinkText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  whiteText: {
+  linkText: {
     color: 'white',
   },
   errorText: {
