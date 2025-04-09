@@ -1,8 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+
+// import utilities
+import { 
+  getSettingsItems, 
+  handleSettingAction,
+  getProfileData, 
+  handleEditProfile,
+  getNavItemColor, 
+  handleBackNavigation 
+} from '@/utils/dashboard/profileUtils';
 
 // define navigation types that align with your app's structure
 type RootStackParamList = {
@@ -14,15 +24,13 @@ type RootStackParamList = {
   MissionReports: undefined;
 };
 
-// define the navigation prop type
+// correctly define the navigation prop type
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-
-  const handleBackNavigation = () => {
-    navigation.goBack();
-  };
+  const profileData = getProfileData();
+  const settingsItems = getSettingsItems();
 
   return (
     <View style={styles.container}>
@@ -32,9 +40,9 @@ const ProfileScreen = () => {
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
-          onPress={handleBackNavigation}
+          onPress={() => handleBackNavigation(navigation)}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <FontAwesome name="arrow-left" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
         <View style={styles.headerRight} />
@@ -44,13 +52,20 @@ const ProfileScreen = () => {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.profileInfo}>
+            <Image 
+              source={profileData.profileImageSource} 
+              style={styles.profileImage}
+            />
             <View style={styles.nameContainer}>
-              <Text style={styles.profileName}>Jacob Leon</Text>
-              <Text style={styles.profileRole}>Handler</Text>
+              <Text style={styles.profileName}>{profileData.displayName}</Text>
+              <Text style={styles.profileRole}>{profileData.role}</Text>
             </View>
           </View>
           
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity 
+            style={styles.editButton}
+            onPress={handleEditProfile}
+          >
             <FontAwesome name="pencil" size={18} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -60,45 +75,16 @@ const ProfileScreen = () => {
           <Text style={styles.sectionTitle}>Settings and privacy</Text>
           
           {/* Settings Options */}
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="bell" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Notifications</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="location-arrow" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Location preferences</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="sign-out" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Login</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="universal-access" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Accessibility</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="globe" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Language and region</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="moon-o" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Dark mode</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="question-circle" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Need help?</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <FontAwesome name="trash" size={20} color="#fff" style={styles.settingIcon} />
-            <Text style={styles.settingText}>Deactivate account</Text>
-          </TouchableOpacity>
+          {settingsItems.map(item => (
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.settingItem}
+              onPress={() => handleSettingAction(item.id)}
+            >
+              <FontAwesome name={item.icon as any} size={20} color="#fff" style={styles.settingIcon} />
+              <Text style={styles.settingText}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         
         {/* Bottom Spacer */}
@@ -112,35 +98,35 @@ const ProfileScreen = () => {
             style={styles.navItem} 
             onPress={() => navigation.navigate('Dashboard')}
           >
-            <FontAwesome name="home" size={24} color="#fff" />
+            <FontAwesome name="home" size={24} color={getNavItemColor('Profile', 'Dashboard')} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.navItem} 
             onPress={() => navigation.navigate('Calendar')}
           >
-            <FontAwesome name="calendar" size={24} color="#fff" />
+            <FontAwesome name="calendar" size={24} color={getNavItemColor('Profile', 'Calendar')} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.navItem}
             onPress={() => navigation.navigate('Messages')}
           >
-            <FontAwesome name="comments" size={24} color="#fff" />
+            <FontAwesome name="comments" size={24} color={getNavItemColor('Profile', 'Messages')} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.navItem} 
             onPress={() => navigation.navigate('Map')}
           >
-            <FontAwesome name="map" size={24} color="#fff" />
+            <FontAwesome name="map" size={24} color={getNavItemColor('Profile', 'Map')} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.navItem} 
             onPress={() => navigation.navigate('MissionReports')}
           >
-            <FontAwesome name="file-text-o" size={22} color="#fff" />
+            <FontAwesome name="file-text-o" size={22} color={getNavItemColor('Profile', 'MissionReports')} />
           </TouchableOpacity>
           
           <TouchableOpacity 
