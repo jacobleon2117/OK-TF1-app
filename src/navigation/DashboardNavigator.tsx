@@ -2,15 +2,13 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet } from 'react-native';
 
-// Import dashboard screens using path aliases
-import MessagesScreen from '@screens/dashboard/MessagesScreen';
-// These imports would be added when those screens are implemented
-// import DashboardHomeScreen from '@screens/dashboard/DashboardHomeScreen';
-// import CalendarScreen from '@screens/dashboard/CalendarScreen';
-// import MapScreen from '@screens/dashboard/MapScreen';
-// import ProfileScreen from '@screens/dashboard/ProfileScreen';
+// Import dashboard screens
+import MessagesScreen from '../screens/dashboard/MessagesScreen';
+import ScheduleScreen from '../screens/dashboard/ScheduleScreen';
+import MissionReportScreen from '../screens/dashboard/MissionReportScreen';
+import DashboardScreenTest from '../screens/dashboard/DashboardScreenTest'; // Use relative path
 
-// Temporary placeholder for screens not yet implemented
+// Placeholder screens for screens not yet implemented
 const PlaceholderScreen = ({ route }: any) => (
   <View style={styles.container}>
     <Text style={styles.text}>{route.name} Screen</Text>
@@ -18,22 +16,11 @@ const PlaceholderScreen = ({ route }: any) => (
   </View>
 );
 
-// Create temporary components for screens not yet implemented
-const DashboardHomeScreen = () => <PlaceholderScreen route={{ name: 'Dashboard Home' }} />;
-const CalendarScreen = () => <PlaceholderScreen route={{ name: 'Calendar' }} />;
+// Use placeholder components where needed
 const MapScreen = () => <PlaceholderScreen route={{ name: 'Map' }} />;
 const ProfileScreen = () => <PlaceholderScreen route={{ name: 'Profile' }} />;
 
-// Define the stack navigator types
-export type DashboardStackParamList = {
-  Dashboard: undefined;
-  Messages: undefined;
-  Calendar: undefined;
-  Map: undefined;
-  Profile: undefined;
-};
-
-const Stack = createStackNavigator<DashboardStackParamList>();
+const Stack = createStackNavigator();
 
 const DashboardNavigator = () => {
   return (
@@ -44,11 +31,12 @@ const DashboardNavigator = () => {
         cardStyle: { backgroundColor: '#000' }
       }}
     >
-      <Stack.Screen name="Dashboard" component={DashboardHomeScreen} />
+      <Stack.Screen name="Dashboard" component={DashboardScreenTest} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
-      <Stack.Screen name="Calendar" component={CalendarScreen} />
+      <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Map" component={MapScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="MissionReports" component={MissionReportScreen} />
     </Stack.Navigator>
   );
 };
