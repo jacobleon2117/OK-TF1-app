@@ -1,7 +1,11 @@
 # Branch Workflow
 
 ## Branches
+<<<<<<< HEAD
 - `feature/dashboard-home` - Current branch
+=======
+- `feature/dashboard-map` - Current branch
+>>>>>>> origin/feature/dashboard-map
 - `FS/testing` - Full stack testing branch
 - `ARVR/testing` - AR/VR testing branch
 - `dev` - Final integration branch (don't push here yet)
