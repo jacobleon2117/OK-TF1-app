@@ -2,37 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RootStackScreenNavigationProp } from '@/@types/navigation';
 
 // Get screen dimensions for better spacing
 const { height } = Dimensions.get('window');
 
-// Define navigation types that align with your app's structure
-type RootStackParamList = {
-  Dashboard: undefined;
-  Messages: undefined;
-  Calendar: undefined;
-  Map: undefined;
-  Profile: undefined;
-  MissionReports: undefined;
-};
-
-type ScheduleScreenNavigationProp = StackNavigationProp<RootStackParamList>;
-
 const ScheduleScreen = () => {
-  const navigation = useNavigation<ScheduleScreenNavigationProp>();
+  const navigation = useNavigation<RootStackScreenNavigationProp<'Calendar'>>();
   const [currentMonthDisplay, setCurrentMonthDisplay] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarDays, setCalendarDays] = useState<Array<Array<{day: string; isCurrentMonth: boolean}>>>([]);
   const [today] = useState(new Date());
-  
+  const [shifts, setShifts] = useState<any[]>([]); // TODO: Define proper shift type
+  const [isLoading, setIsLoading] = useState(true);
+
   // Days of the week - ensure no breaking within weekday names
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   // Get current day of week (0-6)
   const currentDayOfWeek = today.getDay();
-  
-  // Function to generate calendar data for a given month
+
+  // Lifecycle and data fetching methods
+  useEffect(() => {
+    updateCalendarMonth(today);
+    fetchShifts();
+  }, []);
+
+  // Fetch shifts for the current month/date
+  const fetchShifts = async () => {
+    try {
+      setIsLoading(true);
+      // TODO: Implement actual shift fetching from Firebase
+      // const fetchedShifts = await getShiftsForDate(selectedDate.toISOString());
+      // setShifts(fetchedShifts);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch shifts:', error);
+      setIsLoading(false);
+    }
+  };
+
+  // Existing calendar generation method
   const generateCalendarData = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -93,13 +103,8 @@ const ScheduleScreen = () => {
     
     return calendarGrid;
   };
-  
-  // Initialize calendar and date info
-  useEffect(() => {
-    updateCalendarMonth(today);
-  }, []);
-  
-  // Update calendar when month changes
+
+  // Update calendar month display and data
   const updateCalendarMonth = (date: Date) => {
     // Update month display
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -113,6 +118,7 @@ const ScheduleScreen = () => {
     setCalendarDays(calendarData);
   };
 
+  // Month navigation handlers
   const handlePreviousMonth = () => {
     const prevMonth = new Date(selectedDate);
     prevMonth.setMonth(prevMonth.getMonth() - 1);
@@ -127,11 +133,13 @@ const ScheduleScreen = () => {
     updateCalendarMonth(nextMonth);
   };
 
+  // Date selection handler
   const handleDateSelect = (day: string) => {
     // In a real app, this would fetch the user's shifts for this date
     console.log(`Selected day: ${day}`);
   };
 
+  // Back navigation handler
   const handleBackNavigation = () => {
     navigation.goBack();
   };
@@ -236,14 +244,25 @@ const ScheduleScreen = () => {
           </View>
         </View>
         
-        {/* Upcoming Shift Section - now with proper spacing */}
+        {/* Upcoming Shift Section */}
         <View style={styles.shiftCard}>
           <View style={styles.shiftHeader}>
             <FontAwesome name="clock-o" size={18} color="#fff" />
-            <Text style={styles.shiftHeaderText}>Upcoming Shift</Text>
+            <Text style={styles.shiftHeaderText}>Upcoming Shifts</Text>
           </View>
           
-          <Text style={styles.noShiftText}>No upcoming shifts scheduled</Text>
+          {isLoading ? (
+            <Text style={styles.loadingText}>Loading shifts...</Text>
+          ) : shifts.length === 0 ? (
+            <Text style={styles.noShiftText}>No upcoming shifts scheduled</Text>
+          ) : (
+            shifts.map((shift) => (
+              <View key={shift.id} style={styles.shiftItem}>
+                {/* TODO: Render shift details */}
+                <Text style={styles.shiftText}>{shift.description}</Text>
+              </View>
+            ))
+          )}
         </View>
 
         {/* Spacer to ensure content doesn't touch bottom nav */}
@@ -462,6 +481,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    textAlign: 'center',
+    padding: 10,
+  },
+  shiftItem: {
+    backgroundColor: '#222',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 8,
+  },
+  shiftText: {
+    color: '#fff',
   },
 });
 
