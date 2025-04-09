@@ -4,7 +4,7 @@ import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
-// Define navigation types that align with your app's structure
+// define navigation types that align with your app's structure
 type RootStackParamList = {
   Dashboard: undefined;
   Messages: undefined;
@@ -14,7 +14,7 @@ type RootStackParamList = {
   MissionReports: undefined;
 };
 
-// Correctly define the navigation prop type
+// define the navigation prop type
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ProfileScreen = () => {
@@ -145,7 +145,7 @@ const ProfileScreen = () => {
           
           <TouchableOpacity 
             style={styles.navItem}
-            // Already on Profile screen
+            // already on Profile screen
           >
             <FontAwesome name="user" size={24} color="#FF8C00" />
           </TouchableOpacity>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
-    marginTop: 50, // Add extra margin for iOS status bar
+    marginTop: 50, // add extra margin for iOS status bar
   },
   backButton: {
     width: 40,

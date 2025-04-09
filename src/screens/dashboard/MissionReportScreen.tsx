@@ -4,7 +4,7 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Define navigation types that align with your app's structure
+// define navigation types that align with your app's structure
 type RootStackParamList = {
   Dashboard: undefined;
   Messages: undefined;
@@ -20,7 +20,7 @@ const MissionReportsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   const handleBackNavigation = () => {
-    // Use goBack or navigate based on your app's structure
+    // use goBack or navigate based on your app's structure
     navigation.goBack();
   };
 
@@ -81,7 +81,7 @@ const MissionReportsScreen = () => {
           
           <TouchableOpacity 
             style={styles.navItem}
-            // Already on Mission Reports screen
+            // already on Mission Reports screen
           >
             <FontAwesome name="file-text-o" size={22} color="#FF8C00" />
           </TouchableOpacity>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
-    marginTop: 50, // Add extra margin for iOS status bar
+    marginTop: 50, // add extra margin for iOS status bar
   },
   backButton: {
     width: 40,
@@ -121,14 +121,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 8, // Move title closer to back arrow
+    marginLeft: 8, // move title closer to back arrow
   },
   headerRight: {
     width: 40,
   },
   reportsContainer: {
     flex: 1,
-    marginBottom: 80, // Space for the floating nav bar
+    marginBottom: 80, // space for the floating nav bar
     paddingHorizontal: 16,
     paddingTop: 16,
   },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 20, // Space from bottom of screen
+    bottom: 20, // space from bottom of screen
     left: 20,
     right: 20,
     alignItems: 'center',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     backgroundColor: '#111',
-    borderRadius: 30, // Rounded corners
+    borderRadius: 30, // rounded corners
     width: '100%',
     shadowColor: '#000',
     shadowOffset: {
