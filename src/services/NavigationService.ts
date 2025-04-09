@@ -1,8 +1,21 @@
-// src/services/NavigationService.ts
-
+// src/services/NavigationService.tsx
 import Toast from 'react-native-toast-message';
 
 class NavigationService {
+
+  navigation = null;
+
+  setNavigation(navigationRef) {
+    this.navigation =navigationRef;
+  }
+
+  navigate(routeName) {
+    if (this.navigation) {
+      this.navigation.navigate(routeName);
+    } else {
+      console.log('Navigation is not set');
+    }
+  }
   showToast(type = 'info', title, message) {
     Toast.show({
       type,
@@ -18,48 +31,64 @@ class NavigationService {
   // Card press handlers
   handleMessageCardPress() {
     this.showToast('info', 'Message Card', 'You pressed the message card');
+    this.navigate('Message');
   }
 
   handleScheduleCardPress() {
     this.showToast('info', 'Schedule Card', 'You pressed the schedule card');
-  }
+    this.navigate('Schedule');
+    }
+  
   
   handleLocationCardPress() {
     this.showToast('info', 'Location Card', 'You pressed the location card');
-  }
+    this.navigate('Location');
+    }
+  
   
   handleStatusCardPress() {
     this.showToast('info', 'Status Card', 'You pressed the status card');
-  }
+    this.navigate('Status');
+    }
+  
 
   // Navigation tab press handlers
   handleHomePress() {
     this.showToast('info', 'Home', 'You pressed the home tab');
-    // No navigation needed for Home, since we're already there
-  }
+    this.navigate('Home');
+    }
+  
   
   handleSchedulePress() {
     this.showToast('success', 'Schedule', 'You pressed the Schedule tab');
-    // Don't navigate since Schedule screen doesn't exist yet
-  }
+    this.navigate('Schedule');
+    }
+  
 
   handleMapPress() {
     this.showToast('info', 'Map', 'You pressed the Map tab');
-    // Don't navigate since Map screen doesn't exist yet
-  }
+    this.navigate('Map');
+    }
+  
+  
 
   handleMessagePress() {
     this.showToast('info', 'Message', 'You pressed the message button');
-  }
+    this.navigate('Message');
+    }
+  
 
   handleProfilePress() {
     this.showToast('info', 'Profile', 'You pressed the profile tab');
-    // Don't navigate since Profile screen doesn't exist yet
-  }
+   this.navigate('Profile');
+    }
+  
 
   handleNotificationsPress() {
     this.showToast('info', 'Notification', 'You pressed the notification tab');
-  }
+    this.navigate('Notification');
+    }
 }
+
 
 export default new NavigationService();

@@ -3,13 +3,13 @@ import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } fr
 import { StatusBar } from 'expo-status-bar';
 import TabBar from '../../components/navigation/TabBar';
 
-const ProfileScreen = ({ navigation }) => {
-  const [currentScreen, setCurrentScreen] = useState('Profile');
+const ScheduleScreen = ({ navigation }) => {
+  const [currentScreen, setCurrentScreen] = useState('Schedule');
 
   // Handle screen changes
   const handleScreenChange = (screenName) => {
     setCurrentScreen(screenName);
-    if (navigation && screenName !== 'Profile') {
+    if (navigation && screenName !== 'Schedule') {
       navigation.navigate(screenName);
     }
   };
@@ -66,4 +66,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default ScheduleScreen;

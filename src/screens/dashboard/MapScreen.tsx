@@ -1,12 +1,69 @@
-import React from "react";
-import { View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import TabBar from '../../components/navigation/TabBar';
 
-export default function Profile () {
-    return (
-        <View>
-            <Text>
-                Map page 
-            </Text>
-        </View> 
-    );
-}
+const MapScreen = ({ navigation }) => {
+  const [currentScreen, setCurrentScreen] = useState('Map');
+
+  // Handle screen changes
+  const handleScreenChange = (screenName) => {
+    setCurrentScreen(screenName);
+    if (navigation && screenName !== 'Map') {
+      navigation.navigate(screenName);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={styles.background}>
+        <View style={styles.headerContainer}>
+          {/* Your header component can go here */}
+        </View>
+        
+        <View style={styles.content}>
+          {/* Main content of the Schedule screen */}
+        </View>
+        
+        <View style={styles.footerContainer}>
+          <TabBar 
+            currentScreen={currentScreen}
+            onScreenChange={handleScreenChange}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  background: {
+    flex: 1,
+    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 0,
+  },
+  headerContainer: {
+    width: '100%',
+    position: 'absolute',
+    top: Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 0,
+    zIndex: 10,
+  },
+  content: {
+    flex: 1,
+    paddingTop: 60, // Provide space for header
+    paddingBottom: 60, // Provide space for tab bar
+    paddingHorizontal: 8,
+  },
+  footerContainer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 10,
+  },
+});
+
+export default MapScreen;
