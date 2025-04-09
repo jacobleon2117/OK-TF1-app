@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import type { StackNavigationProp } from '@react-navigation/stack';
+
+// Get screen dimensions for better spacing
+const { height } = Dimensions.get('window');
 
 // Define navigation types that align with your app's structure
 type RootStackParamList = {
@@ -14,37 +17,142 @@ type RootStackParamList = {
   MissionReports: undefined;
 };
 
-type NavigationProp = StackNavigationProp<RootStackParamList>;
+type ScheduleScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ScheduleScreen = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const [currentMonth, setCurrentMonth] = useState('March 2025');
+  const navigation = useNavigation<ScheduleScreenNavigationProp>();
+  const [currentMonthDisplay, setCurrentMonthDisplay] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [calendarDays, setCalendarDays] = useState<Array<Array<{day: string; isCurrentMonth: boolean}>>>([]);
+  const [today] = useState(new Date());
   
-  // Days of the week
+  // Days of the week - ensure no breaking within weekday names
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
-  // Calendar data (for visualization purposes)
-  const calendarData = [
-    ['26', '27', '28', '29', '30', '31', '01'],
-    ['2', '3', '4', '5', '6', '7', '8'],
-    ['9', '10', '11', '12', '13', '14', '15'],
-    ['16', '17', '18', '19', '20', '21', '22'],
-    ['23', '24', '25', '26', '27', '28', '29'],
-    ['31', '1', '2', '3', '4', '5', '6'],
-  ];
+  // Get current day of week (0-6)
+  const currentDayOfWeek = today.getDay();
+  
+  // Function to generate calendar data for a given month
+  const generateCalendarData = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // First day of the month
+    const firstDayOfMonth = new Date(year, month, 1);
+    const firstDayOfWeek = firstDayOfMonth.getDay();
+    
+    // Last day of the month
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const totalDaysInMonth = lastDayOfMonth.getDate();
+    
+    // Previous month's last days
+    const lastDayOfPrevMonth = new Date(year, month, 0).getDate();
+    
+    // Calendar grid (6 weeks maximum)
+    const calendarGrid: Array<Array<{day: string; isCurrentMonth: boolean}>> = [];
+    let dayCounter = 1;
+    let nextMonthCounter = 1;
+    
+    // Generate 6 weeks to ensure consistent calendar size
+    for (let week = 0; week < 6; week++) {
+      const weekDays: Array<{day: string; isCurrentMonth: boolean}> = [];
+      
+      for (let day = 0; day < 7; day++) {
+        if (week === 0 && day < firstDayOfWeek) {
+          // Previous month days
+          const prevMonthDay = lastDayOfPrevMonth - (firstDayOfWeek - day - 1);
+          weekDays.push({
+            day: prevMonthDay.toString(),
+            isCurrentMonth: false
+          });
+        } else if (dayCounter <= totalDaysInMonth) {
+          // Current month days
+          weekDays.push({
+            day: dayCounter.toString(),
+            isCurrentMonth: true
+          });
+          dayCounter++;
+        } else {
+          // Next month days
+          weekDays.push({
+            day: nextMonthCounter.toString(),
+            isCurrentMonth: false
+          });
+          nextMonthCounter++;
+        }
+      }
+      
+      calendarGrid.push(weekDays);
+      
+      // Stop generating weeks if we've already covered all days of the month
+      // and we've completed at least 4 weeks (for consistent UI)
+      if (dayCounter > totalDaysInMonth && week >= 3 && nextMonthCounter > 7) {
+        break;
+      }
+    }
+    
+    return calendarGrid;
+  };
+  
+  // Initialize calendar and date info
+  useEffect(() => {
+    updateCalendarMonth(today);
+  }, []);
+  
+  // Update calendar when month changes
+  const updateCalendarMonth = (date: Date) => {
+    // Update month display
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthName = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    setCurrentMonthDisplay(`${monthName} ${year}`);
+    
+    // Generate calendar data
+    const calendarData = generateCalendarData(date);
+    setCalendarDays(calendarData);
+  };
 
   const handlePreviousMonth = () => {
-    // In a real app, you would calculate the previous month
-    setCurrentMonth('February 2025');
+    const prevMonth = new Date(selectedDate);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    setSelectedDate(prevMonth);
+    updateCalendarMonth(prevMonth);
   };
 
   const handleNextMonth = () => {
-    // In a real app, you would calculate the next month
-    setCurrentMonth('April 2025');
+    const nextMonth = new Date(selectedDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    setSelectedDate(nextMonth);
+    updateCalendarMonth(nextMonth);
+  };
+
+  const handleDateSelect = (day: string) => {
+    // In a real app, this would fetch the user's shifts for this date
+    console.log(`Selected day: ${day}`);
   };
 
   const handleBackNavigation = () => {
     navigation.goBack();
+  };
+
+  // Check if the given day is today
+  const isToday = (day: string, isCurrentMonth: boolean): boolean => {
+    if (!isCurrentMonth) return false;
+    
+    return (
+      parseInt(day) === today.getDate() &&
+      selectedDate.getMonth() === today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear()
+    );
+  };
+
+  // Determine if today is being displayed in the current month view
+  const isCurrentMonthView = (): boolean => {
+    return (
+      selectedDate.getMonth() === today.getMonth() && 
+      selectedDate.getFullYear() === today.getFullYear()
+    );
   };
 
   return (
@@ -64,11 +172,14 @@ const ScheduleScreen = () => {
       </View>
       
       {/* Calendar Container */}
-      <ScrollView style={styles.contentContainer}>
+      <ScrollView 
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Month Selection */}
         <View style={styles.calendarCard}>
           <View style={styles.monthSelector}>
-            <Text style={styles.monthText}>{currentMonth}</Text>
+            <Text style={styles.monthText}>{currentMonthDisplay}</Text>
             <View style={styles.monthNavigation}>
               <TouchableOpacity onPress={handlePreviousMonth}>
                 <Ionicons name="chevron-back" size={24} color="#fff" />
@@ -82,34 +193,41 @@ const ScheduleScreen = () => {
           {/* Days of Week Header */}
           <View style={styles.daysHeader}>
             {daysOfWeek.map((day, index) => (
-              <Text 
-                key={index} 
-                style={[
-                  styles.dayHeaderText, 
-                  index === 6 && styles.highlightedDay
-                ]}
-              >
-                {day}
-              </Text>
+              <View key={index} style={styles.dayHeaderContainer}>
+                <Text 
+                  style={[
+                    styles.dayHeaderText, 
+                    // Only highlight the current day of week if we're viewing the current month
+                    isCurrentMonthView() && index === currentDayOfWeek ? styles.currentDayHeader : null
+                  ]}
+                >
+                  {day}
+                </Text>
+              </View>
             ))}
           </View>
           
           {/* Calendar Grid */}
           <View style={styles.calendarGrid}>
-            {calendarData.map((week, weekIndex) => (
+            {calendarDays.map((week, weekIndex) => (
               <View key={weekIndex} style={styles.weekRow}>
-                {week.map((day, dayIndex) => (
+                {week.map((dateObj, dayIndex) => (
                   <TouchableOpacity 
                     key={dayIndex} 
-                    style={styles.dayCell}
+                    style={[
+                      styles.dayCell,
+                      isToday(dateObj.day, dateObj.isCurrentMonth) && styles.currentDayCell
+                    ]}
+                    onPress={() => handleDateSelect(dateObj.day)}
                   >
                     <Text 
                       style={[
                         styles.dayText, 
-                        (dayIndex === 6 || day === '8') && styles.highlightedDay
+                        !dateObj.isCurrentMonth && styles.adjacentMonthDay,
+                        isToday(dateObj.day, dateObj.isCurrentMonth) && styles.currentDayText
                       ]}
                     >
-                      {day}
+                      {dateObj.day}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -118,14 +236,18 @@ const ScheduleScreen = () => {
           </View>
         </View>
         
-        {/* Upcoming Shift Section */}
+        {/* Upcoming Shift Section - now with proper spacing */}
         <View style={styles.shiftCard}>
           <View style={styles.shiftHeader}>
             <FontAwesome name="clock-o" size={18} color="#fff" />
             <Text style={styles.shiftHeaderText}>Upcoming Shift</Text>
           </View>
-          {/* Shift details would go here */}
+          
+          <Text style={styles.noShiftText}>No upcoming shifts scheduled</Text>
         </View>
+
+        {/* Spacer to ensure content doesn't touch bottom nav */}
+        <View style={styles.bottomSpacer} />
       </ScrollView>
       
       {/* Floating Bottom Navigation */}
@@ -161,6 +283,13 @@ const ScheduleScreen = () => {
           
           <TouchableOpacity 
             style={styles.navItem} 
+            onPress={() => navigation.navigate('MissionReports')}
+          >
+            <FontAwesome name="file-text-o" size={22} color="#fff" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.navItem} 
             onPress={() => navigation.navigate('Profile')}
           >
             <FontAwesome name="user" size={24} color="#fff" />
@@ -180,11 +309,9 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingHorizontal: 16,
     marginTop: 50, // Add extra margin for iOS status bar
-    borderBottomWidth: 1,
-    borderBottomColor: '#222',
   },
   backButton: {
     width: 40,
@@ -196,15 +323,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+    marginLeft: 8, // Move title closer to back arrow
   },
   headerRight: {
     width: 40,
   },
   contentContainer: {
     flex: 1,
-    marginBottom: 80, // Space for the floating nav bar
+  },
+  scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
+    paddingBottom: 20,
   },
   calendarCard: {
     backgroundColor: '#111',
@@ -235,14 +365,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
+  dayHeaderContainer: {
+    width: 30,
+    alignItems: 'center',
+  },
   dayHeaderText: {
     color: '#fff',
-    width: 30,
-    textAlign: 'center',
     fontSize: 14,
   },
-  highlightedDay: {
-    color: '#FF8C00', // Orange color for Saturday
+  currentDayHeader: {
+    color: '#FF8C00', // Orange color for current day of week
+    fontWeight: 'bold',
   },
   calendarGrid: {
     marginTop: 8,
@@ -258,16 +391,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  currentDayCell: {
+    backgroundColor: '#222',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#FF8C00',
+  },
   dayText: {
     color: '#fff',
     fontSize: 14,
+  },
+  currentDayText: {
+    color: '#FF8C00',
+    fontWeight: 'bold',
+  },
+  adjacentMonthDay: {
+    color: '#444', // Darkened color for days not in current month
   },
   shiftCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    minHeight: 100, // Ensure there's some visible space for shift info
+    minHeight: height * 0.25, // Make card take up space but not too much
   },
   shiftHeader: {
     flexDirection: 'row',
@@ -279,6 +425,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  noShiftText: {
+    color: '#aaa',
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 10,
+  },
+  // Add a spacer at the bottom to ensure content doesn't touch navigation
+  bottomSpacer: {
+    height: 100, // Plenty of space to ensure no touching
   },
   bottomNavContainer: {
     position: 'absolute',
