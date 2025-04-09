@@ -6,7 +6,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import MessagesScreen from '../screens/dashboard/MessagesScreen';
 import ScheduleScreen from '../screens/dashboard/ScheduleScreen';
 import MissionReportScreen from '../screens/dashboard/MissionReportScreen';
-import DashboardScreenTest from '../screens/dashboard/DashboardScreenTest';
 import ProfileScreen from '../screens/dashboard/ProfileScreen';
 
 // Placeholder screens for screens not yet implemented
@@ -28,7 +27,6 @@ const DashboardNavigator = () => {
         cardStyle: { backgroundColor: '#000' }
       }}
     >
-      <Stack.Screen name="Dashboard" component={DashboardScreenTest} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
