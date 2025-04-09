@@ -42,7 +42,10 @@ const MissionReportsScreen = () => {
       
       {/* Mission Reports List Container */}
       <ScrollView style={styles.reportsContainer}>
-        {/* Reports list will be populated from Firebase later */}
+        <View style={styles.emptyStateContainer}>
+          <FontAwesome name="file-text-o" size={48} color="#333" />
+          <Text style={styles.emptyStateText}>No mission reports available</Text>
+        </View>
       </ScrollView>
       
       {/* Floating Bottom Navigation */}
@@ -77,6 +80,13 @@ const MissionReportsScreen = () => {
           </TouchableOpacity>
           
           <TouchableOpacity 
+            style={styles.navItem}
+            // Already on Mission Reports screen
+          >
+            <FontAwesome name="file-text-o" size={22} color="#FF8C00" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
             style={styles.navItem} 
             onPress={() => navigation.navigate('Profile')}
           >
@@ -97,11 +107,9 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingHorizontal: 16,
     marginTop: 50, // Add extra margin for iOS status bar
-    borderBottomWidth: 1,
-    borderBottomColor: '#222',
   },
   backButton: {
     width: 40,
@@ -113,6 +121,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+    marginLeft: 8, // Move title closer to back arrow
   },
   headerRight: {
     width: 40,
@@ -120,6 +129,19 @@ const styles = StyleSheet.create({
   reportsContainer: {
     flex: 1,
     marginBottom: 80, // Space for the floating nav bar
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    height: 400,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#666',
+    fontSize: 16,
+    marginTop: 16,
   },
   bottomNavContainer: {
     position: 'absolute',
