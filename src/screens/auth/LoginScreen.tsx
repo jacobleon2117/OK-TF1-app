@@ -1,12 +1,10 @@
-// src/screens/auth/LoginScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity,
   Pressable,
-  ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -16,17 +14,41 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { StackNavigationProp } from '@react-navigation/stack';
+import BackgroundGrid from '@/components/BackgroundGrid';
+import CircularLogo from '@/components/CircularLogo';
+import LoadingScreen from '@/components/LoadingScreen';
 
-const LoginScreen = ({ navigation }: { navigation: any }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [organizationCode, setOrganizationCode] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+type AuthStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  ForgotPassword: undefined;
+};
+
+type LoginScreenProps = {
+  navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
+};
+
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const { login, error, setError } = useAuth();
 
-  const validateForm = () => {
+  // Fix for keyboard not showing up on initial load
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // This timeout helps ensure the keyboard shows properly on iOS
+      const timer = setTimeout(() => {
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const validateForm = (): boolean => {
     if (!email.trim()) {
       Alert.alert('Error', 'Please enter your email');
       return false;
@@ -35,19 +57,16 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
       Alert.alert('Error', 'Please enter your password');
       return false;
     }
-    if (!organizationCode.trim()) {
-      Alert.alert('Error', 'Please enter your organization code');
-      return false;
-    }
     return true;
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (): Promise<void> => {
     if (!validateForm()) return;
     
     setIsLoading(true);
     try {
-      await login(email, password, organizationCode);
+      // Always use "123456" as the organization code for now
+      await login(email, password, "123456");
       // If successful, the auth state will change and navigation will redirect
     } catch (err: any) {
       Alert.alert('Login Failed', error || 'An error occurred during login');
@@ -55,15 +74,22 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
       setIsLoading(false);
     }
   };
+  
+  // Clear form data before navigation to prevent password save prompt
+  const navigateToForgotPassword = () => {
+    setEmail('');
+    setPassword('');
+    navigation.navigate('ForgotPassword');
+  };
+
+  const navigateToSignup = () => {
+    setEmail('');
+    setPassword('');
+    navigation.navigate('Signup');
+  };
 
   return (
-    <ImageBackground 
-      source={require('../../../assets/background-login.jpg')} 
-      style={styles.backgroundImage}
-    >
-      {/* Semi-transparent overlay */}
-      <View style={styles.overlay} />
-      
+    <BackgroundGrid>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoid}
@@ -73,17 +99,21 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            {/* Title */}
+            {/* Circular Logo */}
+            <CircularLogo size={80} />
+            
+            {/* Title and Subtitle */}
             <Text style={styles.title}>OK-TF1</Text>
+            <Text style={styles.subtitle}>Urban Search and Rescue Foundation</Text>
             
             {/* Email input */}
             <Text style={styles.label}>Email address</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="example@gmail.com"
+                placeholder="Enter your email address"
                 value={email}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setEmail(text);
                   setError(null); // Clear errors when user types
                 }}
@@ -95,12 +125,13 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
             </View>
             
             {/* Password input */}
+            <Text style={styles.label}>Password</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder="Enter your password"
                 value={password}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   setPassword(text);
                   setError(null);
                 }}
@@ -116,22 +147,11 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
               </Pressable>
             </View>
             
-            {/* Organization code */}
-            <Text style={styles.label}>Organization code</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="6-digit code"
-                value={organizationCode}
-                onChangeText={(text) => {
-                  setOrganizationCode(text.replace(/[^0-9]/g, ''));
-                  setError(null);
-                }}
-                keyboardType="number-pad"
-                maxLength={6}
-                placeholderTextColor="#888"
-              />
-              <Ionicons name="chevron-forward-outline" size={20} color="#888" />
+            {/* Forgot password link */}
+            <View style={styles.forgotContainer}>
+              <TouchableOpacity onPress={navigateToForgotPassword}>
+                <Text style={styles.linkText}>Forgot Password?</Text>
+              </TouchableOpacity>
             </View>
             
             {/* Error message */}
@@ -150,19 +170,12 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
               )}
             </TouchableOpacity>
             
-            {/* Forgot password link */}
-            <View style={styles.forgotContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-                <Text style={styles.linkText}>Forgot password?</Text>
-              </TouchableOpacity>
-            </View>
-            
             {/* Sign up link */}
             <View style={styles.signupContainer}>
               <Text style={styles.whiteText}>Don't have an account?</Text>
               <TouchableOpacity 
                 style={styles.signupButton}
-                onPress={() => navigation.navigate('Signup')}
+                onPress={navigateToSignup}
               >
                 <Text style={styles.boldLinkText}>Sign up</Text>
               </TouchableOpacity>
@@ -170,20 +183,12 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </ImageBackground>
+      <LoadingScreen visible={isLoading} message="Logging in..." overlay={true} />
+    </BackgroundGrid>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
-  },
   keyboardAvoid: {
     flex: 1,
   },
@@ -194,11 +199,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    zIndex: 1, // Ensure content is above the overlay
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 16,
     color: 'white',
     textAlign: 'center',
     marginBottom: 32,
@@ -212,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 25,
     marginBottom: 16,
     paddingHorizontal: 16,
   },
@@ -221,10 +231,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   button: {
-    backgroundColor: '#5C0002', // Main red color
+    backgroundColor: '#F09737',
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
+    marginTop: 24,
     marginBottom: 16,
   },
   buttonText: {

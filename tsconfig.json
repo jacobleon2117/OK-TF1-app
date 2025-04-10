@@ -10,7 +10,8 @@
       "@navigation/*": ["src/navigation/*"],
       "@store/*": ["src/store/*"],
       "@utils/*": ["src/utils/*"],
-      "@assets/*": ["assets/*"]
+      "@assets/*": ["assets/*"],
+      "@env": ["src/env.ts"]
     },
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -21,8 +22,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "lib": ["dom", "esnext"]
+    "lib": ["dom", "esnext"],
+    "moduleResolution": "node"
   },
-  "include": ["**/*.ts", "**/*.tsx", "src/@types/**/*.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
 }

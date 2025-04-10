@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
-    marginTop: 50, // add extra margin for iOS status bar
+    marginTop: 50,
   },
   backButton: {
     width: 40,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   currentDayHeader: {
-    color: '#FF8C00', // orange color for current day of week
+    color: '#FF8C00',
     fontWeight: 'bold',
   },
   calendarGrid: {
@@ -403,14 +403,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   adjacentMonthDay: {
-    color: '#444', // darkened color for days not in current month
+    color: '#444',
   },
   shiftCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    minHeight: height * 0.25, // make card take up space but not too much
+    minHeight: height * 0.25,
   },
   shiftHeader: {
     flexDirection: 'row',
@@ -429,13 +429,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 10,
   },
-  // add a spacer at the bottom to ensure content doesn't touch navigation
   bottomSpacer: {
-    height: 100, // plenty of space to ensure no touching
+    height: 100,
   },
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 20, // space from bottom of screen
+    bottom: 20,
     left: 20,
     right: 20,
     alignItems: 'center',
@@ -444,7 +443,7 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     backgroundColor: '#111',
-    borderRadius: 30, // rounded corners
+    borderRadius: 30,
     width: '100%',
     shadowColor: '#000',
     shadowOffset: {

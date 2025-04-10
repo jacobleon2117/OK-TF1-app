@@ -1,28 +1,39 @@
-// src/navigation/index.tsx
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet } from 'react-native';
+import { 
+  NavigationContainer 
+} from '@react-navigation/native';
+import { 
+  createStackNavigator, 
+  StackScreenProps 
+} from '@react-navigation/stack';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity 
+} from 'react-native';
 
-// Import auth screens
-import LoginScreen from '../screens/auth/LoginScreen';
-import SignupScreen from '../screens/auth/SignupScreen';
-import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+// Import screens
+import LoginScreen from '@/screens/auth/LoginScreen';
+import SignupScreen from '@/screens/auth/SignupScreen';
+import ForgotPasswordScreen from '@/screens/auth/ForgotPasswordScreen';
+import ScheduleScreen from '@/screens/dashboard/ScheduleScreen';
+import AdminScheduleScreen from '@/screens/dashboard/AdminScheduleScreen';
+import LoadingScreen from '@/components/LoadingScreen';
 
 // Import auth context
 import { useAuth } from '../context/AuthContext';
 
-// Create a temporary placeholder screen
-const PlaceholderScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderText}>
-      Authentication successful! Dashboard will be implemented in feature/dashboard-home branch.
-    </Text>
-  </View>
-);
+// Type definition for navigation
+export type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  ForgotPassword: undefined;
+  Calendar: undefined;
+};
 
 // Create stack navigator
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 // Auth navigator - for unauthenticated users
 const AuthNavigator = () => {
@@ -41,23 +52,54 @@ const AuthNavigator = () => {
   );
 };
 
-// Main navigator - just a placeholder for now
+// Main navigator - focused on schedule screens
 const MainNavigator = () => {
+  const { userData } = useAuth();
+
+  console.log('User Data in Navigation:', userData);
+  console.log('Is Admin:', userData?.role === 'admin');
+
+  const isAdmin = userData?.role === 'admin';
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="PlaceholderHome" component={PlaceholderScreen} />
-    </Stack.Navigator>
+<Stack.Navigator 
+  initialRouteName="Calendar"
+  screenOptions={{ headerShown: false }}
+>
+  <Stack.Screen 
+    name="Calendar" 
+    component={isAdmin ? AdminScheduleScreen : ScheduleScreen} 
+  />
+</Stack.Navigator>
   );
 };
 
-// Root navigator - decides which navigator to show based on auth state
 const AppNavigator = () => {
-  const { user, loading } = useAuth();
+  const { user, userData, loading, error, setError } = useAuth();
+
+  console.log('Navigation State:', {
+    user: user ? user.uid : 'No User',
+    userData,
+    loading,
+    error
+  });
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
+      <LoadingScreen 
+        visible={true} 
+        message={`Loading user data${user ? ` for ${user.email}` : ''}`} 
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity onPress={() => setError(null)}>
+          <Text style={styles.retryText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -70,20 +112,22 @@ const AppNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  placeholderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#000',
     padding: 20,
   },
-  placeholderText: {
-    fontSize: 16,
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 18,
+    marginBottom: 20,
     textAlign: 'center',
+  },
+  retryText: {
+    color: '#FF8C00',
+    fontSize: 16,
   },
 });
 
