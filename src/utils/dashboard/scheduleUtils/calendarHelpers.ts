@@ -60,9 +60,9 @@ export const isToday = (
   selectedDate: Date, 
   today: Date
 ): boolean => {
-  if (!isCurrentMonth) return false;
-  
+  // Precise checking for today's date
   return (
+    isCurrentMonth && 
     parseInt(day) === today.getDate() &&
     selectedDate.getMonth() === today.getMonth() &&
     selectedDate.getFullYear() === today.getFullYear()

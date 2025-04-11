@@ -1,4 +1,5 @@
-import { Timestamp, serverTimestamp, FieldValue } from 'firebase/firestore';
+import { Timestamp, serverTimestamp, FieldValue, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/config/firebase';
 import { 
   getShiftsForDate, 
   addShift as addShiftToFirestore,
@@ -36,11 +37,28 @@ export interface Shift {
  */
 export const fetchShifts = async (selectedDate: Date): Promise<Shift[]> => {
   try {
-    const dateString = selectedDate.toISOString().split('T')[0];
-    const shiftsSnapshot = await getShiftsForDate(dateString);
+    // Create start and end of the selected day
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(selectedDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    console.log('Querying shifts between:', startOfDay, 'and', endOfDay);
+    
+    // Query shifts that start on the selected day
+    const shiftsQuery = query(
+      collection(db, 'shifts'),
+      where('startTime', '>=', Timestamp.fromDate(startOfDay)),
+      where('startTime', '<=', Timestamp.fromDate(endOfDay))
+    );
+    
+    const shiftsSnapshot = await getDocs(shiftsQuery);
+    
+    console.log('Shifts snapshot size:', shiftsSnapshot.size);
     
     return shiftsSnapshot.docs.map(doc => {
-      const data = doc.data();
+      const data = doc.data() as Shift;
       return {
         id: doc.id,
         ...data,

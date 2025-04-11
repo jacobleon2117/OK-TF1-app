@@ -130,7 +130,7 @@ export const assignTeamMemberToShift = async (
       name: userName,
       role: userRole,
       status: 'assigned',
-      assignedAt: serverTimestamp(),
+      assignedAt: Timestamp.now(), // Changed from serverTimestamp() to Timestamp.now()
       checkedIn: false,
       checkedInAt: null
     });

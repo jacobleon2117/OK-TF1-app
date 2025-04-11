@@ -5,6 +5,7 @@ import {
   View, 
   StatusBar, 
   TouchableOpacity, 
+  ScrollView,
   Dimensions 
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
@@ -54,11 +55,10 @@ const ScheduleScreen = () => {
   const currentDayOfWeek = getCurrentDayOfWeek();
 
   // lifecycle and data fetching methods
-  useEffect(() => {
-    // TODO: We need to add error handling and potential loading state
-    updateCalendarMonth(today);
-    loadShifts();
-  }, []);
+useEffect(() => {
+  updateCalendarMonth(today);
+  loadShifts();
+}, []);
 
   // update calendar month and generate the calendar data
   const updateCalendarMonth = (date: Date) => {
@@ -70,22 +70,21 @@ const ScheduleScreen = () => {
     setCalendarDays(calendarData);
   };
 
-  // fetch shifts for the selected date
-  const loadShifts = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: JACOB: I'll need to implement user role-based shift filtering
-      // Example: I'll need to create a filter for shifts to only show shifts for the user's team or role
-      const fetchedShifts = await fetchShifts(selectedDate);
-      setShifts(fetchedShifts);
-    } catch (error) {
-      console.error('Error loading shifts:', error);
-      // TODO: JACOB: I'll need to implement user-friendly error handling
-      // I'll consider adding an error state to show in UI
-    } finally {
-      setIsLoading(false);
-    }
-  };
+// Check if loadShifts properly fetches shifts
+const loadShifts = async () => {
+  setIsLoading(true);
+  try {
+    console.log('Fetching shifts for date:', selectedDate);
+    const fetchedShifts = await fetchShifts(selectedDate);
+    console.log('Fetched shifts:', fetchedShifts); // Log to check if shifts are returned
+    setShifts(fetchedShifts);
+  } catch (error) {
+    console.error('Error loading shifts:', error);
+    // Error handling here
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // month navigation handlers
   const handlePreviousMonth = () => {
@@ -102,22 +101,24 @@ const ScheduleScreen = () => {
     loadShifts();
   };
 
-  // date selection handler
-  const handleDateSelect = (day: string, isCurrentMonth: boolean) => {
-    if (isCurrentMonth) {
-      const selectedDateTime = new Date(
-        selectedDate.getFullYear(), 
-        selectedDate.getMonth(), 
-        parseInt(day)
-      );
-      
-      // TODO: JACOB: I'll need to implement date-specific shift viewing
-      // Potential features:
-      // 1. Show detailed shifts for selected date
-      // 2. Allow shift creation/assignment
-      console.log(`Selected day: ${selectedDateTime.toDateString()}`);
-    }
-  };
+// date selection handler
+const handleDateSelect = (day: string, isCurrentMonth: boolean) => {
+  if (isCurrentMonth) {
+    const selectedDateTime = new Date(
+      selectedDate.getFullYear(), 
+      selectedDate.getMonth(), 
+      parseInt(day)
+    );
+    
+    // Update the selected date
+    setSelectedDate(selectedDateTime);
+    
+    // Load shifts for the selected date
+    loadShifts();
+    
+    console.log(`Selected day: ${selectedDateTime.toDateString()}`);
+  }
+};
 
   // This is a helper method to format shift time
   const formatShiftTime = (timestamp: Timestamp): string => {
@@ -149,7 +150,13 @@ const ScheduleScreen = () => {
       </View>
       
       {/* Calendar Container */}
-      <View style={styles.contentContainer}>
+      <ScrollView 
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={true}
+      >
         {/* Month Selection */}
         <View style={styles.calendarCard}>
           <View style={styles.monthSelector}>
@@ -245,10 +252,10 @@ const ScheduleScreen = () => {
             ))
           )}
         </View>
-      </View>
-      
+      <View style={styles.bottomSpacer} />
+      </ScrollView>
       {/* Floating Bottom Navigation */}
-      <View style={styles.bottomNavContainer}>
+<View style={styles.bottomNavContainer}>
         <View style={styles.bottomNav}>
           <TouchableOpacity 
             style={styles.navItem} 
@@ -301,13 +308,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    paddingHorizontal: 16, // Add horizontal padding to the entire container
   },
   header: {
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 16,
     marginTop: 50,
   },
   backButton: {
@@ -338,6 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    marginHorizontal: 0, // Ensure no additional horizontal margins
   },
   monthSelector: {
     flexDirection: 'row',
@@ -388,20 +396,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  currentDayCell: {
-    backgroundColor: '#222',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#FF8C00',
-  },
+currentDayCell: {
+  backgroundColor: '#222', // Dark background
+  borderRadius: 15,
+  borderWidth: 1,
+  borderColor: '#FF8C00', // Orange border
+},
   dayText: {
     color: '#fff',
     fontSize: 14,
   },
-  currentDayText: {
-    color: '#FF8C00',
-    fontWeight: 'bold',
-  },
+currentDayText: {
+  color: '#FF8C00', // Orange text
+  fontWeight: 'bold',
+},
   adjacentMonthDay: {
     color: '#444',
   },
@@ -409,7 +417,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 16, // This ensures space between the card and bottom nav
     minHeight: height * 0.25,
   },
   shiftHeader: {
@@ -430,7 +438,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   bottomSpacer: {
-    height: 100,
+    height: 20,
   },
   bottomNavContainer: {
     position: 'absolute',
@@ -477,6 +485,10 @@ const styles = StyleSheet.create({
     color: '#aaa',
     fontSize: 12,
     marginTop: 4,
+  },
+  scrollContentContainer: {
+    flexGrow: 1,
+    paddingBottom: 100,
   },
 });
 

@@ -42,16 +42,66 @@ import {
   deleteExistingShift,
   assignTeamMemberToShift,
   getAllTeamMembers,
-  UserData
+  UserData,
+  getShiftAssignments 
 } from '@utils/dashboard/scheduleUtils/adminUtils';
 
 // firebase imports
 import { Timestamp, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
-import { addShift, deleteShift, updateShiftStatus } from '../../services/firebase/schedulingService';
+import { addShift, deleteShift } from '../../services/firebase/schedulingService';
 
 // get users screen dimensions for better spacing on different screen sizes
 const { height, width } = Dimensions.get('window');
+
+// Time picker component
+const TimePicker = ({ 
+  value, 
+  onChange, 
+  label 
+}: { 
+  value: string;
+  onChange: (time: string) => void;
+  label: string;
+}) => {
+  // Generate time options (every 30 minutes)
+  const timeOptions = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute of [0, 30]) {
+      const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
+      const formattedMinute = minute === 0 ? '00' : '30';
+      timeOptions.push(`${formattedHour}:${formattedMinute}`);
+    }
+  }
+
+  return (
+    <View style={styles.timePickerContainer}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <View style={styles.pickerContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.timeOptionsContainer}
+        >
+          {timeOptions.map((time) => (
+            <TouchableOpacity
+              key={time}
+              style={[
+                styles.timeOption,
+                value === time && styles.selectedTimeOption
+              ]}
+              onPress={() => onChange(time)}
+            >
+              <Text style={value === time ? styles.selectedTimeText : styles.timeText}>
+                {time}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </View>
+  );
+};
 
 const AdminScheduleScreen = () => {
   const navigation = useNavigation<RootStackScreenNavigationProp<'Calendar'>>();
@@ -71,16 +121,19 @@ const AdminScheduleScreen = () => {
   const [teamMembers, setTeamMembers] = useState<UserData[]>([]);
   const [selectedTeamMembers, setSelectedTeamMembers] = useState<UserData[]>([]);
   
-  // Admin modal states
+  // Modal states
   const [isCreateShiftModalVisible, setCreateShiftModalVisible] = useState(false);
   const [isEditShiftModalVisible, setEditShiftModalVisible] = useState(false);
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-  
+
+  // Time selection states
+  const [selectedStartTime, setSelectedStartTime] = useState('09:00');
+  const [selectedEndTime, setSelectedEndTime] = useState('17:00');
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+
   // Shift form states
   const [shiftDescription, setShiftDescription] = useState('');
   const [shiftLocation, setShiftLocation] = useState('');
-  const [shiftStartTime, setShiftStartTime] = useState(new Date());
-  const [shiftEndTime, setShiftEndTime] = useState(new Date(new Date().getTime() + 3600000)); // Default to 1 hour later
 
   // days of the week and the current day
   const daysOfWeek = getDaysOfWeek();
@@ -125,7 +178,7 @@ const AdminScheduleScreen = () => {
     setCalendarDays(calendarData);
   };
 
-  // fetch shifts for the selected date
+  // Load shifts with improved error handling
   const loadShifts = async () => {
     setIsLoading(true);
     try {
@@ -133,7 +186,25 @@ const AdminScheduleScreen = () => {
       setShifts(fetchedShifts);
     } catch (error) {
       console.error('Error loading shifts:', error);
-      Alert.alert('Error', 'Failed to load shifts. Please try again.');
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unknown error occurred';
+        
+      Alert.alert(
+        'Error Loading Shifts',
+        `There was a problem loading your shifts. ${errorMessage}`,
+        [
+          {
+            text: 'Retry',
+            onPress: () => loadShifts()
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]
+      );
     } finally {
       setIsLoading(false);
     }
@@ -155,36 +226,84 @@ const AdminScheduleScreen = () => {
   };
 
   // date selection handler
-  const handleDateSelect = (day: string, isCurrentMonth: boolean) => {
-    if (isCurrentMonth) {
-      const selectedDateTime = new Date(
-        selectedDate.getFullYear(), 
-        selectedDate.getMonth(), 
-        parseInt(day)
-      );
-      
-      setSelectedDate(selectedDateTime);
-      // Reload shifts for the selected date
-      loadShifts();
-    }
-  };
+const handleDateSelect = (day: string, isCurrentMonth: boolean) => {
+  if (!isCurrentMonth) return;
+  
+  const selectedDateTime = new Date(
+    selectedDate.getFullYear(), 
+    selectedDate.getMonth(), 
+    parseInt(day)
+  );
+  
+  // Check if date is already selected
+  const isDateSelected = selectedDates.some(date => 
+    date.getDate() === selectedDateTime.getDate() &&
+    date.getMonth() === selectedDateTime.getMonth() &&
+    date.getFullYear() === selectedDateTime.getFullYear()
+  );
+  
+  // If already selected, remove it, otherwise add it
+  if (isDateSelected) {
+    setSelectedDates(prev => prev.filter(date => 
+      !(date.getDate() === selectedDateTime.getDate() &&
+        date.getMonth() === selectedDateTime.getMonth() &&
+        date.getFullYear() === selectedDateTime.getFullYear())
+    ));
+  } else {
+    setSelectedDates(prev => [...prev, selectedDateTime]);
+  }
+};
 
 const handleCreateShift = async () => {
-    if (!shiftDescription || !shiftLocation) {
-      Alert.alert('Error', 'Please fill all required fields');
-      return;
-    }
+  if (!shiftDescription || !shiftLocation) {
+    Alert.alert('Error', 'Please fill all required fields');
+    return;
+  }
+  
+  if (selectedDates.length === 0) {
+    Alert.alert('Error', 'Please select at least one date');
+    return;
+  }
     
-    setIsLoading(true);
-    try {
+ // Create date objects with selected date and times
+  const [startHour, startMinute] = selectedStartTime.split(':').map(Number);
+  const [endHour, endMinute] = selectedEndTime.split(':').map(Number);
+  
+  setIsLoading(true);
+  try {
+    // Create shifts for each selected date
+    for (const selectedDate of selectedDates) {
+      const startDateTime = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        startHour,
+        startMinute
+      );
+      
+      const endDateTime = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        endHour,
+        endMinute
+      );
+    
+// Validation - make sure end time is after start time
+      if (endDateTime <= startDateTime) {
+        Alert.alert('Error', 'End time must be after start time');
+        setIsLoading(false);
+        return;
+      }
+      
       const newShift = {
         description: shiftDescription,
         location: {
           name: shiftLocation,
-          address: '', // Optional, can be added later
+          address: '', 
         },
-        startTime: Timestamp.fromDate(shiftStartTime),
-        endTime: Timestamp.fromDate(shiftEndTime),
+        startTime: Timestamp.fromDate(startDateTime),
+        endTime: Timestamp.fromDate(endDateTime),
         status: 'active',
       };
       
@@ -192,16 +311,15 @@ const handleCreateShift = async () => {
       const shiftRef = await addShift(newShift);
       
       // Assign selected team members to the shift
-      await Promise.all(
-        selectedTeamMembers.map(member => 
-          assignTeamMemberToShift(
-            shiftRef.id, 
-            member.id, 
-            member.displayName, 
-            member.role
-          )
-        )
-      );
+      for (const member of selectedTeamMembers) {
+        await assignTeamMemberToShift(
+          shiftRef.id, 
+          member.id, 
+          member.displayName, 
+          member.role
+        );
+      }
+    }
     
     // Reset form and close modal
     resetShiftForm();
@@ -210,15 +328,16 @@ const handleCreateShift = async () => {
     // Reload shifts
     loadShifts();
     
-      Alert.alert('Success', 'Shift created and team members assigned');
-    } catch (error) {
-      console.error('Error creating shift:', error);
-      Alert.alert('Error', 'Failed to create shift');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    Alert.alert('Success', `${selectedDates.length} shifts created successfully`);
+  } catch (error) {
+    console.error('Error creating shifts:', error);
+    Alert.alert('Error', 'Failed to create shifts');
+  } finally {
+    setIsLoading(false);
+  }
+};
   
+  // Update an existing shift
   const handleUpdateShift = async () => {
     if (!selectedShift || !selectedShift.id) {
       return;
@@ -226,6 +345,32 @@ const handleCreateShift = async () => {
     
     if (!shiftDescription || !shiftLocation) {
       Alert.alert('Error', 'Please fill all required fields');
+      return;
+    }
+    
+    // Create date objects with selected times
+    const [startHour, startMinute] = selectedStartTime.split(':').map(Number);
+    const [endHour, endMinute] = selectedEndTime.split(':').map(Number);
+    
+    const startDateTime = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      startHour,
+      startMinute
+    );
+    
+    const endDateTime = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      endHour,
+      endMinute
+    );
+    
+    // Validation - make sure end time is after start time
+    if (endDateTime <= startDateTime) {
+      Alert.alert('Error', 'End time must be after start time');
       return;
     }
     
@@ -238,14 +383,24 @@ const handleCreateShift = async () => {
           name: shiftLocation,
           address: selectedShift.location.address || '',
         },
-        startTime: Timestamp.fromDate(shiftStartTime),
-        endTime: Timestamp.fromDate(shiftEndTime),
+        startTime: Timestamp.fromDate(startDateTime),
+        endTime: Timestamp.fromDate(endDateTime),
         status: 'updated',
+        updatedAt: serverTimestamp()
       };
       
-      // In a real app, you would update all shift fields
-      // For now, we'll just update the status as example
-      await updateShiftStatus(selectedShift.id, 'updated');
+      // Update the shift
+      await updateExistingShift(selectedShift.id, updatedData);
+      
+      // Update team member assignments
+      for (const member of selectedTeamMembers) {
+        await assignTeamMemberToShift(
+          selectedShift.id,
+          member.id,
+          member.displayName,
+          member.role
+        );
+      }
       
       // Reset form and close modal
       resetShiftForm();
@@ -263,79 +418,119 @@ const handleCreateShift = async () => {
     }
   };
   
+  // Delete a shift
   const handleDeleteShift = async () => {
-  if (!selectedShift || !selectedShift.id) {
-    return;
-  }
-  
-  Alert.alert(
-    'Confirm Delete',
-    'Are you sure you want to delete this shift?',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          setIsLoading(true);
-          try {
-            // Make sure id is defined before calling deleteShift
-            if (selectedShift.id) {
-              await deleteShift(selectedShift.id);
-              
-              // Reset form and close modal
-              resetShiftForm();
-              setEditShiftModalVisible(false);
-              
-              // Reload shifts
-              loadShifts();
-              
-              Alert.alert('Success', 'Shift deleted successfully');
-            } else {
-              throw new Error('Shift ID is undefined');
-            }
-          } catch (error) {
-            console.error('Error deleting shift:', error);
-            Alert.alert('Error', 'Failed to delete shift');
-          } finally {
-            setIsLoading(false);
-          }
+    if (!selectedShift || !selectedShift.id) {
+      return;
+    }
+    
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this shift?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-      },
-    ],
-  );
-};
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              if (selectedShift.id) {
+                await deleteShift(selectedShift.id);
+                
+                resetShiftForm();
+                setEditShiftModalVisible(false);
+                loadShifts();
+                
+                Alert.alert('Success', 'Shift deleted successfully');
+              } else {
+                throw new Error('Shift ID is undefined');
+              }
+            } catch (error) {
+              console.error('Error deleting shift:', error);
+              Alert.alert('Error', 'Failed to delete shift');
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
   
   // Helper functions
-  const resetShiftForm = () => {
-    setShiftDescription('');
-    setShiftLocation('');
-    setShiftStartTime(new Date());
-    setShiftEndTime(new Date(new Date().getTime() + 3600000));
-    setSelectedShift(null);
-    setSelectedTeamMembers([]); // Reset selected team members
-  };
+const resetShiftForm = () => {
+  setShiftDescription('');
+  setShiftLocation('');
+  setSelectedStartTime('09:00');
+  setSelectedEndTime('17:00');
+  setSelectedShift(null);
+  setSelectedTeamMembers([]);
+  setSelectedDates([]); // Clear selected dates
+};
   
   const handleOpenCreateShiftModal = () => {
     resetShiftForm();
     setCreateShiftModalVisible(true);
   };
   
-  const handleOpenEditShiftModal = (shift: Shift) => {
+  // Open the edit shift modal with shift details
+  const handleOpenEditShiftModal = async (shift: Shift) => {
     setSelectedShift(shift);
     setShiftDescription(shift.description);
     setShiftLocation(shift.location.name);
-    setShiftStartTime(shift.startTime.toDate());
-    setShiftEndTime(shift.endTime.toDate());
+    
+    // Format times for the picker
+    const formatTimeForPicker = (date: Date) => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes() >= 30 ? '30' : '00';
+      return `${hours}:${minutes}`;
+    };
+    
+    // Set shift start and end times
+    const startDate = shift.startTime.toDate();
+    const endDate = shift.endTime.toDate();
+    
+    setSelectedStartTime(formatTimeForPicker(startDate));
+    setSelectedEndTime(formatTimeForPicker(endDate));
+    
+    // Load the assigned team members
+    try {
+      // If shift has assignedUsers property
+      if (shift.assignedUsers && shift.assignedUsers.length > 0) {
+        const assignedMembers = [];
+        
+        for (const assignment of shift.assignedUsers) {
+          const member = teamMembers.find(m => m.id === assignment.userId);
+          if (member) {
+            assignedMembers.push({...member});
+          }
+        }
+        
+        setSelectedTeamMembers(assignedMembers);
+      } else {
+        // If assignedUsers is not directly on the shift, try to fetch it
+        const assignments = await getShiftAssignments(shift.id || '');
+        
+        const assignedMembers = [];
+        for (const assignment of assignments) {
+          const member = teamMembers.find(m => m.id === assignment.userId);
+          if (member) {
+            assignedMembers.push({...member});
+          }
+        }
+        
+        setSelectedTeamMembers(assignedMembers);
+      }
+    } catch (error) {
+      console.error('Error loading shift assignments:', error);
+      setSelectedTeamMembers([]);
+    }
+    
     setEditShiftModalVisible(true);
-  };
-  
-  // Navigate to Admin Setup
-  const navigateToAdminSetup = () => {
-    navigation.navigate('AdminSetup');
   };
 
   return (
@@ -359,114 +554,102 @@ const handleCreateShift = async () => {
         <FontAwesome name="shield" size={12} color="#FF8C00" />
         <Text style={styles.adminBadgeText}>Coordinator View</Text>
       </View>
+     {/* Calendar Container */}
+<ScrollView 
+  style={styles.contentContainer}
+  showsVerticalScrollIndicator={false}
+>  <View style={styles.scrollContent}>
+    {/* Month Selection */}
+    <View style={styles.calendarCard}>
+      <View style={styles.monthSelector}>
+        <Text style={styles.monthText}>{currentMonthDisplay}</Text>
+        <View style={styles.monthNavigation}>
+          <TouchableOpacity onPress={handlePreviousMonth}>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleNextMonth}>
+            <Ionicons name="chevron-forward" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
       
-      {/* Calendar Container */}
-      <ScrollView style={styles.contentContainer}>
-        <View style={styles.scrollContent}>
-          {/* Month Selection */}
-          <View style={styles.calendarCard}>
-            <View style={styles.monthSelector}>
-              <Text style={styles.monthText}>{currentMonthDisplay}</Text>
-              <View style={styles.monthNavigation}>
-                <TouchableOpacity onPress={handlePreviousMonth}>
-                  <Ionicons name="chevron-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleNextMonth}>
-                  <Ionicons name="chevron-forward" size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            </View>
-            
-            {/* Days of Week Header */}
-            <View style={styles.daysHeader}>
-              {daysOfWeek.map((day, index) => (
-                <View key={index} style={styles.dayHeaderContainer}>
-                  <Text 
-                    style={[
-                      styles.dayHeaderText, 
-                      isCurrentMonthView(selectedDate, today) && 
-                      index === currentDayOfWeek ? 
-                      styles.currentDayHeader : null
-                    ]}
-                  >
-                    {day}
-                  </Text>
-                </View>
-              ))}
-            </View>
-            
-            {/* Calendar Grid */}
-            <View style={styles.calendarGrid}>
-              {calendarDays.map((week, weekIndex) => (
-                <View key={weekIndex} style={styles.weekRow}>
-                  {week.map((dateObj, dayIndex) => (
-                    <TouchableOpacity 
-                      key={dayIndex} 
-                      style={[
-                        styles.dayCell,
-                        isToday(
-                          dateObj.day, 
-                          dateObj.isCurrentMonth, 
-                          selectedDate, 
-                          today
-                        ) && styles.currentDayCell,
-                        selectedDate.getDate() === parseInt(dateObj.day) && 
-                        dateObj.isCurrentMonth && styles.selectedDayCell
-                      ]}
-                      onPress={() => handleDateSelect(dateObj.day, dateObj.isCurrentMonth)}
-                    >
-                      <Text 
-                        style={[
-                          styles.dayText, 
-                          !dateObj.isCurrentMonth && styles.adjacentMonthDay,
-                          isToday(
-                            dateObj.day, 
-                            dateObj.isCurrentMonth, 
-                            selectedDate, 
-                            today
-                          ) && styles.currentDayText,
-                          selectedDate.getDate() === parseInt(dateObj.day) && 
-                          dateObj.isCurrentMonth && styles.selectedDayText
-                        ]}
-                      >
-                        {dateObj.day}
-                      </Text>
-                      
-                      {/* Dot indicator for days with shifts */}
-                      {shifts.some(shift => {
-                        const shiftDate = shift.startTime.toDate();
-                        return (
-                          dateObj.isCurrentMonth &&
-                          parseInt(dateObj.day) === shiftDate.getDate() &&
-                          selectedDate.getMonth() === shiftDate.getMonth() &&
-                          selectedDate.getFullYear() === shiftDate.getFullYear()
-                        );
-                      }) && (
-                        <View style={styles.shiftIndicator} />
-                      )}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              ))}
-            </View>
-          </View>
-          
-          {/* Selected Date Display */}
-          <View style={styles.selectedDateContainer}>
-            <Text style={styles.selectedDateText}>
-              {selectedDate.toDateString()}
+      {/* Days of Week Header */}
+      <View style={styles.daysHeader}>
+        {daysOfWeek.map((day, index) => (
+          <View key={index} style={styles.dayHeaderContainer}>
+            <Text 
+              style={[
+                styles.dayHeaderText, 
+                isCurrentMonthView(selectedDate, today) && 
+                index === currentDayOfWeek ? 
+                styles.currentDayHeader : null
+              ]}
+            >
+              {day}
             </Text>
           </View>
-          
-          {/* Shifts Section */}
-          <View style={styles.shiftCard}>
-            <View style={styles.shiftHeader}>
-              <FontAwesome name="clock-o" size={18} color="#fff" />
-              <Text style={styles.shiftHeaderText}>
-                Manage Shifts
-              </Text>
-            </View>
-            
+        ))}
+      </View>
+      
+      {/* Calendar Grid */}
+      <View style={styles.calendarGrid}>
+        {calendarDays.map((week, weekIndex) => (
+          <View key={weekIndex} style={styles.weekRow}>
+            {week.map((dateObj, dayIndex) => (
+              <TouchableOpacity 
+                key={dayIndex} 
+                style={[
+                  styles.dayCell,
+                  isToday(
+                    dateObj.day, 
+                    dateObj.isCurrentMonth, 
+                    selectedDate, 
+                    today
+                  ) && styles.currentDayCell
+                ]}
+                onPress={() => handleDateSelect(dateObj.day, dateObj.isCurrentMonth)}
+              >
+                <Text 
+                  style={[
+                    styles.dayText, 
+                    !dateObj.isCurrentMonth && styles.adjacentMonthDay,
+                    isToday(
+                      dateObj.day, 
+                      dateObj.isCurrentMonth, 
+                      selectedDate, 
+                      today
+                    ) && styles.currentDayText
+                  ]}
+                >
+                  {dateObj.day}
+                </Text>
+                
+                {/* Dot indicator for days with shifts */}
+                {shifts.some(shift => {
+                  const shiftDate = shift.startTime.toDate();
+                  return (
+                    dateObj.isCurrentMonth &&
+                    parseInt(dateObj.day) === shiftDate.getDate() &&
+                    selectedDate.getMonth() === shiftDate.getMonth() &&
+                    selectedDate.getFullYear() === shiftDate.getFullYear()
+                  );
+                }) && (
+                  <View style={styles.shiftIndicator} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </View>
+      </View>
+      {/* Shifts Section */}
+      <View style={styles.shiftCard}>
+        <View style={styles.shiftHeader}>
+          <FontAwesome name="clock-o" size={18} color="#fff" />
+          <Text style={styles.shiftHeaderText}>
+            Manage Shifts
+          </Text>
+        </View>
             <TouchableOpacity 
               style={styles.createShiftButton}
               onPress={handleOpenCreateShiftModal}
@@ -513,146 +696,193 @@ const handleCreateShift = async () => {
             )}
           </View>
           
-          {/* Admin Control Section */}
-          <View style={styles.adminCard}>
-            <View style={styles.adminHeader}>
-              <FontAwesome name="shield" size={18} color="#FF8C00" />
-              <Text style={styles.adminHeaderText}>Coordinator Controls</Text>
-            </View>
-            
-            <TouchableOpacity 
-              style={styles.adminButton}
-              onPress={handleOpenCreateShiftModal}
-            >
-              <Text style={styles.adminButtonText}>Create New Shift</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.adminButton}
-              onPress={() => Alert.alert('Coming Soon', 'Team availability view will be available in the next update.')}
-            >
-              <Text style={styles.adminButtonText}>View Team Availability</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.adminButton}
-              onPress={() => Alert.alert('Coming Soon', 'Shift templates will be available in the next update.')}
-            >
-              <Text style={styles.adminButtonText}>Manage Shift Templates</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.adminButton}
-              onPress={navigateToAdminSetup}
-            >
-              <Text style={styles.adminButtonText}>Admin Setup</Text>
-            </TouchableOpacity>
-          </View>
-          
           {/* Add spacing at the bottom for the floating nav */}
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
       
       {/* Create Shift Modal */}
-<Modal
-  visible={isCreateShiftModalVisible}
-  animationType="slide"
-  transparent={true}
-  onRequestClose={() => setCreateShiftModalVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <View style={styles.modalHeader}>
-        <Text style={styles.modalTitle}>Create New Shift</Text>
-        <TouchableOpacity onPress={() => setCreateShiftModalVisible(false)}>
-          <Ionicons name="close" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.modalForm}>
-        {/* Existing input fields */}
-        <Text style={styles.inputLabel}>Description *</Text>
-        <TextInput
-          style={styles.input}
-          value={shiftDescription}
-          onChangeText={setShiftDescription}
-          placeholder="Enter shift description"
-          placeholderTextColor="#666"
-        />
-        
-        <Text style={styles.inputLabel}>Location *</Text>
-        <TextInput
-          style={styles.input}
-          value={shiftLocation}
-          onChangeText={setShiftLocation}
-          placeholder="Enter location"
-          placeholderTextColor="#666"
-        />
-        
-        {/* Team Member Selection */}
-        <Text style={styles.inputLabel}>Assign Team Members</Text>
-        <ScrollView 
-          horizontal 
-          style={styles.teamMemberScrollView}
-          showsHorizontalScrollIndicator={false}
-        >
-          {teamMembers.map(member => (
-            <TouchableOpacity 
-              key={member.id}
-              style={[
-                styles.teamMemberItem,
-                selectedTeamMembers.some(m => m.id === member.id) && styles.selectedTeamMember
-              ]}
-              onPress={() => toggleTeamMemberSelection(member)}
-            >
-              <Text style={styles.teamMemberText}>{member.displayName}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        
-        {/* Date and Time Selection */}
-        <Text style={styles.inputLabel}>Shift Date</Text>
-        <View style={styles.dateSelectionContainer}>
-          {calendarDays.flat().map((dateObj, index) => (
-            dateObj.isCurrentMonth && (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.dateSelectionCell,
-                  selectedDate.getDate() === parseInt(dateObj.day) && styles.selectedDateCell
-                ]}
-                onPress={() => {
-                  const newDate = new Date(
-                    selectedDate.getFullYear(), 
-                    selectedDate.getMonth(), 
-                    parseInt(dateObj.day)
-                  );
-                  setShiftStartTime(newDate);
-                  setShiftEndTime(new Date(newDate.getTime() + 3600000)); // 1 hour later
-                }}
-              >
-                <Text style={styles.dateSelectionText}>{dateObj.day}</Text>
+      <Modal
+        visible={isCreateShiftModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setCreateShiftModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Create New Shift</Text>
+              <TouchableOpacity onPress={() => setCreateShiftModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
-            )
-          ))}
+            </View>
+            
+            <ScrollView style={styles.modalScroll}>
+              <View style={styles.modalForm}>
+                <Text style={styles.inputLabel}>Description *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={shiftDescription}
+                  onChangeText={setShiftDescription}
+                  placeholder="Enter shift description"
+                  placeholderTextColor="#666"
+                />
+                
+                <Text style={styles.inputLabel}>Location *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={shiftLocation}
+                  onChangeText={setShiftLocation}
+                  placeholder="Enter location"
+                  placeholderTextColor="#666"
+                />
+                
+                <Text style={styles.inputLabel}>Team Members</Text>
+                <View style={styles.selectedTeamMembersContainer}>
+                  {selectedTeamMembers.length > 0 ? (
+                    <ScrollView 
+                      style={{maxHeight: 100}}
+                      showsHorizontalScrollIndicator={false}
+                    >
+                      {selectedTeamMembers.map(member => (
+                        <View key={member.id} style={styles.selectedMemberChip}>
+                          <Text style={styles.selectedMemberName}>{member.displayName}</Text>
+                          <TouchableOpacity
+                            onPress={() => toggleTeamMemberSelection(member)}
+                            style={styles.removeMemberButton}
+                          >
+                            <Ionicons name="close-circle" size={16} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <Text style={styles.noMembersText}>No team members assigned</Text>
+                  )}
+                </View>
+
+                <Text style={styles.inputLabel}>Available Team Members</Text>
+                <ScrollView 
+                  horizontal 
+                  style={styles.teamMemberScrollView}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {teamMembers
+                    .filter(member => !selectedTeamMembers.some(m => m.id === member.id))
+                    .map(member => (
+                      <TouchableOpacity 
+                        key={member.id}
+                        style={styles.teamMemberItem}
+                        onPress={() => toggleTeamMemberSelection(member)}
+                      >
+                        <Text style={styles.teamMemberText}>{member.displayName}</Text>
+                      </TouchableOpacity>
+                    ))
+                  }
+                </ScrollView>
+                {/* Multi-Date Selection */}
+<Text style={styles.inputLabel}>Select Shift Dates</Text>
+<View style={styles.dateSelectionContainer}>
+  {calendarDays.flat().map((dateObj, index) => (
+    dateObj.isCurrentMonth && (
+      <TouchableOpacity
+        key={index}
+        style={[
+          styles.dateSelectionCell,
+          selectedDates.some(date => date.getDate() === parseInt(dateObj.day)) && 
+            styles.selectedDateCell
+        ]}
+        onPress={() => {
+          const newDate = new Date(
+            selectedDate.getFullYear(), 
+            selectedDate.getMonth(), 
+            parseInt(dateObj.day)
+          );
+          
+          // Check if already selected
+          const isSelected = selectedDates.some(date => 
+            date.getDate() === newDate.getDate() &&
+            date.getMonth() === newDate.getMonth() &&
+            date.getFullYear() === newDate.getFullYear()
+          );
+          
+          // Toggle selection
+          if (isSelected) {
+            setSelectedDates(prev => prev.filter(date => 
+              !(date.getDate() === newDate.getDate() &&
+                date.getMonth() === newDate.getMonth() &&
+                date.getFullYear() === newDate.getFullYear())
+            ));
+          } else {
+            setSelectedDates(prev => [...prev, newDate]);
+          }
+        }}
+      >
+        <Text style={styles.dateSelectionText}>{dateObj.day}</Text>
+      </TouchableOpacity>
+    )
+  ))}
+</View>
+
+{/* Selected Dates Display */}
+{selectedDates.length > 0 && (
+  <View style={styles.selectedDatesContainer}>
+    <Text style={styles.inputLabel}>Selected Dates:</Text>
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false}
+      style={styles.selectedDatesScrollView}
+    >
+      {selectedDates.map((date, index) => (
+        <View key={index} style={styles.selectedDateChip}>
+          <Text style={styles.selectedDateText}>
+            {date.toLocaleDateString()}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedDates(prev => prev.filter((d, i) => i !== index));
+            }}
+            style={styles.removeDateButton}
+          >
+            <Ionicons name="close-circle" size={16} color="#fff" />
+          </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity 
-          style={styles.submitButton}
-          onPress={handleCreateShift}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#FFF" />
-          ) : (
-            <Text style={styles.submitButtonText}>Create Shift</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </View>
+      ))}
+    </ScrollView>
   </View>
-</Modal>
+)}
+                
+                {/* Improved Time Selection */}
+                <View style={styles.timeSelectionContainer}>
+                  <TimePicker 
+                    label="Start Time"
+                    value={selectedStartTime}
+                    onChange={setSelectedStartTime}
+                  />
+
+                  <TimePicker 
+                    label="End Time"
+                    value={selectedEndTime}
+                    onChange={setSelectedEndTime}
+                  />
+                </View>
+                
+                <TouchableOpacity 
+                  style={styles.submitButton}
+                  onPress={handleCreateShift}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <Text style={styles.submitButtonText}>Create Shift</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
       
       {/* Edit Shift Modal */}
       <Modal
@@ -670,65 +900,109 @@ const handleCreateShift = async () => {
               </TouchableOpacity>
             </View>
             
-            <View style={styles.modalForm}>
-              <Text style={styles.inputLabel}>Description *</Text>
-              <TextInput
-                style={styles.input}
-                value={shiftDescription}
-                onChangeText={setShiftDescription}
-                placeholder="Enter shift description"
-                placeholderTextColor="#666"
-              />
-              
-              <Text style={styles.inputLabel}>Location *</Text>
-              <TextInput
-                style={styles.input}
-                value={shiftLocation}
-                onChangeText={setShiftLocation}
-                placeholder="Enter location"
-                placeholderTextColor="#666"
-              />
-              
-              <Text style={styles.inputLabel}>Date and Time</Text>
-              <Text style={styles.timeText}>
-                Start: {shiftStartTime.toLocaleString()}
-              </Text>
-              
-              <Text style={styles.timeText}>
-                End: {shiftEndTime.toLocaleString()}
-              </Text>
-              
-              <View style={styles.buttonRow}>
-                <TouchableOpacity 
-                  style={styles.updateButton}
-                  onPress={handleUpdateShift}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="#FFF" />
-                  ) : (
-                    <Text style={styles.submitButtonText}>Update</Text>
-                  )}
-                </TouchableOpacity>
+            <ScrollView style={styles.modalScroll}>
+              <View style={styles.modalForm}>
+                <Text style={styles.inputLabel}>Description *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={shiftDescription}
+                  onChangeText={setShiftDescription}
+                  placeholder="Enter shift description"
+                  placeholderTextColor="#666"
+                />
                 
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={handleDeleteShift}
-                  disabled={isLoading}
+                <Text style={styles.inputLabel}>Location *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={shiftLocation}
+                  onChangeText={setShiftLocation}
+                  placeholder="Enter location"
+                  placeholderTextColor="#666"
+                />
+                
+                {/* Team members section */}
+                <Text style={styles.inputLabel}>Assigned Team Members</Text>
+                <View style={styles.selectedTeamMembersContainer}>
+                  {selectedTeamMembers.length > 0 ? (
+                    <ScrollView 
+                      style={{maxHeight: 100}}
+                      showsHorizontalScrollIndicator={false}
+                    >
+                      {selectedTeamMembers.map(member => (
+                        <View key={member.id} style={styles.selectedMemberChip}>
+                          <Text style={styles.selectedMemberName}>{member.displayName}</Text>
+                          <TouchableOpacity
+                            onPress={() => toggleTeamMemberSelection(member)}
+                            style={styles.removeMemberButton}
+                          >
+                            <Ionicons name="close-circle" size={16} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <Text style={styles.noMembersText}>No team members assigned</Text>
+                  )}
+                </View>
+
+                <Text style={styles.inputLabel}>Available Team Members</Text>
+                <ScrollView 
+                  horizontal 
+                  style={styles.teamMemberScrollView}
+                  showsHorizontalScrollIndicator={false}
                 >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
-                </TouchableOpacity>
+                  {teamMembers
+                    .filter(member => !selectedTeamMembers.some(m => m.id === member.id))
+                    .map(member => (
+                      <TouchableOpacity 
+                        key={member.id}
+                        style={styles.teamMemberItem}
+                        onPress={() => toggleTeamMemberSelection(member)}
+                      >
+                        <Text style={styles.teamMemberText}>{member.displayName}</Text>
+                      </TouchableOpacity>
+                    ))
+                  }
+                </ScrollView>
+                
+                {/* Improved Time Selection */}
+                <View style={styles.timeSelectionContainer}>
+                    <TimePicker 
+                    label="Start Time"
+                    value={selectedStartTime}
+                    onChange={setSelectedStartTime}
+                  />
+
+                  <TimePicker 
+                    label="End Time"
+                    value={selectedEndTime}
+                    onChange={setSelectedEndTime}
+                  />
+                </View>
+                
+                <View style={styles.buttonRow}>
+                  <TouchableOpacity 
+                    style={styles.updateButton}
+                    onPress={handleUpdateShift}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                      <Text style={styles.submitButtonText}>Update</Text>
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.deleteButton}
+                    onPress={handleDeleteShift}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              
-              <TouchableOpacity 
-                style={styles.assignButton}
-                onPress={() => {
-                  Alert.alert('Coming Soon', 'Team assignment will be available in the next update.');
-                }}
-              >
-                <Text style={styles.assignButtonText}>Assign Team Members</Text>
-              </TouchableOpacity>
-            </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -736,38 +1010,23 @@ const handleCreateShift = async () => {
       {/* Floating Bottom Navigation */}
       <View style={styles.bottomNavContainer}>
         <View style={styles.bottomNav}>
-          <TouchableOpacity 
-            style={styles.navItem} 
-            onPress={() => Alert.alert('Coming Soon', 'Dashboard will be available in a future update.')}
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="home" size={24} color="#fff" />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.navItem}
-            // already on Calendar screen
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="calendar" size={24} color="#FF8C00" />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.navItem}
-            onPress={() => Alert.alert('Coming Soon', 'Messages will be available in a future update.')}
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="comments" size={24} color="#fff" />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.navItem} 
-            onPress={() => Alert.alert('Coming Soon', 'Map will be available in a future update.')}
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="map" size={24} color="#fff" />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.navItem} 
-            onPress={() => Alert.alert('Coming Soon', 'Mission Reports will be available in a future update.')}
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="file-text-o" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -780,14 +1039,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    paddingHorizontal: 16, // Add horizontal padding to the entire container
   },
   header: {
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginTop: 50, // add extra margin for iOS status bar
+    // Remove horizontal padding as it's now handled by container
+    marginTop: 50,
   },
   backButton: {
     width: 40,
@@ -828,15 +1088,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 20,
+    flexGrow: 1,
+    paddingBottom: 100, // Ensure enough space at the bottom
   },
   calendarCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    marginHorizontal: 0, // Ensure no additional horizontal margins
   },
   monthSelector: {
     flexDirection: 'row',
@@ -870,7 +1130,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   currentDayHeader: {
-    color: '#FF8C00', // orange color for current day of week
+    color: '#FF8C00',
     fontWeight: 'bold',
   },
   calendarGrid: {
@@ -887,30 +1147,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  currentDayCell: {
-    backgroundColor: '#222',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#FF8C00',
-  },
-  selectedDayCell: {
-    backgroundColor: '#333',
-    borderRadius: 15,
-  },
+currentDayCell: {
+  backgroundColor: '#222', // Dark background
+  borderRadius: 15,
+  borderWidth: 1,
+  borderColor: '#FF8C00', // Orange border
+},
+selectedDayCell: {
+  backgroundColor: '#333', // Slightly lighter dark background
+  borderRadius: 15,
+},
   dayText: {
     color: '#fff',
     fontSize: 14,
   },
-  currentDayText: {
-    color: '#FF8C00',
-    fontWeight: 'bold',
-  },
-  selectedDayText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+currentDayText: {
+  color: '#FF8C00', // Orange text
+  fontWeight: 'bold',
+},
+selectedDayText: {
+  color: '#fff', // White text
+  fontWeight: 'bold',
+},
   adjacentMonthDay: {
-    color: '#444', // darkened color for days not in current month
+    color: '#444',
   },
   shiftIndicator: {
     width: 4,
@@ -924,17 +1184,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  selectedDateText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   shiftCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
-    minHeight: 150,
+    marginBottom: 16, // This ensures space between the card and bottom nav
+    minHeight: height * 0.25,
   },
   shiftHeader: {
     flexDirection: 'row',
@@ -1018,52 +1273,22 @@ const styles = StyleSheet.create({
     color: '#aaa',
     fontSize: 12,
   },
-  adminCard: {
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  adminHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  adminHeaderText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  adminButton: {
-    backgroundColor: '#222',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  adminButtonText: {
-    color: '#FF8C00',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   bottomSpacer: {
-    height: 100, // Add space at the bottom so content isn't hidden behind floating nav
+    height: 20, // Increased spacing to prevent overlap with bottom nav
   },
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 20, // space from bottom of screen
+    bottom: 20,
     left: 20,
     right: 20,
     alignItems: 'center',
+    zIndex: 100,
   },
   bottomNav: {
     height: 60,
     flexDirection: 'row',
     backgroundColor: '#111',
-    borderRadius: 30, // rounded corners
+    borderRadius: 30,
     width: '100%',
     shadowColor: '#000',
     shadowOffset: {
@@ -1091,6 +1316,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     maxHeight: height * 0.8,
+  },
+  modalScroll: {
+    maxHeight: height * 0.65, // Limit modal scroll height
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1122,21 +1350,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 16,
   },
-  timeText: {
-    color: '#ddd',
-    marginBottom: 8,
-  },
-  noteText: {
-    color: '#aaa',
-    fontStyle: 'italic',
-    fontSize: 12,
-    marginBottom: 20,
-  },
   submitButton: {
     backgroundColor: '#FF8C00',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 16,
   },
   submitButtonText: {
     color: '#000',
@@ -1145,6 +1364,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 16,
     marginBottom: 16,
   },
   updateButton: {
@@ -1167,55 +1387,129 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  assignButton: {
-    backgroundColor: '#222',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FF8C00',
-    marginTop: 10,
+  // Time picker styles
+  timePickerContainer: {
+    marginBottom: 16,
   },
-  assignButtonText: {
-    color: '#FF8C00',
+  timeSelectionContainer: {
+    marginVertical: 8,
+  },
+  pickerContainer: {
+    borderRadius: 8,
+    backgroundColor: '#222',
+    marginVertical: 8,
+  },
+  timeOptionsContainer: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  timeOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    borderRadius: 4,
+  },
+  selectedTimeOption: {
+    backgroundColor: '#FF8C00',
+  },
+  timeText: {
+    color: '#fff',
+  },
+  selectedTimeText: {
+    color: '#000',
     fontWeight: 'bold',
   },
+  // Team member styles
   teamMemberScrollView: {
+    marginBottom: 16,
+  },
+  teamMemberItem: {
+    backgroundColor: '#222',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  selectedTeamMember: {
+    backgroundColor: '#FF8C00',
+  },
+  teamMemberText: {
+    color: '#fff',
+  },
+  selectedTeamMembersContainer: {
+    marginBottom: 12,
+    minHeight: 40,
+    backgroundColor: '#222',
+    borderRadius: 8,
+    padding: 8,
+  },
+  selectedMemberChip: {
+    backgroundColor: '#333',
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  selectedMemberName: {
+    color: '#fff',
+    marginRight: 4,
+  },
+  removeMemberButton: {
+    marginLeft: 4,
+  },
+  noMembersText: {
+    color: '#888',
+    fontStyle: 'italic',
+    padding: 8,
+  },
+  // Date selection styles
+  dateSelectionContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  dateSelectionCell: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 4,
+    borderRadius: 20,
+    backgroundColor: '#222',
+  },
+  selectedDateCell: {
+    backgroundColor: '#FF8C00',
+  },
+  dateSelectionText: {
+    color: '#fff',
+  },
+  selectedDatesContainer: {
   marginBottom: 16,
 },
-teamMemberItem: {
-  backgroundColor: '#222',
-  paddingVertical: 8,
+selectedDatesScrollView: {
+  maxHeight: 80,
+},
+selectedDateChip: {
+  backgroundColor: '#333',
+  borderRadius: 16,
+  paddingVertical: 6,
   paddingHorizontal: 12,
-  borderRadius: 8,
   marginRight: 8,
-},
-selectedTeamMember: {
-  backgroundColor: '#FF8C00',
-},
-teamMemberText: {
-  color: '#fff',
-},
-dateSelectionContainer: {
+  marginBottom: 8,
   flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'center',
-  marginBottom: 16,
-},
-dateSelectionCell: {
-  width: 40,
-  height: 40,
-  justifyContent: 'center',
   alignItems: 'center',
-  margin: 4,
-  borderRadius: 20,
-  backgroundColor: '#222',
 },
-selectedDateCell: {
-  backgroundColor: '#FF8C00',
-},
-dateSelectionText: {
-  color: '#fff',
+  selectedDateText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+removeDateButton: {
+  marginLeft: 4,
 },
 });
 
