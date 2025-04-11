@@ -10,10 +10,11 @@
       "supportsTablet": true
     },
     "android": {
-"android": {
   "adaptiveIcon": {
     "backgroundColor": "#000000"
   }
 },
 "web": {
+}
+}
 }
