@@ -10,14 +10,10 @@
       "supportsTablet": true
     },
     "android": {
-<<<<<<< HEAD
-    },
-    "web": {
-=======
-      "adaptiveIcon": {
-        "backgroundColor": "#000000"
-      }
->>>>>>> origin/feature/dashboard-map
-    }
+"android": {
+  "adaptiveIcon": {
+    "backgroundColor": "#000000"
   }
+},
+"web": {
 }
