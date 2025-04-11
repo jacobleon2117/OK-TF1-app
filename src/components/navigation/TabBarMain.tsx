@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   activeTab: {
-    borderTopWidth: 2,
-    borderTopColor: '#F7941D',
+    borderBottomWidth: 2,
+    borderBottomColor: '#F7941D',
   },
 });
 

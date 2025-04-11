@@ -11,9 +11,11 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
+  KeyboardAvoidingView
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 // Firebase imports - 
 // import { auth, firestore } from '../../firebase/config';
 // import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -62,11 +64,11 @@ const ProfileScreen = ({ navigation }) => {
       try {
         // Mock user data - this will be replaced with actual Firebase Auth data
         const mockUserData = {
-          displayName: 'John Doe',
-          email: 'john.doe@example.com',
+          displayName: 'Jacob Leon',
+          email: 'jacob.leon@example.com',
           phoneNumber: '(555) 123-4567',
-          photoURL: 'https://via.placeholder.com/150',
-          bio: 'Frontend developer passionate about React Native',
+          photoURL: 'https://randomuser.me/api/portraits/men/32.jpg',
+          bio: 'Handler',
           location: 'New York, NY'
         };
         
@@ -78,11 +80,6 @@ const ProfileScreen = ({ navigation }) => {
           bio: mockUserData.bio,
           location: mockUserData.location
         });
-        
-        // For Firebase:
-        // 1. Get currentUser from auth
-        // 2. Get additional data from Firestore
-        // 3. Set the profile data with actual user data
         
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -109,10 +106,7 @@ const ProfileScreen = ({ navigation }) => {
     try {
       setSaving(true);
       
-      // PLACEHOLDER: 
-      // Simulate saving profile data
-      
-      // For now, just update the local state
+      // Update the local state
       setProfileData(prev => ({
         ...prev,
         displayName: formData.displayName,
@@ -120,11 +114,6 @@ const ProfileScreen = ({ navigation }) => {
         bio: formData.bio,
         location: formData.location
       }));
-      
-      // For Firebase:
-      // 1. Update display name in Firebase Auth using updateProfile
-      // 2. Update additional info in Firestore 
-      // 3. Handle errors appropriately
       
       // Simulate network request with timeout
       setTimeout(() => {
@@ -163,21 +152,12 @@ const ProfileScreen = ({ navigation }) => {
         const imageUri = result.assets[0].uri;
         setSaving(true);
         
-        // PLACEHOLDER: This will be implemented the Firebase teammate
-        // For now, just updated the local state with the selected image
-        
-        // For Firebase teammate:
-        // 1. Upload image to Firebase Storage
-        // 2. Get the download URL
-        // 3. Update the user profile in Auth
-        // 4. Update the user document in Firestore
-        
         // Simulate upload with timeout
         setTimeout(() => {
           // Update local state with the selected image
           setProfileData(prev => ({
             ...prev,
-            photoURL: imageUri // In the real implementation, this will be the Firebase Storage URL
+            photoURL: imageUri
           }));
           
           setSaving(false);
@@ -205,6 +185,14 @@ const ProfileScreen = ({ navigation }) => {
     setEditing(!editing);
   };
 
+  // Render settings item
+  const renderSettingItem = (icon, title, onPress) => (
+    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+      <FontAwesome5 name={icon} size={20} color="white" style={styles.settingIcon} />
+      <Text style={styles.settingText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -223,11 +211,17 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.headerContainer}>
           <Header />
         </View>
-        
-        <ScrollView 
+        <KeyboardAvoidingView 
+          style={{flex: 1}}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 40}
+          >
+    <ScrollView 
           style={styles.content}
           contentContainerStyle={styles.contentContainer}
-        >
+          keyboardShouldPersistTaps="handled"
+          >
+          {/* Profile Section */}
           <View style={styles.profileHeader}>
             <Text style={styles.profileTitle}>Profile</Text>
             <TouchableOpacity 
@@ -235,41 +229,48 @@ const ProfileScreen = ({ navigation }) => {
               onPress={toggleEditMode}
               disabled={saving}
             >
-              <Text style={styles.editButtonText}>
-                {editing ? 'Cancel' : 'Edit'}
-              </Text>
+              <FontAwesome5 name="pen" size={16} color="white" />
             </TouchableOpacity>
           </View>
           
-          <View style={styles.profileImageContainer}>
-            {profileData.photoURL ? (
-              <Image 
-                source={{ uri: profileData.photoURL }} 
-                style={styles.profileImage} 
-              />
-            ) : (
-              <View style={[styles.profileImage, styles.profileImagePlaceholder]}>
-                <Text style={styles.profileImagePlaceholderText}>
-                  {profileData.displayName ? profileData.displayName[0].toUpperCase() : 'U'}
-                </Text>
+          {/* Profile Card */}
+          <View style={styles.profileCard}>
+            <View style={styles.profileInfo}>
+              {profileData.photoURL ? (
+                <Image 
+                  source={{ uri: profileData.photoURL }} 
+                  style={styles.profileImage} 
+                />
+              ) : (
+                <View style={[styles.profileImage, styles.profileImagePlaceholder]}>
+                  <Text style={styles.profileImagePlaceholderText}>
+                    {profileData.displayName ? profileData.displayName[0].toUpperCase() : 'U'}
+                  </Text>
+                </View>
+              )}
+              
+              <View style={styles.nameContainer}>
+                <Text style={styles.name}>{profileData.displayName || 'No Name'}</Text>
+                <Text style={styles.role}>{profileData.bio || 'No Role'}</Text>
               </View>
-            )}
+            </View>
             
             {editing && (
               <TouchableOpacity 
-                style={styles.changePhotoButton}
+                style={styles.editPhotoButton}
                 onPress={handleChangePhoto}
                 disabled={saving}
               >
-                <Text style={styles.changePhotoText}>Change Photo</Text>
+                <FontAwesome5 name="camera" size={16} color="white" />
               </TouchableOpacity>
             )}
           </View>
           
-          <View style={styles.form}>
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Name</Text>
-              {editing ? (
+          {/* Settings Section */}
+          {editing ? (
+            <View style={styles.form}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Name</Text>
                 <TextInput 
                   style={styles.input}
                   value={formData.displayName}
@@ -278,20 +279,16 @@ const ProfileScreen = ({ navigation }) => {
                   placeholderTextColor="#999"
                   editable={!saving}
                 />
-              ) : (
-                <Text style={styles.infoText}>{profileData.displayName || 'Not set'}</Text>
-              )}
-            </View>
-            
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Email</Text>
-              <Text style={styles.infoText}>{profileData.email}</Text>
-              <Text style={styles.helperText}>Email cannot be changed</Text>
-            </View>
-            
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Phone Number</Text>
-              {editing ? (
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Email</Text>
+                <Text style={styles.infoText}>{profileData.email}</Text>
+                <Text style={styles.helperText}>Email cannot be changed</Text>
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Phone Number</Text>
                 <TextInput 
                   style={styles.input}
                   value={formData.phoneNumber}
@@ -301,14 +298,10 @@ const ProfileScreen = ({ navigation }) => {
                   keyboardType="phone-pad"
                   editable={!saving}
                 />
-              ) : (
-                <Text style={styles.infoText}>{profileData.phoneNumber || 'Not set'}</Text>
-              )}
-            </View>
-            
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Location</Text>
-              {editing ? (
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Location</Text>
                 <TextInput 
                   style={styles.input}
                   value={formData.location}
@@ -317,14 +310,10 @@ const ProfileScreen = ({ navigation }) => {
                   placeholderTextColor="#999"
                   editable={!saving}
                 />
-              ) : (
-                <Text style={styles.infoText}>{profileData.location || 'Not set'}</Text>
-              )}
-            </View>
-            
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Bio</Text>
-              {editing ? (
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Bio</Text>
                 <TextInput 
                   style={[styles.input, styles.textArea]}
                   value={formData.bio}
@@ -335,12 +324,8 @@ const ProfileScreen = ({ navigation }) => {
                   numberOfLines={4}
                   editable={!saving}
                 />
-              ) : (
-                <Text style={styles.infoText}>{profileData.bio || 'No bio provided'}</Text>
-              )}
-            </View>
-            
-            {editing && (
+              </View>
+              
               <TouchableOpacity 
                 style={styles.saveButton}
                 onPress={handleSaveProfile}
@@ -352,9 +337,23 @@ const ProfileScreen = ({ navigation }) => {
                   <Text style={styles.saveButtonText}>Save Changes</Text>
                 )}
               </TouchableOpacity>
-            )}
-          </View>
+            </View>
+          ) : (
+            <View style={styles.settingsSection}>
+              <Text style={styles.sectionTitle}>Settings and privacy</Text>
+              
+              {renderSettingItem('bell', 'Notifications', () => Alert.alert('Notifications', 'Notifications settings'))}
+              {renderSettingItem('location-arrow', 'Location preferences', () => Alert.alert('Location', 'Location settings'))}
+              {renderSettingItem('sign-in-alt', 'Login', () => Alert.alert('Login', 'Login settings'))}
+              {renderSettingItem('universal-access', 'Accessibility', () => Alert.alert('Accessibility', 'Accessibility settings'))}
+              {renderSettingItem('globe', 'Language and region', () => Alert.alert('Language', 'Language settings'))}
+              {renderSettingItem('moon', 'Dark mode', () => Alert.alert('Dark Mode', 'Dark mode settings'))}
+              {renderSettingItem('question-circle', 'Need help?', () => Alert.alert('Help', 'Help center'))}
+              {renderSettingItem('trash', 'Deactivate account', () => Alert.alert('Warning', 'Are you sure you want to deactivate your account?'))}
+            </View>
+          )}
         </ScrollView>
+        </KeyboardAvoidingView>
         
         <View style={styles.footerContainer}>
           <TabBarMain 
@@ -398,10 +397,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   editButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#333',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editButtonText: {
     color: '#FFF',
@@ -416,14 +417,25 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-  profileImageContainer: {
+  // Profile Card Styles
+  profileCard: {
+    flexDirection: 'row',
+    backgroundColor: '#222222',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
     alignItems: 'center',
-    marginVertical: 24,
+    justifyContent: 'space-between',
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 16,
   },
   profileImagePlaceholder: {
     backgroundColor: '#333',
@@ -431,23 +443,67 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileImagePlaceholderText: {
-    fontSize: 40,
+    fontSize: 20,
     color: '#FFF',
     fontWeight: 'bold',
   },
-  changePhotoButton: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#444',
+  nameContainer: {
+    justifyContent: 'center',
   },
-  changePhotoText: {
-    color: '#FFF',
+  name: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  role: {
+    color: '#BBBBBB',
     fontSize: 14,
   },
+  editPhotoButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#333333',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Settings Section Styles
+  settingsSection: {
+    backgroundColor: '#222222',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333333',
+  },
+  settingIcon: {
+    width: 24,
+    marginRight: 16,
+    textAlign: 'center',
+  },
+  settingText: {
+    color: 'white',
+    fontSize: 15,
+  },
+  // Form Styles
   form: {
     width: '100%',
+    backgroundColor: '#222222',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
   formGroup: {
     marginBottom: 20,
@@ -458,12 +514,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#222',
+    backgroundColor: '#333',
     color: '#FFF',
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#444',
     fontSize: 16,
   },
   textArea: {
@@ -487,7 +543,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 40,
   },
   saveButtonText: {
     color: '#FFF',
