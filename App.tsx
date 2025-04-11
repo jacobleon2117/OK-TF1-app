@@ -1,76 +1,28 @@
-<<<<<<< HEAD
 // App.tsx
-import React, { useRef } from 'react'; // Add useRef
-import { StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar } from 'expo-status-bar';
 import Toast from 'react-native-toast-message';
-import NavigationService from './src/services/NavigationService'; // Import NavigationService
+import NavigationService from './src/services/NavigationService';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-// Import your screens
+// Import auth screens
+import LoginScreen from './src/screens/auth/LoginScreen';
+import SignupScreen from './src/screens/auth/SignupScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
+
+// Import dashboard screens
 import HomeScreen from './src/screens/dashboard/HomeScreen';
 import MapScreen from './src/screens/dashboard/MapScreen';
 import ProfileScreen from './src/screens/dashboard/ProfileScreen';
 import ScheduleScreen from './src/screens/dashboard/ScheduleScreen';
 import MessageScreen from './src/screens/dashboard/MessageScreen';
 
-// Create a stack navigator
-const Stack = createStackNavigator();
-
-export default function App() {
-  // Create navigation reference
-  const navigationRef = useRef(null);
-
-  return (
-    <>
-    <NavigationContainer
-      ref={navigationRef}
-      onReady={() => {
-        // Set the navigation reference in NavigationService
-        NavigationService.setNavigation(navigationRef.current);
-      }}
-    >
-      <Stack.Navigator 
-        initialRouteName="Home"
-        screenOptions={{
-          headerShown: false // Hide the default header
-        }}
-      >
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Map" component={MapScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen}/>
-        <Stack.Screen name="Schedule" component={ScheduleScreen}/>
-        <Stack.Screen name="Message" component={MessageScreen}/>
-        {/* Add other screens here as you create them */}
-      </Stack.Navigator>
-    </NavigationContainer>
-     <Toast />
-     </>
-=======
-<<<<<<< HEAD
-// App.tsx
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import AppNavigator from './src/navigation';
-import { AuthProvider } from './src/context/AuthContext';
-=======
-// src/navigation/index.tsx
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet } from 'react-native';
->>>>>>> feature/dashboard-messaging
-
-// Import auth screens
-import LoginScreen from '../screens/auth/LoginScreen';
-import SignupScreen from '../screens/auth/SignupScreen';
-import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
-
 // Import Dashboard Navigator
-import DashboardNavigator from './DashboardNavigator';
+import DashboardNavigator from './src/navigation/DashboardNavigator';
 
-// Import auth context
-import { useAuth } from '../context/AuthContext';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // Create stack navigator
 const Stack = createStackNavigator();
@@ -78,15 +30,6 @@ const Stack = createStackNavigator();
 // Auth navigator - for unauthenticated users
 const AuthNavigator = () => {
   return (
-<<<<<<< HEAD
-    <AuthProvider>
-      <StatusBar style="light" />
-      <AppNavigator />
-    </AuthProvider>
->>>>>>> origin/feature/dashboard-map
-  );
-}
-=======
     <Stack.Navigator 
       initialRouteName="Login"
       screenOptions={{ 
@@ -101,16 +44,10 @@ const AuthNavigator = () => {
   );
 };
 
-<<<<<<< HEAD
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-=======
 // Root navigator - decides which navigator to show based on auth state
-const AppNavigator = () => {
+const AppContent = () => {
   const { user, loading } = useAuth();
+  const navigationRef = useRef(null);
 
   if (loading) {
     return (
@@ -119,5 +56,41 @@ const AppNavigator = () => {
       </View>
     );
   }
->>>>>>> feature/dashboard-messaging
->>>>>>> origin/feature/dashboard-map
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        // Set the navigation reference in NavigationService
+        NavigationService.setNavigation(navigationRef.current);
+      }}
+    >
+      {user ? (
+        <DashboardNavigator />
+      ) : (
+        <AuthNavigator />
+      )}
+    </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <StatusBar style="light" />
+      <AppContent />
+      <Toast />
+    </AuthProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
