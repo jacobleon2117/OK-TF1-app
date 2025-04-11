@@ -37,7 +37,13 @@
     "@react-navigation/stack": "^7.2.3",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
+<<<<<<< HEAD
     "expo-location": "~18.0.10",
+=======
+    "expo": "~52.0.41",
+    "expo-image-picker": "^16.0.6",
+    "expo-location": "~18.0.8",
+>>>>>>> 27622e3 (home and map)
     "expo-status-bar": "~2.0.1",
     "firebase": "^11.6.0",
     "metro-core": "^0.82.1",
