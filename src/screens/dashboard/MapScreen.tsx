@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import TabBar from '../../components/navigation/TabBar';
+import TabBarMap from '../../components/navigation/TabBarMap';
 import Header from '../../components/layout/Header';
 // import MapboxGL from '@rnmapbox/maps';
 
@@ -37,65 +37,63 @@ const MapScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      <View style={styles.background}>
-        {/* Full screen purple background (will be replaced with MapboxGL.MapView) */}
-        <View style={styles.mapExtent}>
-          {/* When ready to implement the real map, replace this View with:
-          <MapboxGL.MapView
-            style={styles.map}
-            styleURL={MapboxGL.StyleURL.Dark}
-            onDidFinishLoadingMap={() => setMapReady(true)}
-          >
-            <MapboxGL.Camera
-              zoomLevel={initialZoomLevel}
-              centerCoordinate={initialCoordinates}
-              animationDuration={0}
-            />
-            
-            <MapboxGL.PointAnnotation
-              id="currentLocation"
-              coordinate={initialCoordinates}
-            />
-          </MapboxGL.MapView>
-          */}
+    <View style={styles.container}>
+      {/* No SafeAreaView to ensure content goes behind status bar */}
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+      
+      {/* Purple background (will be replaced with MapboxGL.MapView) */}
+      <View style={styles.mapExtent}>
+        {/* When ready to implement the real map, replace this View with:
+        <MapboxGL.MapView
+          style={styles.map}
+          styleURL={MapboxGL.StyleURL.Dark}
+          onDidFinishLoadingMap={() => setMapReady(true)}
+        >
+          <MapboxGL.Camera
+            zoomLevel={initialZoomLevel}
+            centerCoordinate={initialCoordinates}
+            animationDuration={0}
+          />
           
-          {/* Header container positioned at top */}
-          <View style={styles.headerContainer}>
-            <Header />
-          </View>
-          
-          {/* Footer container positioned at bottom */}
-          <View style={styles.footerContainer}>
-            <View style={styles.tabBarWrapper}>
-              <TabBar 
-                currentScreen={currentScreen}
-                onScreenChange={handleScreenChange}
-                style={styles.tabBar}
-              />
-            </View>
-          </View>
+          <MapboxGL.PointAnnotation
+            id="currentLocation"
+            coordinate={initialCoordinates}
+          />
+        </MapboxGL.MapView>
+        */}
+      </View>
+      
+      {/* Header container positioned at top */}
+      <View style={styles.headerContainer}>
+        <Header />
+      </View>
+      
+      {/* Footer container positioned at bottom */}
+      <View style={styles.footerContainer}>
+        <View style={styles.tabBarWrapper}>
+          <TabBarMap 
+            currentScreen={currentScreen}
+            onScreenChange={handleScreenChange}
+            style={styles.tabBar}
+          />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  background: {
-    flex: 1,
-    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 0,
+    backgroundColor: '#111',
   },
   mapExtent: {
-    flex: 1,
-    backgroundColor: 'purple', // Purple for demonstration, will be replaced by actual map
-    borderRadius: 8,
-    position: 'relative', // Needed for absolute positioning of children
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#111', // Purple for demonstration, will be replaced by actual map
   },
   map: {
     flex: 1,
@@ -107,8 +105,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    opacity: 0.3, // Dark, semi-transparent background
-    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 0,
+    backgroundColor: '#111',
+    opacity: 0.3,
+    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 60,
   },
   footerContainer: {
     width: '100%',

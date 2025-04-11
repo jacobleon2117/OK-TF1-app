@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import TabBar from '../../components/navigation/TabBar';
+import TabBarMain from '../../components/navigation/TabBarMain';
 
 const ProfileScreen = ({ navigation }) => {
   const [currentScreen, setCurrentScreen] = useState('Profile');
@@ -27,7 +27,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
         
         <View style={styles.footerContainer}>
-          <TabBar 
+          <TabBarMain 
             currentScreen={currentScreen}
             onScreenChange={handleScreenChange}
           />

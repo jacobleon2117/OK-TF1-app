@@ -13,7 +13,8 @@ src/
 │   ├── layout/
 │   │   └── Header.tsx (updated)
 │   └── navigation/
-│       ├── TabBar.tsx (updated)
+│       ├── TabBarMain.tsx (updated)
+            TabBarMap.tsx (update)
 │       └── icons/
 │           ├── HomeIcon.tsx (move from icons/)
 │           ├── IconStyle.ts (move from icons/)

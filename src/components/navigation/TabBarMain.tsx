@@ -1,4 +1,4 @@
-// src/components/navigation/TabBar.tsx
+// src/components/navigation/TabBarMain.tsx
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import HomeIcon from './icons/HomeIcon';
@@ -11,7 +11,7 @@ import NavigationService from '../../services/NavigationService';
 // Default no-op function to prevent undefined errors
 const noop = () => {};
 
-const TabBar = ({ 
+const TabBarMain = ({ 
   currentScreen,
   onScreenChange = noop,
   style = {},
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TabBar;
+export default TabBarMain;

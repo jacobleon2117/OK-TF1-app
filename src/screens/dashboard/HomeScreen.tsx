@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import TabBar from '../../components/navigation/TabBar';
+import TabBarMain from '../../components/navigation/TabBarMain';
 import Header from '../../components/layout/Header';
 import { 
   LocationCard, 
@@ -54,7 +54,7 @@ const HomeScreen = ({ navigation }) => {
         
         {/* Footer fixed at bottom */}
         <View style={styles.footerContainer}>
-          <TabBar 
+          <TabBarMain
             currentScreen={currentScreen}
             onScreenChange={handleScreenChange}
           />
