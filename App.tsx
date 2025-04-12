@@ -1,18 +1,13 @@
-// App.jsx
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import HomeScreen from './src/screens/HomeScreen';
+import { StatusBar } from 'expo-status-bar';
+import AppNavigator from './src/navigation';
+import { AuthProvider } from './src/context/AuthContext';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <HomeScreen />
-    </View>
+    <AuthProvider>
+      <StatusBar style="light" />
+      <AppNavigator />
+    </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
