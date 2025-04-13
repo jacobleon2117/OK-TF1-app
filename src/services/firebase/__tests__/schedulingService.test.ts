@@ -1,4 +1,4 @@
-import { 
+import {
   addAvailability,
   getAvailability,
   addShift,
@@ -14,17 +14,17 @@ import {
   performBatchUpdate,
   AvailabilityData,
   ShiftData,
-  ShiftTemplateData
+  ShiftTemplateData,
 } from '../schedulingService';
-import { db } from '../../../config/firebase';
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  getDocs, 
+import { db } from '@/config/firebase';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
   addDoc,
-  updateDoc, 
+  updateDoc,
   deleteDoc,
   query,
   where,
@@ -36,7 +36,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
   FieldValue,
-  DocumentData
+  DocumentData,
 } from 'firebase/firestore';
 
 // Mock Firebase modules
@@ -53,18 +53,18 @@ jest.mock('firebase/firestore', () => ({
   where: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now())
+    now: jest.fn(() => Date.now()),
   },
   serverTimestamp: jest.fn(() => Date.now()),
   arrayUnion: jest.fn(data => data),
   writeBatch: jest.fn(() => ({
     update: jest.fn(),
-    commit: jest.fn().mockResolvedValue(undefined)
-  }))
+    commit: jest.fn().mockResolvedValue(undefined),
+  })),
 }));
 
-jest.mock('../../../config/firebase', () => ({
-  db: {}
+jest.mock('@/config/firebase', () => ({
+  db: {},
 }));
 
 describe('schedulingService', () => {
@@ -82,7 +82,7 @@ describe('schedulingService', () => {
         const availabilityData: AvailabilityData = {
           status: 'available',
           startTime: '09:00',
-          endTime: '17:00'
+          endTime: '17:00',
         };
 
         (doc as jest.Mock).mockReturnValue({});
@@ -93,11 +93,7 @@ describe('schedulingService', () => {
 
         // Assert
         expect(doc).toHaveBeenCalled();
-        expect(setDoc).toHaveBeenCalledWith(
-          expect.anything(),
-          availabilityData,
-          { merge: true }
-        );
+        expect(setDoc).toHaveBeenCalledWith(expect.anything(), availabilityData, { merge: true });
       });
     });
 
@@ -109,13 +105,13 @@ describe('schedulingService', () => {
         const mockAvailability = {
           status: 'available',
           startTime: '09:00',
-          endTime: '17:00'
+          endTime: '17:00',
         };
 
         (doc as jest.Mock).mockReturnValue({});
         (getDoc as jest.Mock).mockResolvedValue({
           exists: () => true,
-          data: () => mockAvailability
+          data: () => mockAvailability,
         });
 
         // Act
@@ -138,9 +134,9 @@ describe('schedulingService', () => {
           startTime: Timestamp.now(),
           endTime: Timestamp.now(),
           location: {
-            name: 'Test location'
+            name: 'Test location',
           },
-          status: 'scheduled'
+          status: 'scheduled',
         };
 
         (addDoc as jest.Mock).mockResolvedValue({ id: 'test-shift-id' });
@@ -165,16 +161,16 @@ describe('schedulingService', () => {
             startTime: Timestamp.now(),
             endTime: Timestamp.now(),
             location: { name: 'Location 1' },
-            status: 'scheduled'
-          }
+            status: 'scheduled',
+          },
         ];
 
         (query as jest.Mock).mockReturnValue({});
         (getDocs as jest.Mock).mockResolvedValue({
           docs: mockShifts.map(shift => ({
             id: shift.id,
-            data: () => shift
-          }))
+            data: () => shift,
+          })),
         });
 
         // Act
@@ -204,7 +200,7 @@ describe('schedulingService', () => {
         expect(updateDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            status: newStatus
+            status: newStatus,
           })
         );
       });
@@ -219,7 +215,7 @@ describe('schedulingService', () => {
           name: 'Test User',
           role: 'responder',
           status: 'assigned',
-          assignedAt: serverTimestamp()
+          assignedAt: serverTimestamp(),
         };
 
         (doc as jest.Mock).mockReturnValue({});
@@ -230,12 +226,9 @@ describe('schedulingService', () => {
 
         // Assert
         expect(doc).toHaveBeenCalled();
-        expect(updateDoc).toHaveBeenCalledWith(
-          expect.anything(),
-          {
-            assignedUsers: userData
-          }
-        );
+        expect(updateDoc).toHaveBeenCalledWith(expect.anything(), {
+          assignedUsers: userData,
+        });
       });
     });
   });
@@ -248,7 +241,7 @@ describe('schedulingService', () => {
           templateName: 'Morning Shift',
           shiftType: 'regular',
           startTime: Timestamp.now(),
-          endTime: Timestamp.now()
+          endTime: Timestamp.now(),
         };
 
         (addDoc as jest.Mock).mockResolvedValue({ id: 'test-template-id' });
@@ -270,13 +263,13 @@ describe('schedulingService', () => {
           templateName: 'Morning Shift',
           shiftType: 'regular',
           startTime: Timestamp.now(),
-          endTime: Timestamp.now()
+          endTime: Timestamp.now(),
         };
 
         (doc as jest.Mock).mockReturnValue({});
         (getDoc as jest.Mock).mockResolvedValue({
           exists: () => true,
-          data: () => mockTemplate
+          data: () => mockTemplate,
         });
 
         // Act
@@ -297,17 +290,17 @@ describe('schedulingService', () => {
         const updates = [
           {
             ref: doc(db, 'collection', 'doc1'),
-            data: { field1: 'value1' }
+            data: { field1: 'value1' },
           },
           {
             ref: doc(db, 'collection', 'doc2'),
-            data: { field2: 'value2' }
-          }
+            data: { field2: 'value2' },
+          },
         ];
 
         const mockBatch = {
           update: jest.fn(),
-          commit: jest.fn().mockResolvedValue(undefined)
+          commit: jest.fn().mockResolvedValue(undefined),
         };
         (writeBatch as jest.Mock).mockReturnValue(mockBatch);
 
@@ -321,4 +314,4 @@ describe('schedulingService', () => {
       });
     });
   });
-}); 
+});

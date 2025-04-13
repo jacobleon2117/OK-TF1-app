@@ -1,19 +1,19 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   query,
   where,
   Timestamp,
   DocumentReference,
   DocumentSnapshot,
-  QuerySnapshot
+  QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { db } from '@/config/firebase';
 
 export interface Coordinates {
   latitude: number;
@@ -60,23 +60,19 @@ export interface MissionData {
   status: 'preparing' | 'active' | 'completed' | 'cancelled';
   location: Location;
   missionMetrics: MissionMetrics;
-  reportSummary: ReportSummary; 
+  reportSummary: ReportSummary;
   id?: string;
 }
 
 // CREATE NEW MISSION
-export const createMission = async (
-  missionData: MissionData
-): Promise<DocumentReference> => {
+export const createMission = async (missionData: MissionData): Promise<DocumentReference> => {
   return await addDoc(collection(db, 'missions'), missionData);
-}
+};
 
-export const getMissionById = async (
-  missionId: string
-): Promise<DocumentSnapshot> => {
+export const getMissionById = async (missionId: string): Promise<DocumentSnapshot> => {
   const missionRef = doc(db, 'missions', missionId);
   return await getDoc(missionRef);
-}
+};
 
 export const updateMission = async (
   missionId: string,
@@ -84,27 +80,23 @@ export const updateMission = async (
 ): Promise<void> => {
   const missionRef = doc(db, 'missions', missionId);
   await updateDoc(missionRef, updateData);
-}
+};
 
-export const deleteMission = async (
-  missionId: string
-): Promise<void> => {
+export const deleteMission = async (missionId: string): Promise<void> => {
   const missionRef = doc(db, 'missions', missionId);
   await deleteDoc(missionRef);
-}
+};
 
 // For test compatibility
-export const getMission = async (
-  missionId: string
-): Promise<MissionData | null> => {
+export const getMission = async (missionId: string): Promise<MissionData | null> => {
   const missionRef = doc(db, 'missions', missionId);
   const missionDoc = await getDoc(missionRef);
-  
+
   if (missionDoc.exists()) {
     const data = missionDoc.data();
     return { id: missionId, ...data } as MissionData;
   }
-  
+
   return null;
 };
 
@@ -117,11 +109,8 @@ export const getAllMissions = async (): Promise<MissionData[]> => {
 };
 
 export const getActiveMissions = async (): Promise<MissionData[]> => {
-  const missionsQuery = query(
-    collection(db, 'missions'),
-    where('status', '==', 'active')
-  );
-  
+  const missionsQuery = query(collection(db, 'missions'), where('status', '==', 'active'));
+
   const missionsSnapshot = await getDocs(missionsQuery);
   return missionsSnapshot.docs.map(doc => {
     const data = doc.data();
@@ -129,16 +118,14 @@ export const getActiveMissions = async (): Promise<MissionData[]> => {
   });
 };
 
-export const getMissionTeams = async (
-  missionId: string
-): Promise<string[]> => {
+export const getMissionTeams = async (missionId: string): Promise<string[]> => {
   const missionRef = doc(db, 'missions', missionId);
   const missionDoc = await getDoc(missionRef);
-  
+
   if (missionDoc.exists()) {
     const data = missionDoc.data() as MissionData;
     return data.teamId ? [data.teamId] : [];
   }
-  
+
   return [];
 };

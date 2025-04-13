@@ -1,29 +1,29 @@
-import { 
-  createMission, 
-  getMissionById, 
-  getAllMissions, 
-  updateMission, 
-  deleteMission, 
-  getActiveMissions, 
+import {
+  createMission,
+  getMissionById,
+  getAllMissions,
+  updateMission,
+  deleteMission,
+  getActiveMissions,
   getMissionTeams,
-  MissionData
+  MissionData,
 } from '../missionService';
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   query,
   where,
   Timestamp,
   DocumentReference,
   DocumentSnapshot,
-  QuerySnapshot
+  QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
+import { db } from '@/config/firebase';
 
 // Mock Firebase modules
 jest.mock('firebase/firestore', () => ({
@@ -38,12 +38,12 @@ jest.mock('firebase/firestore', () => ({
   where: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now())
-  }
+    now: jest.fn(() => Date.now()),
+  },
 }));
 
-jest.mock('../../../config/firebase', () => ({
-  db: {}
+jest.mock('@/config/firebase', () => ({
+  db: {},
 }));
 
 describe('missionService', () => {
@@ -65,23 +65,23 @@ describe('missionService', () => {
         location: {
           startingCoordinates: {
             latitude: 37.7749,
-            longitude: -122.4194
+            longitude: -122.4194,
           },
           operationArea: {
             northEast: {
               latitude: 37.7849,
-              longitude: -122.4094
+              longitude: -122.4094,
             },
             southWest: {
               latitude: 37.7649,
-              longitude: -122.4294
-            }
-          }
+              longitude: -122.4294,
+            },
+          },
         },
         missionMetrics: {
           totalDistanceCovered: 0,
           totalDuration: 0,
-          averageTeamSpeed: 0
+          averageTeamSpeed: 0,
         },
         reportSummary: {
           totalPinsDropped: 0,
@@ -91,11 +91,11 @@ describe('missionService', () => {
             boat: 0,
             fire: 0,
             bodyFound: 0,
-            rescuedPeople: 0
-          }
-        }
+            rescuedPeople: 0,
+          },
+        },
       };
-      
+
       const mockDocRef = { id: 'test-mission-id' };
       (collection as jest.Mock).mockReturnValue('missions-collection');
       (addDoc as jest.Mock).mockResolvedValue(mockDocRef);
@@ -128,23 +128,23 @@ describe('missionService', () => {
           location: {
             startingCoordinates: {
               latitude: 37.7749,
-              longitude: -122.4194
+              longitude: -122.4194,
             },
             operationArea: {
               northEast: {
                 latitude: 37.7849,
-                longitude: -122.4094
+                longitude: -122.4094,
               },
               southWest: {
                 latitude: 37.7649,
-                longitude: -122.4294
-              }
-            }
+                longitude: -122.4294,
+              },
+            },
           },
           missionMetrics: {
             totalDistanceCovered: 0,
             totalDuration: 0,
-            averageTeamSpeed: 0
+            averageTeamSpeed: 0,
           },
           reportSummary: {
             totalPinsDropped: 0,
@@ -154,12 +154,12 @@ describe('missionService', () => {
               boat: 0,
               fire: 0,
               bodyFound: 0,
-              rescuedPeople: 0
-            }
-          }
-        })
+              rescuedPeople: 0,
+            },
+          },
+        }),
       };
-      
+
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
 
@@ -189,23 +189,23 @@ describe('missionService', () => {
           location: {
             startingCoordinates: {
               latitude: 37.7749,
-              longitude: -122.4194
+              longitude: -122.4194,
             },
             operationArea: {
               northEast: {
                 latitude: 37.7849,
-                longitude: -122.4094
+                longitude: -122.4094,
               },
               southWest: {
                 latitude: 37.7649,
-                longitude: -122.4294
-              }
-            }
+                longitude: -122.4294,
+              },
+            },
           },
           missionMetrics: {
             totalDistanceCovered: 0,
             totalDuration: 0,
-            averageTeamSpeed: 0
+            averageTeamSpeed: 0,
           },
           reportSummary: {
             totalPinsDropped: 0,
@@ -215,9 +215,9 @@ describe('missionService', () => {
               boat: 0,
               fire: 0,
               bodyFound: 0,
-              rescuedPeople: 0
-            }
-          }
+              rescuedPeople: 0,
+            },
+          },
         },
         {
           id: 'mission-2',
@@ -231,23 +231,23 @@ describe('missionService', () => {
           location: {
             startingCoordinates: {
               latitude: 37.7749,
-              longitude: -122.4194
+              longitude: -122.4194,
             },
             operationArea: {
               northEast: {
                 latitude: 37.7849,
-                longitude: -122.4094
+                longitude: -122.4094,
               },
               southWest: {
                 latitude: 37.7649,
-                longitude: -122.4294
-              }
-            }
+                longitude: -122.4294,
+              },
+            },
           },
           missionMetrics: {
             totalDistanceCovered: 0,
             totalDuration: 0,
-            averageTeamSpeed: 0
+            averageTeamSpeed: 0,
           },
           reportSummary: {
             totalPinsDropped: 0,
@@ -257,23 +257,23 @@ describe('missionService', () => {
               boat: 0,
               fire: 0,
               bodyFound: 0,
-              rescuedPeople: 0
-            }
-          }
-        }
+              rescuedPeople: 0,
+            },
+          },
+        },
       ];
-      
+
       (collection as jest.Mock).mockReturnValue('missions-collection');
       (getDocs as jest.Mock).mockResolvedValue({
         docs: mockMissions.map(mission => ({
           id: mission.id,
-          data: () => mission
-        }))
+          data: () => mission,
+        })),
       });
-      
+
       // Act
       const result = await getAllMissions();
-      
+
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions');
       expect(getDocs).toHaveBeenCalledWith('missions-collection');
@@ -287,9 +287,9 @@ describe('missionService', () => {
       const missionId = 'test-mission-id';
       const updateData: Partial<MissionData> = {
         title: 'Updated Mission',
-        status: 'active'
+        status: 'active',
       };
-      
+
       const mockDocRef = { id: missionId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
@@ -336,23 +336,23 @@ describe('missionService', () => {
           location: {
             startingCoordinates: {
               latitude: 37.7749,
-              longitude: -122.4194
+              longitude: -122.4194,
             },
             operationArea: {
               northEast: {
                 latitude: 37.7849,
-                longitude: -122.4094
+                longitude: -122.4094,
               },
               southWest: {
                 latitude: 37.7649,
-                longitude: -122.4294
-              }
-            }
+                longitude: -122.4294,
+              },
+            },
           },
           missionMetrics: {
             totalDistanceCovered: 0,
             totalDuration: 0,
-            averageTeamSpeed: 0
+            averageTeamSpeed: 0,
           },
           reportSummary: {
             totalPinsDropped: 0,
@@ -362,25 +362,25 @@ describe('missionService', () => {
               boat: 0,
               fire: 0,
               bodyFound: 0,
-              rescuedPeople: 0
-            }
-          }
-        }
+              rescuedPeople: 0,
+            },
+          },
+        },
       ];
-      
+
       (collection as jest.Mock).mockReturnValue('missions-collection');
       (query as jest.Mock).mockReturnValue('missions-query');
       (where as jest.Mock).mockReturnValue('where-clause');
       (getDocs as jest.Mock).mockResolvedValue({
         docs: mockMissions.map(mission => ({
           id: mission.id,
-          data: () => mission
-        }))
+          data: () => mission,
+        })),
       });
-      
+
       // Act
       const result = await getActiveMissions();
-      
+
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions');
       expect(query).toHaveBeenCalledWith('missions-collection', 'where-clause');
@@ -408,23 +408,23 @@ describe('missionService', () => {
           location: {
             startingCoordinates: {
               latitude: 37.7749,
-              longitude: -122.4194
+              longitude: -122.4194,
             },
             operationArea: {
               northEast: {
                 latitude: 37.7849,
-                longitude: -122.4094
+                longitude: -122.4094,
               },
               southWest: {
                 latitude: 37.7649,
-                longitude: -122.4294
-              }
-            }
+                longitude: -122.4294,
+              },
+            },
           },
           missionMetrics: {
             totalDistanceCovered: 0,
             totalDuration: 0,
-            averageTeamSpeed: 0
+            averageTeamSpeed: 0,
           },
           reportSummary: {
             totalPinsDropped: 0,
@@ -434,12 +434,12 @@ describe('missionService', () => {
               boat: 0,
               fire: 0,
               bodyFound: 0,
-              rescuedPeople: 0
-            }
-          }
-        })
+              rescuedPeople: 0,
+            },
+          },
+        }),
       };
-      
+
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
 
@@ -458,9 +458,9 @@ describe('missionService', () => {
       const mockDocRef = { id: missionId };
       const mockDocSnapshot = {
         exists: () => false,
-        data: () => null
+        data: () => null,
       };
-      
+
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
 
@@ -479,7 +479,7 @@ describe('missionService', () => {
       const mockDocRef = { id: missionId };
       const mockMissionData = {
         coordinatorId: 'user-123',
-        teamId: '',  // Empty team ID
+        teamId: '', // Empty team ID
         title: 'Test Mission',
         description: 'Test Description',
         startTime: Timestamp.now(),
@@ -488,23 +488,23 @@ describe('missionService', () => {
         location: {
           startingCoordinates: {
             latitude: 37.7749,
-            longitude: -122.4194
+            longitude: -122.4194,
           },
           operationArea: {
             northEast: {
               latitude: 37.7849,
-              longitude: -122.4094
+              longitude: -122.4094,
             },
             southWest: {
               latitude: 37.7649,
-              longitude: -122.4294
-            }
-          }
+              longitude: -122.4294,
+            },
+          },
         },
         missionMetrics: {
           totalDistanceCovered: 0,
           totalDuration: 0,
-          averageTeamSpeed: 0
+          averageTeamSpeed: 0,
         },
         reportSummary: {
           totalPinsDropped: 0,
@@ -514,24 +514,24 @@ describe('missionService', () => {
             boat: 0,
             fire: 0,
             bodyFound: 0,
-            rescuedPeople: 0
-          }
-        }
+            rescuedPeople: 0,
+          },
+        },
       };
-      
+
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue({
         exists: () => true,
-        data: () => mockMissionData
+        data: () => mockMissionData,
       });
-      
+
       // Act
       const result = await getMissionTeams(missionId);
-      
+
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId);
       expect(getDoc).toHaveBeenCalledWith(mockDocRef);
       expect(result).toEqual([]);
     });
   });
-}); 
+});
