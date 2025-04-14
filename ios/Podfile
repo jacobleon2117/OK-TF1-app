@@ -20,6 +20,10 @@ $RNMapboxMapsDownloadToken = 'sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdnOG5jcjBkNHc
 target 'OKTF1app' do
   use_expo_modules!
 
+  # Add Firebase pods here
+  pod 'Firebase/Auth'
+  pod 'Firebase/Core'
+
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
     config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"];
   else
