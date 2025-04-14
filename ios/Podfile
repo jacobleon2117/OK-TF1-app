@@ -11,7 +11,7 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 install! 'cocoapods',
   :deterministic_uuids => false
 
-prepare_react_native_project!
+use_modular_headers!
 
 # @generated begin @rnmapbox/maps-rnmapboxmapsimpl - expo prebuild (DO NOT MODIFY) sync-bb7086c714cd6a780afd0ed2764257809e68416c
 $RNMapboxMapsDownloadToken = 'sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdnOG5jcjBkNHcyaW9paml6a2YyZmwifQ.pyBK_7-_mPMxjhbZ4rf5tw'
