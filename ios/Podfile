@@ -1,31 +1,34 @@
-require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
-require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
-
 require 'json'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
+
+source 'https://cdn.cocoapods.org/'
+source 'https://github.com/mapbox/cocoapods-specs.git'
+
+platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
+
+install! 'cocoapods',
+  :deterministic_uuids => false
+
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
 
-platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
-use_modular_headers!
-install! 'cocoapods',
-  :deterministic_uuids => false
+prepare_react_native_project!
 
-use_modular_headers!
-
-# @generated begin @rnmapbox/maps-rnmapboxmapsimpl - expo prebuild (DO NOT MODIFY) sync-bb7086c714cd6a780afd0ed2764257809e68416c
-$RNMapboxMapsDownloadToken = 'sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdnOG5jcjBkNHcyaW9paml6a2YyZmwifQ.pyBK_7-_mPMxjhbZ4rf5tw'
-# @generated end @rnmapbox/maps-rnmapboxmapsimpl
 target 'OKTF1app' do
+  use_modular_headers!
   use_expo_modules!
 
-  # Add Firebase pods here
-  pod 'Firebase/Auth'
-  pod 'Firebase/Core'
+  pod 'MapboxMaps'
+  pod '@rnmapbox/maps', :path => '@/node_modules/@rnmapbox/maps'
+  
+  # Use the local path for @rnmapbox/maps
+  pod '@rnmapbox/maps', :path => '@/node_modules/@rnmapbox/maps'
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
-    config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"];
+    config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"]
   else
     config_command = [
       'node',
@@ -44,41 +47,25 @@ target 'OKTF1app' do
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
-# @generated begin pre_installer - expo prebuild (DO NOT MODIFY) sync-c8812095000d6054b846ce74840f0ffb540c2757
-  pre_install do |installer|
-# @generated begin @rnmapbox/maps-pre_installer - expo prebuild (DO NOT MODIFY) sync-ea4905840bf9fcea0acc62e92aa2e784f9d760f8
-    $RNMapboxMaps.pre_install(installer)
-# @generated end @rnmapbox/maps-pre_installer
-  end
-# @generated end pre_installer
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
 
+  pre_install do |installer|
+    $RNMapboxMaps.pre_install(installer)
+  end
+
   post_install do |installer|
-# @generated begin @rnmapbox/maps-post_installer - expo prebuild (DO NOT MODIFY) sync-c4e8f90e96f6b6c6ea9241dd7b52ab5f57f7bf36
     $RNMapboxMaps.post_install(installer)
-# @generated end @rnmapbox/maps-post_installer
+
     react_native_post_install(
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
-
-    # This is necessary for Xcode 14, because it signs resource bundles by default
-    # when building for devices.
-    installer.target_installation_results.pod_target_installation_results
-      .each do |pod_name, target_installation_result|
-      target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
-        resource_bundle_target.build_configurations.each do |config|
-          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-        end
-      end
-    end
   end
 end

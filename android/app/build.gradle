@@ -94,7 +94,7 @@ packagingOptions {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.jleon2117.OKTF1app'
+    namespace "com.oktf1app"
     defaultConfig {
         applicationId 'com.jleon2117.OKTF1app'
         minSdkVersion rootProject.ext.minSdkVersion

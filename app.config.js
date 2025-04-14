@@ -10,8 +10,7 @@ module.exports = {
     [
       '@rnmapbox/maps',
       {
-        RNMapboxMapsDownloadToken:
-          'sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdnOG5jcjBkNHcyaW9paml6a2YyZmwifQ.pyBK_7-_mPMxjhbZ4rf5tw',
+        RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
       },
     ],
   ],
