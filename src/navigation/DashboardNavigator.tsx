@@ -1,7 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import MapScreen from '@/screens/dashboard/map/MapScreen';
 import MessagesScreen from '@/screens/dashboard/Message/MessagesScreen';
 import ScheduleScreen from '@/screens/dashboard/Schedule/ScheduleScreen';
 import MissionReportScreen from '@/screens/dashboard/Mission/MissionReportScreen';
@@ -24,7 +23,6 @@ const DashboardNavigator = () => {
       <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="MissionReports" component={MissionReportScreen} />
-      <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );
 };
