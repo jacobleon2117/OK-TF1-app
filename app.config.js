@@ -17,6 +17,7 @@ module.exports = {
   ],
   ios: {
     supportsTablet: true,
+    bundleIdentifier: 'com.jleon2117.OKTF1app',
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         'This app needs access to your location to show it on the map.',
