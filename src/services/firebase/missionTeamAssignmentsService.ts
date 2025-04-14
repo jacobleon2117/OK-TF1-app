@@ -11,7 +11,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { db } from '@/config/firebase';
 
 export interface MissionTeamAssignment {
   userId: string;
@@ -41,9 +41,7 @@ export const getTeamAssignmentById = async (
   return await getDoc(assignmentRef);
 };
 
-export const getAllTeamAssignments = async (
-  missionId: string
-): Promise<QuerySnapshot> => {
+export const getAllTeamAssignments = async (missionId: string): Promise<QuerySnapshot> => {
   return await getDocs(collection(db, 'missions', missionId, 'team_assignments'));
 };
 

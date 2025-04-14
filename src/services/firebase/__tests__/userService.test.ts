@@ -11,7 +11,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
+import { db } from '@/config/firebase';
 import {
   getUserById,
   getAllUsers,
@@ -21,7 +21,7 @@ import {
   updateUserStatus,
   updateUserRole,
   updateUserPreferences,
-  User
+  User,
 } from '../userService';
 
 // Mock Firebase modules
@@ -38,7 +38,7 @@ jest.mock('firebase/firestore', () => ({
   },
 }));
 
-jest.mock('../../../config/firebase', () => ({
+jest.mock('@/config/firebase', () => ({
   db: {},
 }));
 
@@ -226,4 +226,4 @@ describe('userService', () => {
       });
     });
   });
-}); 
+});

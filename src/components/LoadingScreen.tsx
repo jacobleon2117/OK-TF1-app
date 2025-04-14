@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Modal } from 'react-native';
-import BackgroundGrid from './BackgroundGrid';
+import BackgroundGrid from './common/auth/BackgroundGrid';
 
 interface LoadingScreenProps {
   visible: boolean;
@@ -8,13 +8,13 @@ interface LoadingScreenProps {
   overlay?: boolean;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
-  visible, 
-  message = "loading...",
-  overlay = true
+const LoadingScreen: React.FC<LoadingScreenProps> = ({
+  visible,
+  message = 'loading...',
+  overlay = true,
 }) => {
   if (!visible) return null;
-  
+
   const content = (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#F09737" />
@@ -24,23 +24,13 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
 
   if (overlay) {
     return (
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={visible}
-      >
-        <View style={styles.overlay}>
-          {content}
-        </View>
+      <Modal transparent={true} animationType="fade" visible={visible}>
+        <View style={styles.overlay}>{content}</View>
       </Modal>
     );
   }
-  
-  return (
-    <BackgroundGrid>
-      {content}
-    </BackgroundGrid>
-  );
+
+  return <BackgroundGrid>{content}</BackgroundGrid>;
 };
 
 const styles = StyleSheet.create({
@@ -59,7 +49,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 10,
     fontSize: 16,
-  }
+  },
 });
 
 export default LoadingScreen;

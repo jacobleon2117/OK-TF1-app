@@ -1,7 +1,5 @@
-// src/env.ts
 import Constants from 'expo-constants';
 
-// Access the environment variables
 export const FIREBASE_API_KEY = Constants.expoConfig?.extra?.FIREBASE_API_KEY || '';
 export const FIREBASE_AUTH_DOMAIN = Constants.expoConfig?.extra?.FIREBASE_AUTH_DOMAIN || '';
 export const FIREBASE_PROJECT_ID = Constants.expoConfig?.extra?.FIREBASE_PROJECT_ID || '';

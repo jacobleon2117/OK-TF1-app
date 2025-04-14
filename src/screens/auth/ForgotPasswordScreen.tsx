@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   View,
-  Text, 
-  TextInput, 
-  TouchableOpacity,
+  Text,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
-  ActivityIndicator
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../context/AuthContext';
 import { StackNavigationProp } from '@react-navigation/stack';
-import BackgroundGrid from '../../components/BackgroundGrid';
-import CircularLogo from '../../components/CircularLogo';
-import LoadingScreen from '../../components/LoadingScreen';
+import { useAuth } from '@/context/AuthContext';
+import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
+import LoadingScreen from '@/components/LoadingScreen';
+import {
+  AuthHeader,
+  FullNameField,
+  EmailField,
+  AuthButton,
+  LinkText,
+  ResetPasswordSuccess,
+} from '@/components/common/auth';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -33,39 +36,45 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
+  const [nameError, setNameError] = useState<string>('');
+  const [emailError, setEmailError] = useState<string>('');
+
   const { resetPassword, error, setError } = useAuth();
 
-  // Fix for keyboard not showing up on initial load
   useEffect(() => {
     if (Platform.OS === 'ios') {
-      // This timeout helps ensure the keyboard shows properly on iOS
-      const timer = setTimeout(() => {
-      }, 100);
-      
+      const timer = setTimeout(() => {}, 100);
       return () => clearTimeout(timer);
     }
   }, []);
 
   const validateForm = (): boolean => {
+    let isValid = true;
+
     if (!fullName.trim()) {
-      Alert.alert('Error', 'Please enter your full name');
-      return false;
+      setNameError('Full name is required');
+      isValid = false;
+    } else {
+      setNameError('');
     }
+
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email');
-      return false;
+      setEmailError('Email is required');
+      isValid = false;
+    } else {
+      setEmailError('');
     }
-    return true;
+
+    return isValid;
   };
 
   const handleResetPassword = async (): Promise<void> => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
-      // Use "123456" as a default organization code for now
-      await resetPassword(email, "123456");
+      await resetPassword(email, '123456');
       setEmailSent(true);
     } catch (err: any) {
       Alert.alert('Reset Password Failed', error || 'An error occurred while sending reset email');
@@ -74,7 +83,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     }
   };
 
-  // Clear form data before navigation to prevent password save prompt
   const navigateToLogin = () => {
     setFullName('');
     setEmail('');
@@ -84,7 +92,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   return (
     <BackgroundGrid>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
       >
         <ScrollView
@@ -92,86 +100,42 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            {/* Circular Logo */}
-            <CircularLogo size={80} />
-            
-            {/* Title and Subtitle */}
-            <Text style={styles.title}>OK-TF1</Text>
-            <Text style={styles.subtitle}>Urban Search and Rescue Foundation</Text>
-            
+            <AuthHeader />
+
             {emailSent ? (
-              // Email sent success message
-              <View style={styles.successContainer}>
-                <Ionicons name="checkmark-circle" size={60} color="#4BB543" />
-                <Text style={styles.successTitle}>Email Sent</Text>
-                <Text style={styles.successMessage}>
-                  We've sent a password reset link to {email}. Please check your inbox and follow the instructions to reset your password.
-                </Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={navigateToLogin}
-                >
-                  <Text style={styles.buttonText}>Back to Login</Text>
-                </TouchableOpacity>
-              </View>
+              <ResetPasswordSuccess email={email} onBackToLogin={navigateToLogin} />
             ) : (
-              // Reset password form
               <>
-                {/* Full Name input */}
-                <Text style={styles.label}>Full name</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your account name"
-                    value={fullName}
-                    onChangeText={(text: string) => {
-                      setFullName(text);
-                      setError(null);
-                    }}
-                    placeholderTextColor="#888"
-                  />
-                </View>
-                
-                {/* Email input */}
-                <Text style={styles.label}>Email address</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your account email address"
-                    value={email}
-                    onChangeText={(text: string) => {
-                      setEmail(text);
-                      setError(null);
-                    }}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    placeholderTextColor="#888"
-                  />
-                  <Ionicons name="mail-outline" size={20} color="#888" />
-                </View>
-                
-                {/* Error message */}
+                <FullNameField
+                  value={fullName}
+                  onChangeText={text => {
+                    setFullName(text);
+                    setError(null);
+                  }}
+                  error={nameError}
+                />
+
+                <EmailField
+                  value={email}
+                  onChangeText={text => {
+                    setEmail(text);
+                    setError(null);
+                  }}
+                  error={emailError}
+                />
+
                 {error && <Text style={styles.errorText}>{error}</Text>}
-                
-                {/* Back to login link */}
-                <View style={styles.forgotContainer}>
-                  <TouchableOpacity onPress={navigateToLogin}>
-                    <Text style={styles.linkText}>Back to login</Text>
-                  </TouchableOpacity>
+
+                <View style={styles.backContainer}>
+                  <LinkText text="Back to login" onPress={navigateToLogin} />
                 </View>
-                
-                {/* Reset button */}
-                <TouchableOpacity
-                  style={styles.button}
+
+                <AuthButton
+                  title="Reset Password"
                   onPress={handleResetPassword}
+                  isLoading={isLoading}
                   disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.buttonText}>Reset Password</Text>
-                  )}
-                </TouchableOpacity>
+                />
               </>
             )}
           </View>
@@ -194,78 +158,17 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  label: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 8,
-  },
-inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 25, // rounded corners as per Figma
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 12,
-  },
-  button: {
-    backgroundColor: '#F09737', // orange accent color
-    paddingVertical: 12,
-    borderRadius: 25, // rounded corners as per Figma
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  forgotContainer: {
+  backContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginTop: 8,
-  },
-  linkText: {
-    color: 'white',
-  },
-  successContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    marginVertical: 16,
-  },
-  successMessage: {
-    color: 'white',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 8,
   },
   errorText: {
-    color: '#ff6b6b', 
+    color: '#ff6b6b',
     marginBottom: 10,
     textAlign: 'center',
-  }
+  },
 });
 
 export default ForgotPasswordScreen;

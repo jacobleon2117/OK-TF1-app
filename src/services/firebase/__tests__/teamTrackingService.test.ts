@@ -1,31 +1,31 @@
-import { 
-  createTeam, 
-  getTeam, 
-  getAllTeams, 
-  getActiveTeams, 
-  updateTeam, 
-  updateTeamStatus, 
-  updateTeamPosition, 
-  getTeamPositionHistory, 
-  subscribeToTeamPosition, 
-  subscribeToActiveTeams, 
+import {
+  createTeam,
+  getTeam,
+  getAllTeams,
+  getActiveTeams,
+  updateTeam,
+  updateTeamStatus,
+  updateTeamPosition,
+  getTeamPositionHistory,
+  subscribeToTeamPosition,
+  subscribeToActiveTeams,
   getTeamsInArea,
   Team,
-  PositionUpdate
+  PositionUpdate,
 } from '../teamTrackingService';
-import { db } from '../../../config/firebase';
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
-  updateDoc, 
-  onSnapshot, 
+import { db } from '@/config/firebase';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  onSnapshot,
   GeoPoint,
-  Timestamp
+  Timestamp,
 } from 'firebase/firestore';
 
 // Mock Firebase modules
@@ -39,12 +39,12 @@ jest.mock('firebase/firestore', () => ({
   where: jest.fn(),
   updateDoc: jest.fn(),
   onSnapshot: jest.fn(),
-  GeoPoint: jest.fn()
+  GeoPoint: jest.fn(),
 }));
 
 // Mock Firebase config
-jest.mock('../../../config/firebase', () => ({
-  db: {}
+jest.mock('@/config/firebase', () => ({
+  db: {},
 }));
 
 describe('teamTrackingService', () => {
@@ -62,16 +62,16 @@ describe('teamTrackingService', () => {
         dogId: 'dog123',
         dogName: 'Rex',
         breed: 'German Shepherd',
-        status: 'active'
+        status: 'active',
       };
-      
+
       const mockDocRef = { id: 'team123' };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (setDoc as jest.Mock).mockResolvedValue(undefined);
-      
+
       // Act
       const result = await createTeam(mockTeam);
-      
+
       // Assert
       expect(result).toBe('team123');
       expect(doc).toHaveBeenCalled();
@@ -91,17 +91,17 @@ describe('teamTrackingService', () => {
         dogName: 'Max',
         breed: 'German Shepherd',
         status: 'active',
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       };
-      
+
       (getDoc as jest.Mock).mockResolvedValue({
         exists: () => true,
-        data: () => mockTeamData
+        data: () => mockTeamData,
       });
-      
+
       // Act
       const result = await getTeam(mockTeamId);
-      
+
       // Assert
       expect(result).toEqual(mockTeamData);
       expect(getDoc).toHaveBeenCalled();
@@ -110,14 +110,14 @@ describe('teamTrackingService', () => {
     it('should return null when team does not exist', async () => {
       // Arrange
       const mockTeamId = 'non-existent-team';
-      
+
       (getDoc as jest.Mock).mockResolvedValue({
-        exists: () => false
+        exists: () => false,
       });
-      
+
       // Act
       const result = await getTeam(mockTeamId);
-      
+
       // Assert
       expect(result).toBeNull();
       expect(getDoc).toHaveBeenCalled();
@@ -136,7 +136,7 @@ describe('teamTrackingService', () => {
           dogName: 'Max',
           breed: 'German Shepherd',
           status: 'active',
-          lastUpdated: Date.now()
+          lastUpdated: Date.now(),
         },
         {
           id: 'team-2',
@@ -146,19 +146,19 @@ describe('teamTrackingService', () => {
           dogName: 'Rex',
           breed: 'Belgian Malinois',
           status: 'inactive',
-          lastUpdated: Date.now()
-        }
+          lastUpdated: Date.now(),
+        },
       ];
-      
+
       (getDocs as jest.Mock).mockResolvedValue({
         docs: mockTeams.map(team => ({
-          data: () => team
-        }))
+          data: () => team,
+        })),
       });
-      
+
       // Act
       const result = await getAllTeams();
-      
+
       // Assert
       expect(result).toEqual(mockTeams);
       expect(getDocs).toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('teamTrackingService', () => {
           dogName: 'Max',
           breed: 'German Shepherd',
           status: 'on-duty',
-          lastUpdated: Date.now()
+          lastUpdated: Date.now(),
         },
         {
           id: 'team-2',
@@ -187,20 +187,20 @@ describe('teamTrackingService', () => {
           dogName: 'Rex',
           breed: 'Belgian Malinois',
           status: 'off-duty',
-          lastUpdated: Date.now()
-        }
+          lastUpdated: Date.now(),
+        },
       ];
-      
+
       (query as jest.Mock).mockReturnValue({});
       (getDocs as jest.Mock).mockResolvedValue({
         docs: [mockTeams[0]].map(team => ({
-          data: () => team
-        }))
+          data: () => team,
+        })),
       });
-      
+
       // Act
       const result = await getActiveTeams();
-      
+
       // Assert
       expect(result).toEqual([mockTeams[0]]);
       expect(query).toHaveBeenCalled();
@@ -214,14 +214,14 @@ describe('teamTrackingService', () => {
       const mockTeamId = 'test-team-id';
       const mockTeamData: Partial<Team> = {
         status: 'on-duty',
-        notes: 'Updated notes'
+        notes: 'Updated notes',
       };
-      
+
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
-      
+
       // Act
       await updateTeam(mockTeamId, mockTeamData);
-      
+
       // Assert
       expect(updateDoc).toHaveBeenCalled();
     });
@@ -232,12 +232,12 @@ describe('teamTrackingService', () => {
       // Arrange
       const mockTeamId = 'test-team-id';
       const mockStatus: Team['status'] = 'on-duty';
-      
+
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
-      
+
       // Act
       await updateTeamStatus(mockTeamId, mockStatus);
-      
+
       // Assert
       expect(updateDoc).toHaveBeenCalled();
     });
@@ -253,16 +253,16 @@ describe('teamTrackingService', () => {
         speed: 5,
         timestamp: Date.now(),
         accuracy: 10,
-        batteryLevel: 85
+        batteryLevel: 85,
       };
-      
+
       (doc as jest.Mock).mockReturnValue({ id: 'position-id' });
       (setDoc as jest.Mock).mockResolvedValue(undefined);
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
-      
+
       // Act
       await updateTeamPosition(mockPositionUpdate);
-      
+
       // Assert
       expect(updateDoc).toHaveBeenCalled();
       expect(setDoc).toHaveBeenCalled();
@@ -275,7 +275,7 @@ describe('teamTrackingService', () => {
       const mockTeamId = 'test-team-id';
       const mockStartTime = Date.now() - 3600000; // 1 hour ago
       const mockEndTime = Date.now();
-      
+
       const mockPositions: PositionUpdate[] = [
         {
           teamId: mockTeamId,
@@ -284,29 +284,29 @@ describe('teamTrackingService', () => {
           speed: 5,
           timestamp: mockStartTime + 1800000, // 30 minutes ago
           accuracy: 10,
-          batteryLevel: 85
+          batteryLevel: 85,
         },
         {
           teamId: mockTeamId,
-          location: new GeoPoint(37.7750, -122.4195),
+          location: new GeoPoint(37.775, -122.4195),
           heading: 95,
           speed: 6,
           timestamp: mockStartTime + 2700000, // 15 minutes ago
           accuracy: 8,
-          batteryLevel: 80
-        }
+          batteryLevel: 80,
+        },
       ];
-      
+
       (query as jest.Mock).mockReturnValue({});
       (getDocs as jest.Mock).mockResolvedValue({
         docs: mockPositions.map(position => ({
-          data: () => position
-        }))
+          data: () => position,
+        })),
       });
-      
+
       // Act
       const result = await getTeamPositionHistory(mockTeamId, mockStartTime, mockEndTime);
-      
+
       // Assert
       expect(result).toEqual(mockPositions);
       expect(query).toHaveBeenCalled();
@@ -320,12 +320,12 @@ describe('teamTrackingService', () => {
       const mockTeamId = 'test-team-id';
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
-      
+
       (onSnapshot as jest.Mock).mockReturnValue(mockUnsubscribe);
-      
+
       // Act
       const unsubscribe = subscribeToTeamPosition(mockTeamId, mockCallback);
-      
+
       // Assert
       expect(onSnapshot).toHaveBeenCalled();
       expect(unsubscribe).toBe(mockUnsubscribe);
@@ -337,13 +337,13 @@ describe('teamTrackingService', () => {
       // Arrange
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
-      
+
       (query as jest.Mock).mockReturnValue({});
       (onSnapshot as jest.Mock).mockReturnValue(mockUnsubscribe);
-      
+
       // Act
       const unsubscribe = subscribeToActiveTeams(mockCallback);
-      
+
       // Assert
       expect(query).toHaveBeenCalled();
       expect(onSnapshot).toHaveBeenCalled();
@@ -355,10 +355,10 @@ describe('teamTrackingService', () => {
     it('should return teams within the specified area', async () => {
       // Arrange
       // Mock GeoPoint constructor to return real objects
-      (GeoPoint as jest.Mock).mockImplementation(function(lat: number, lng: number) {
+      (GeoPoint as jest.Mock).mockImplementation(function (lat: number, lng: number) {
         return {
           latitude: lat,
-          longitude: lng
+          longitude: lng,
         };
       });
 
@@ -384,14 +384,14 @@ describe('teamTrackingService', () => {
           status: 'active',
           lastUpdated: Date.now(),
           location: new GeoPoint(89, 179), // Very far from origin
-        }
+        },
       ];
 
       // Mock getAllTeams to return our test data
       (getDocs as jest.Mock).mockResolvedValue({
         docs: mockTeams.map(team => ({
-          data: () => team
-        }))
+          data: () => team,
+        })),
       });
 
       // Search around origin with small radius
@@ -406,4 +406,4 @@ describe('teamTrackingService', () => {
       expect(result[0].id).toBe('team-1');
     });
   });
-}); 
+});
