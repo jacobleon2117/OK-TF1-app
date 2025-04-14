@@ -11,16 +11,16 @@ jest.mock('firebase/firestore', () => ({
   where: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now())
+    now: jest.fn(() => Date.now()),
   },
   serverTimestamp: jest.fn(() => Date.now()),
   arrayUnion: jest.fn(data => data),
   writeBatch: jest.fn(() => ({
     update: jest.fn(),
-    commit: jest.fn().mockResolvedValue(undefined)
+    commit: jest.fn().mockResolvedValue(undefined),
   })),
-  GeoPoint: jest.fn(function(latitude, longitude) {
+  GeoPoint: jest.fn(function (latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
-  })
-})); 
+  }),
+}));

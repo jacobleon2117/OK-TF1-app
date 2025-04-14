@@ -6,13 +6,28 @@ module.exports = {
   orientation: 'portrait',
   userInterfaceStyle: 'light',
   newArchEnabled: true,
+  plugins: [
+    [
+      '@rnmapbox/maps',
+      {
+        RNMapboxMapsDownloadToken:
+          'sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdkczR6NjAwdmwyd29vM245cGticW4ifQ.5eFWUB1RY_Ykl7gwf-ZGFQ',
+      },
+    ],
+  ],
   ios: {
     supportsTablet: true,
+    infoPlist: {
+      NSLocationWhenInUseUsageDescription:
+        'This app needs access to your location to show it on the map.',
+    },
   },
   android: {
     adaptiveIcon: {
       backgroundColor: '#000000',
     },
+    permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
+    package: 'com.jleon2117.OKTF1app',
   },
   // Environment variables will be added here
   extra: {
