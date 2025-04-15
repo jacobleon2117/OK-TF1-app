@@ -1,65 +1,86 @@
-# Add any changes here.
+# Changelog
 
-## Make sure to document your name, current date, and what you changed in this branch.
+All notable changes to this project will be documented in this file.
 
-## [2025-04-06] - Jacob Leon
+## [NEXT STEPS] - Upcoming
+
+### Role-Based Access Implementation
+- Implement role-based permissions in Schedule screen using roleUtils
+- Add conditional rendering based on user permissions
+- Create shift creation form for coordinator users only
+- Filter shifts display based on user role
+
+### Firebase Integration 
+- Complete createShift function implementation in shiftUtils.ts
+- Add robust error handling for database operations
+- Implement real-time updates for shift changes
+
+### UI Enhancements
+- Add visual indicators for days with scheduled shifts on the calendar
+- Create shift detail view modal for selected shifts
+- Add proper loading states and error messages
+
+### Utilities Framework Completion
+- Implement MessagesScreen utilities (messageDataUtils, conversationUtils)
+- Implement MissionReportScreen utilities (reportDataUtils, reportFilterUtils)
+- Apply business logic separation pattern to all screens
+
+### Testing & Documentation
+- Test role-based access with different user accounts
+- Document role permission system for team reference
+- Improve inline code documentation for utility functions
+
+## [2025-04-09] - Jacob Leon
 
 ### Added
-- Comprehensive unit testing for authentication services
-- Jest configuration for React Native testing
-- Test scripts for running authentication tests
-- Test coverage for login, signup, password reset, and logout functionality
-- Mocking strategy for Firebase authentication services
-- Added new dev dependencies for testing:
-  - @testing-library/jest-native
-  - @testing-library/react-native
-  - @types/jest
-  - jest
-  - jest-expo
-- Created new test files:
-  - src/__tests__/auth.test.ts
-  - src/__tests__/AuthContext.test.tsx
-- Updated package.json with test scripts and jest configuration
-- Implemented robust error handling in authentication context
-- Added Firestore user document creation during signup
-- Improved type safety for authentication methods
+- Created utility folders structure for screen-specific business logic
+- Added profileUtils with separated settings, data and UI functions
+- Added roleUtils for role-based permissions in the scheduling screen
+- Comprehensive navigation type declarations for React Navigation
+- Updated TypeScript configuration for better module resolution
+- Created enhanced type safety for navigation across screens
+- Improved type declarations in `@types` folder
+- Added module augmentation for React Navigation types
 
 ### Changed
-- Refactored authentication service methods
-- Updated Firebase authentication approach
-- Modified AuthContext to use direct Firebase methods
-- Replaced `updateProfile` with Firestore user document creation
-- Added comprehensive type definitions
-- Enhanced error handling across authentication flows
-- Added test scripts for running and managing tests
-- Configured Jest with support for React Native and TypeScript
+- Refactored Profile screen to use utility functions
+- Refactored navigation type imports in screen components
+- Updated Babel configuration to support path aliases
+- Modified `tsconfig.json` to improve TypeScript module resolution
+- Updated React Navigation type declarations
 
 ### Fixed
-- Resolved Firebase authentication type inconsistencies
-- Improved type safety in authentication test suites
-- Ensured proper mocking of Firebase authentication methods
-- Added test coverage for critical authentication flows
-- Corrected authentication context type definitions
+- Separated business logic from UI components for better maintainability
+- Established role-based access control framework
+- Resolved TypeScript errors in navigation type imports
+- Corrected module resolution for React Navigation types
+- Fixed type safety issues in navigation prop usage
+- Improved type declarations for screen navigation
 
 ### Comments
-- Established a robust testing framework for authentication
-- Improved code quality and reliability through comprehensive testing
-- Created separate test suites for services and context
-- Added coverage reporting to track test completeness
-- Simplified test setup and execution with new scripts
-- Enhanced security and flexibility of user authentication process
+- Enhanced type safety and developer experience for navigation
+- Established consistent typing approach for React Navigation
+- Simplified navigation type imports across the application
+- Improved overall TypeScript configuration for the project
+- Created foundation for role-based access control
 
 ## [2025-04-01] - Jacob Leon
 
 ### Added
-- Created new folder structure /src/services/firebase/ for better organization
-- Added new TypeScript file /src/services/firebase/auth.ts for authentication services
-- Created/Updated documentation files (README.md, FIREBASE-SETUP.md, CONTRIBUTING.md, DB-MAPPING.md, CHANGELOG.md, INSTALLATION.md)
+- Created new folder structure `/src/services/firebase/` for better organization
+- Added new TypeScript file `/src/services/firebase/auth.ts` for authentication services
+- Created/Updated documentation files:
+  - README.md
+  - FIREBASE-SETUP.md
+  - CONTRIBUTING.md
+  - DB-MAPPING.md
+  - CHANGELOG.md
+  - INSTALLATION.md
 
 ### Changed
-- Changed file extension for firebase.js to firebase.ts (no changes to file content)
-- Moved firebase.ts to /src/services/firebase/firebase.ts
-- Updated src/config/firebase.ts to initialize and export Firestore db
+- Changed file extension for `firebase.js` to `firebase.ts`
+- Moved `firebase.ts` to `/src/services/firebase/firebase.ts`
+- Updated `src/config/firebase.ts` to initialize and export Firestore db
 
 ### Fixed
 - Established proper file organization for future development

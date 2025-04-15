@@ -12,7 +12,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { db } from '@/config/firebase';
 import { getMissionById } from './missionService';
 
 export interface MissionPin {
@@ -32,7 +32,6 @@ export interface MissionPin {
   id?: string;
 }
 
-
 //========================================
 // PIN FUNCTIONS
 //========================================
@@ -42,7 +41,7 @@ export const addMissionPin = async (
   pinData: MissionPin
 ): Promise<DocumentReference> => {
   return await addDoc(collection(db, 'missions', missionId, 'pins'), pinData);
-}
+};
 
 export const getMissionPinById = async (
   missionId: string,
@@ -50,13 +49,11 @@ export const getMissionPinById = async (
 ): Promise<DocumentSnapshot> => {
   const pinRef = doc(db, 'missions', missionId, 'pins', pinId);
   return await getDoc(pinRef);
-}
+};
 
-export const getAllMissionPins = async (
-  missionId: string,
-): Promise<QuerySnapshot> => {
-  return await getDocs(collection(db, 'missions', missionId, 'pins'))
-}
+export const getAllMissionPins = async (missionId: string): Promise<QuerySnapshot> => {
+  return await getDocs(collection(db, 'missions', missionId, 'pins'));
+};
 
 export const updateMissionPin = async (
   missionId: string,
@@ -65,12 +62,9 @@ export const updateMissionPin = async (
 ): Promise<void> => {
   const pinRef = doc(db, 'missions', missionId, 'pins', pinId);
   return await updateDoc(pinRef, updatedData);
-}
+};
 
-export const deleteMissionPin = async (
-  missionId: string,
-  pinId: string
-): Promise<void> => {
+export const deleteMissionPin = async (missionId: string, pinId: string): Promise<void> => {
   const pinRef = doc(db, 'missions', missionId, 'pins', pinId);
   await deleteDoc(pinRef);
-}
+};

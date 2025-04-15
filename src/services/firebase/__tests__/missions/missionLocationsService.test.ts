@@ -1,27 +1,27 @@
-import { 
-  addMissionLocation, 
-  getMissionLocationById, 
-  getAllMissionLocations, 
-  updateMissionLocation, 
+import {
+  addMissionLocation,
+  getMissionLocationById,
+  getAllMissionLocations,
+  updateMissionLocation,
   deleteMissionLocation,
-  MissionLocation
+  MissionLocation,
 } from '../missionLocationsService';
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   query,
   where,
   Timestamp,
   DocumentReference,
   DocumentSnapshot,
-  QuerySnapshot
+  QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
+import { db } from '@/config/firebase';
 
 // Mock Firebase modules
 jest.mock('firebase/firestore', () => ({
@@ -36,12 +36,12 @@ jest.mock('firebase/firestore', () => ({
   where: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now())
-  }
+    now: jest.fn(() => Date.now()),
+  },
 }));
 
-jest.mock('../../../config/firebase', () => ({
-  db: {}
+jest.mock('@/config/firebase', () => ({
+  db: {},
 }));
 
 describe('missionLocationsService', () => {
@@ -58,15 +58,15 @@ describe('missionLocationsService', () => {
         timestamp: Timestamp.now(),
         coordinates: {
           latitude: 37.7749,
-          longitude: -122.4194
+          longitude: -122.4194,
         },
         accuracy: 10,
         altitude: 100,
         speed: 5,
         heading: 90,
-        roadType: 'paved'
+        roadType: 'paved',
       };
-      
+
       const mockDocRef = { id: 'test-location-id' };
       (collection as jest.Mock).mockReturnValue('mission-locations-collection');
       (addDoc as jest.Mock).mockResolvedValue(mockDocRef);
@@ -94,16 +94,16 @@ describe('missionLocationsService', () => {
           timestamp: Timestamp.now(),
           coordinates: {
             latitude: 37.7749,
-            longitude: -122.4194
+            longitude: -122.4194,
           },
           accuracy: 10,
           altitude: 100,
           speed: 5,
           heading: 90,
-          roadType: 'paved'
-        })
+          roadType: 'paved',
+        }),
       };
-      
+
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
 
@@ -130,14 +130,14 @@ describe('missionLocationsService', () => {
               timestamp: Timestamp.now(),
               coordinates: {
                 latitude: 37.7749,
-                longitude: -122.4194
+                longitude: -122.4194,
               },
               accuracy: 10,
               altitude: 100,
               speed: 5,
               heading: 90,
-              roadType: 'paved'
-            })
+              roadType: 'paved',
+            }),
           },
           {
             id: 'location-2',
@@ -145,19 +145,19 @@ describe('missionLocationsService', () => {
               userId: 'user-456',
               timestamp: Timestamp.now(),
               coordinates: {
-                latitude: 37.7750,
-                longitude: -122.4195
+                latitude: 37.775,
+                longitude: -122.4195,
               },
               accuracy: 15,
               altitude: 150,
               speed: 10,
               heading: 180,
-              roadType: 'dirt'
-            })
-          }
-        ]
+              roadType: 'dirt',
+            }),
+          },
+        ],
       };
-      
+
       (collection as jest.Mock).mockReturnValue('mission-locations-collection');
       (getDocs as jest.Mock).mockResolvedValue(mockQuerySnapshot);
 
@@ -178,9 +178,9 @@ describe('missionLocationsService', () => {
       const locationId = 'test-location-id';
       const updateData: Partial<MissionLocation> = {
         accuracy: 20,
-        speed: 15
+        speed: 15,
       };
-      
+
       const mockDocRef = { id: locationId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
@@ -211,4 +211,4 @@ describe('missionLocationsService', () => {
       expect(deleteDoc).toHaveBeenCalledWith(mockDocRef);
     });
   });
-}); 
+});

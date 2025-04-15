@@ -13,6 +13,21 @@
       "adaptiveIcon": {
         "backgroundColor": "#000000"
       }
-    }
+    },
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "sk.eyJ1Ijoiamxlb24yMTE3IiwiYSI6ImNtOWdnOG5jcjBkNHcyaW9paml6a2YyZmwifQ.pyBK_7-_mPMxjhbZ4rf5tw",
+          "RNMapboxMapsVersion": "11.0.0"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ]
+    ]
   }
 }

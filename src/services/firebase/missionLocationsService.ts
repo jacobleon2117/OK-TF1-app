@@ -9,9 +9,9 @@ import {
   Timestamp,
   DocumentReference,
   DocumentSnapshot,
-  QuerySnapshot
+  QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { db } from '@/config/firebase';
 
 export interface MissionLocation {
   userId: string;
@@ -45,13 +45,11 @@ export const getMissionLocationById = async (
 ): Promise<DocumentSnapshot> => {
   const locationRef = doc(db, 'missions', missionId, 'locations', locationId);
   return await getDoc(locationRef);
-}
+};
 
-export const getAllMissionLocations = async (
-  missionId: string
-): Promise<QuerySnapshot> => {
+export const getAllMissionLocations = async (missionId: string): Promise<QuerySnapshot> => {
   return await getDocs(collection(db, 'missions', missionId, 'locations'));
-}
+};
 
 export const updateMissionLocation = async (
   missionId: string,
@@ -60,7 +58,7 @@ export const updateMissionLocation = async (
 ): Promise<void> => {
   const locationRef = doc(db, 'missions', missionId, 'locations', locationId);
   await updateDoc(locationRef, updateData);
-}
+};
 
 export const deleteMissionLocation = async (
   missionId: string,
@@ -68,4 +66,4 @@ export const deleteMissionLocation = async (
 ): Promise<void> => {
   const locationRef = doc(db, 'missions', missionId, 'locations', locationId);
   await deleteDoc(locationRef);
-}
+};

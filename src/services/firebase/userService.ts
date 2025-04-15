@@ -11,7 +11,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { db } from '@/config/firebase';
 
 export interface User {
   id: string;
@@ -54,10 +54,13 @@ export const getUserById = async (userId: string): Promise<User | null> => {
 export const getAllUsers = async (): Promise<User[]> => {
   try {
     const usersSnapshot = await getDocs(collection(db, 'users'));
-    return usersSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as User));
+    return usersSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as User)
+    );
   } catch (error) {
     console.error('Error getting all users:', error);
     throw error;
@@ -72,10 +75,13 @@ export const getUsersByOrganization = async (organizationId: string): Promise<Us
       where('organizationId', '==', organizationId)
     );
     const usersSnapshot = await getDocs(usersQuery);
-    return usersSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as User));
+    return usersSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as User)
+    );
   } catch (error) {
     console.error('Error getting users by organization:', error);
     throw error;
@@ -85,15 +91,15 @@ export const getUsersByOrganization = async (organizationId: string): Promise<Us
 // Get users by role
 export const getUsersByRole = async (role: User['role']): Promise<User[]> => {
   try {
-    const usersQuery = query(
-      collection(db, 'users'),
-      where('role', '==', role)
-    );
+    const usersQuery = query(collection(db, 'users'), where('role', '==', role));
     const usersSnapshot = await getDocs(usersQuery);
-    return usersSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as User));
+    return usersSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as User)
+    );
   } catch (error) {
     console.error('Error getting users by role:', error);
     throw error;
@@ -106,7 +112,7 @@ export const updateUser = async (userId: string, userData: Partial<User>): Promi
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, {
       ...userData,
-      updatedAt: Timestamp.now()
+      updatedAt: Timestamp.now(),
     });
   } catch (error) {
     console.error('Error updating user:', error);
@@ -145,4 +151,4 @@ export const updateUserPreferences = async (
     console.error('Error updating user preferences:', error);
     throw error;
   }
-}; 
+};
