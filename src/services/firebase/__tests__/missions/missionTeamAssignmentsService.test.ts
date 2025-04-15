@@ -1,21 +1,21 @@
-import {
+import { 
   addTeamAssignment,
   getTeamAssignmentById,
   getAllTeamAssignments,
   updateTeamAssignment,
   deleteTeamAssignment,
-  MissionTeamAssignment,
-} from '../missionTeamAssignmentsService';
-import { db } from '@/config/firebase';
-import {
-  collection,
-  doc,
+  MissionTeamAssignment
+} from '../../missionTeamAssignmentsService';
+import { db } from '../../../../config/firebase';
+import { 
+  collection, 
+  doc, 
   addDoc,
-  getDoc,
-  getDocs,
+  getDoc, 
+  getDocs, 
   updateDoc,
   deleteDoc,
-  Timestamp,
+  Timestamp
 } from 'firebase/firestore';
 
 // Mock Firebase modules
@@ -29,12 +29,12 @@ jest.mock('firebase/firestore', () => ({
   deleteDoc: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now()),
-  },
+    now: jest.fn(() => Date.now())
+  }
 }));
 
-jest.mock('@/config/firebase', () => ({
-  db: {},
+jest.mock('../../../config/firebase', () => ({
+  db: {}
 }));
 
 describe('missionTeamAssignmentsService', () => {
@@ -52,16 +52,16 @@ describe('missionTeamAssignmentsService', () => {
         role: 'team_leader',
         status: 'active',
         checkinTime: Timestamp.now(),
-        checkoutTime: Timestamp.now(),
+        checkoutTime: Timestamp.now()
       };
-
+      
       const mockDocRef = { id: 'test-assignment-id' };
       (collection as jest.Mock).mockReturnValue('team-assignments-collection');
       (addDoc as jest.Mock).mockResolvedValue(mockDocRef);
-
+      
       // Act
       const result = await addTeamAssignment(missionId, mockAssignment);
-
+      
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions', missionId, 'team_assignments');
       expect(addDoc).toHaveBeenCalledWith('team-assignments-collection', mockAssignment);
@@ -82,16 +82,16 @@ describe('missionTeamAssignmentsService', () => {
           role: 'team_leader',
           status: 'active',
           checkinTime: Timestamp.now(),
-          checkoutTime: Timestamp.now(),
-        }),
+          checkoutTime: Timestamp.now()
+        })
       };
-
+      
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
-
+      
       // Act
       const result = await getTeamAssignmentById(missionId, assignmentId);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'team_assignments', assignmentId);
       expect(getDoc).toHaveBeenCalledWith(mockDocRef);
@@ -112,8 +112,8 @@ describe('missionTeamAssignmentsService', () => {
               role: 'team_leader',
               status: 'active',
               checkinTime: Timestamp.now(),
-              checkoutTime: Timestamp.now(),
-            }),
+              checkoutTime: Timestamp.now()
+            })
           },
           {
             id: 'assignment-2',
@@ -122,18 +122,18 @@ describe('missionTeamAssignmentsService', () => {
               role: 'team_member',
               status: 'active',
               checkinTime: Timestamp.now(),
-              checkoutTime: Timestamp.now(),
-            }),
-          },
-        ],
+              checkoutTime: Timestamp.now()
+            })
+          }
+        ]
       };
-
+      
       (collection as jest.Mock).mockReturnValue('team-assignments-collection');
       (getDocs as jest.Mock).mockResolvedValue(mockQuerySnapshot);
-
+      
       // Act
       const result = await getAllTeamAssignments(missionId);
-
+      
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions', missionId, 'team_assignments');
       expect(getDocs).toHaveBeenCalledWith('team-assignments-collection');
@@ -147,16 +147,16 @@ describe('missionTeamAssignmentsService', () => {
       const missionId = 'test-mission-id';
       const assignmentId = 'test-assignment-id';
       const updateData: Partial<MissionTeamAssignment> = {
-        status: 'injured',
+        status: 'injured'
       };
-
+      
       const mockDocRef = { id: assignmentId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
-
+      
       // Act
       await updateTeamAssignment(missionId, assignmentId, updateData);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'team_assignments', assignmentId);
       expect(updateDoc).toHaveBeenCalledWith(mockDocRef, updateData);
@@ -171,13 +171,13 @@ describe('missionTeamAssignmentsService', () => {
       const mockDocRef = { id: assignmentId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (deleteDoc as jest.Mock).mockResolvedValue(undefined);
-
+      
       // Act
       await deleteTeamAssignment(missionId, assignmentId);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'team_assignments', assignmentId);
       expect(deleteDoc).toHaveBeenCalledWith(mockDocRef);
     });
   });
-});
+}); 

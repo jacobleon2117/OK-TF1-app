@@ -1,21 +1,21 @@
-import {
+import { 
   addMissionPin,
   getMissionPinById,
   getAllMissionPins,
   updateMissionPin,
   deleteMissionPin,
-  MissionPin,
-} from '../missionPinsService';
-import { db } from '@/config/firebase';
-import {
-  collection,
-  doc,
+  MissionPin
+} from '../../missionPinsService';
+import { db } from '../../../../config/firebase';
+import { 
+  collection, 
+  doc, 
   addDoc,
-  getDoc,
-  getDocs,
+  getDoc, 
+  getDocs, 
   updateDoc,
   deleteDoc,
-  Timestamp,
+  Timestamp
 } from 'firebase/firestore';
 
 // Mock Firebase modules
@@ -29,12 +29,12 @@ jest.mock('firebase/firestore', () => ({
   deleteDoc: jest.fn(),
   Timestamp: {
     fromDate: jest.fn(date => date.getTime()),
-    now: jest.fn(() => Date.now()),
-  },
+    now: jest.fn(() => Date.now())
+  }
 }));
 
-jest.mock('@/config/firebase', () => ({
-  db: {},
+jest.mock('../../../config/firebase', () => ({
+  db: {}
 }));
 
 describe('missionPinsService', () => {
@@ -53,22 +53,22 @@ describe('missionPinsService', () => {
         timestamp: Timestamp.now(),
         coordinates: {
           latitude: 37.7749,
-          longitude: -122.4194,
+          longitude: -122.4194
         },
         description: 'Test pin description',
         imageUrls: ['url1', 'url2'],
         additionalDetails: {
-          rescueCount: 2,
-        },
+          rescueCount: 2
+        }
       };
-
+      
       const mockDocRef = { id: 'test-pin-id' };
       (collection as jest.Mock).mockReturnValue('pins-collection');
       (addDoc as jest.Mock).mockResolvedValue(mockDocRef);
-
+      
       // Act
       const result = await addMissionPin(missionId, mockPin);
-
+      
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions', missionId, 'pins');
       expect(addDoc).toHaveBeenCalledWith('pins-collection', mockPin);
@@ -90,22 +90,22 @@ describe('missionPinsService', () => {
           timestamp: Timestamp.now(),
           coordinates: {
             latitude: 37.7749,
-            longitude: -122.4194,
+            longitude: -122.4194
           },
           description: 'Test pin description',
           imageUrls: ['url1', 'url2'],
           additionalDetails: {
-            rescueCount: 2,
-          },
-        }),
+            rescueCount: 2
+          }
+        })
       };
-
+      
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (getDoc as jest.Mock).mockResolvedValue(mockDocSnapshot);
-
+      
       // Act
       const result = await getMissionPinById(missionId, pinId);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'pins', pinId);
       expect(getDoc).toHaveBeenCalledWith(mockDocRef);
@@ -127,14 +127,14 @@ describe('missionPinsService', () => {
               timestamp: Timestamp.now(),
               coordinates: {
                 latitude: 37.7749,
-                longitude: -122.4194,
+                longitude: -122.4194
               },
               description: 'Pin 1 description',
               imageUrls: ['url1'],
               additionalDetails: {
-                rescueCount: 1,
-              },
-            }),
+                rescueCount: 1
+              }
+            })
           },
           {
             id: 'pin-2',
@@ -143,25 +143,25 @@ describe('missionPinsService', () => {
               userId: 'user-456',
               timestamp: Timestamp.now(),
               coordinates: {
-                latitude: 37.775,
-                longitude: -122.4195,
+                latitude: 37.7750,
+                longitude: -122.4195
               },
               description: 'Pin 2 description',
               imageUrls: ['url2'],
               additionalDetails: {
-                fireIntensity: 'high',
-              },
-            }),
-          },
-        ],
+                fireIntensity: 'high'
+              }
+            })
+          }
+        ]
       };
-
+      
       (collection as jest.Mock).mockReturnValue('pins-collection');
       (getDocs as jest.Mock).mockResolvedValue(mockQuerySnapshot);
-
+      
       // Act
       const result = await getAllMissionPins(missionId);
-
+      
       // Assert
       expect(collection).toHaveBeenCalledWith(db, 'missions', missionId, 'pins');
       expect(getDocs).toHaveBeenCalledWith('pins-collection');
@@ -177,17 +177,17 @@ describe('missionPinsService', () => {
       const updateData: Partial<MissionPin> = {
         description: 'Updated pin description',
         additionalDetails: {
-          rescueCount: 3,
-        },
+          rescueCount: 3
+        }
       };
-
+      
       const mockDocRef = { id: pinId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (updateDoc as jest.Mock).mockResolvedValue(undefined);
-
+      
       // Act
       await updateMissionPin(missionId, pinId, updateData);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'pins', pinId);
       expect(updateDoc).toHaveBeenCalledWith(mockDocRef, updateData);
@@ -202,10 +202,10 @@ describe('missionPinsService', () => {
       const mockDocRef = { id: pinId };
       (doc as jest.Mock).mockReturnValue(mockDocRef);
       (deleteDoc as jest.Mock).mockResolvedValue(undefined);
-
+      
       // Act
       await deleteMissionPin(missionId, pinId);
-
+      
       // Assert
       expect(doc).toHaveBeenCalledWith(db, 'missions', missionId, 'pins', pinId);
       expect(deleteDoc).toHaveBeenCalledWith(mockDocRef);
