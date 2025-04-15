@@ -44,26 +44,21 @@ jest.mock('../../../config/firebase', () => ({
 
 describe('userService', () => {
   const mockUser: User = {
-    id: 'user-1',
+    id: 'test-user-id',
     email: 'test@example.com',
     displayName: 'Test User',
     role: 'team_member',
-    organizationId: 'org-1',
+    organizationId: 'test-org-id',
     status: 'active',
     lastLogin: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
     phoneNumber: '1234567890',
-    emergencyContact: {
-      name: 'Emergency Contact',
-      phoneNumber: '0987654321',
-      relationship: 'Family',
-    },
     preferences: {
       notifications: true,
       emailUpdates: true,
-      darkMode: false,
-    },
+      darkMode: false
+    }
   };
 
   beforeEach(() => {
