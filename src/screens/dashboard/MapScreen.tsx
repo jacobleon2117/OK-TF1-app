@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Platform, StatusBar as RNStatusBar, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import TabBarMap from '../../components/navigation/TabBarMap';
 import Header from '../../components/layout/Header';
-// import MapboxGL from '@rnmapbox/maps';
+import Mapbox from '@rnmapbox/maps';
 
-// Set your MapBox access token
-// MapboxGL.setAccessToken('YOUR_MAPBOX_ACCESS_TOKEN');
+// Set the token
+Mapbox.setAccessToken('pk.eyJ1IjoiYWRlbGtub2RlIiwiYSI6ImNtOWpkaWc3MzBiZWYybHB0YjY0ejEwdjUifQ.6TDz0lDslKBf6lDCpRvOkQ');
 
 const MapScreen = ({ navigation }) => {
   const [currentScreen, setCurrentScreen] = useState('Map');
-//   const [mapReady, setMapReady] = useState(false);
-  
-  // Default coordinates - update to your preferred initial location
-//   const initialCoordinates = [-122.4324, 37.7795]; // San Francisco
-//   const initialZoomLevel = 12;
+  const [mapReady, setMapReady] = useState(false);
 
-//   useEffect(() => {
-//     // Check if location permissions are enabled (Android only)
-//     const checkLocationPermission = async () => {
-//       if (Platform.OS === 'android') {
-//         const isGranted = await MapboxGL.requestAndroidLocationPermissions();
-//         console.log('Location permissions granted:', isGranted);
-//       }
-//     };
+  // Add CSS for web platform
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      // Check if the CSS is already loaded to avoid duplicates
+      const existingLink = document.head.querySelector('link[href*="mapbox-gl.css"]');
 
-//     checkLocationPermission();
-//   }, []);
+      if (!existingLink) {
+        console.log("Adding Mapbox CSS to head");
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css';
+        document.head.appendChild(link);
+      }
+    }
+  }, []);
 
   // Handle screen changes
   const handleScreenChange = (screenName) => {
@@ -38,40 +38,40 @@ const MapScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* No SafeAreaView to ensure content goes behind status bar */}
       <StatusBar style="light" translucent backgroundColor="transparent" />
-      
-      {/* Purple background (will be replaced with MapboxGL.MapView) */}
+
+      {/* Map View */}
       <View style={styles.mapExtent}>
-        {/* When ready to implement the real map, replace this View with:
-        <MapboxGL.MapView
+        {/* Fallback in case map doesn't load */}
+        <View style={styles.mapPlaceholder}>
+          <Text style={styles.placeholderText}>
+            {mapReady ? '' : 'Map Loading...'}
+          </Text>
+        </View>
+
+        {/* Just the MapView without children */}
+        <Mapbox.MapView
           style={styles.map}
-          styleURL={MapboxGL.StyleURL.Dark}
-          onDidFinishLoadingMap={() => setMapReady(true)}
-        >
-          <MapboxGL.Camera
-            zoomLevel={initialZoomLevel}
-            centerCoordinate={initialCoordinates}
-            animationDuration={0}
-          />
-          
-          <MapboxGL.PointAnnotation
-            id="currentLocation"
-            coordinate={initialCoordinates}
-          />
-        </MapboxGL.MapView>
-        */}
+          styleURL={Mapbox.StyleURL.Dark}
+          onDidFinishLoadingMap={() => {
+            console.log("Map finished loading!");
+            setMapReady(true);
+          }}
+          onDidFailLoadingMap={(error) => {
+            console.error("Map failed to load:", error);
+          }}
+        />
       </View>
-      
+
       {/* Header container positioned at top */}
       <View style={styles.headerContainer}>
         <Header />
       </View>
-      
+
       {/* Footer container positioned at bottom */}
       <View style={styles.footerContainer}>
         <View style={styles.tabBarWrapper}>
-          <TabBarMap 
+          <TabBarMap
             currentScreen={currentScreen}
             onScreenChange={handleScreenChange}
             style={styles.tabBar}
@@ -93,7 +93,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#111', // Purple for demonstration, will be replaced by actual map
+  },
+  mapPlaceholder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#1e1e1e',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
+  },
+  placeholderText: {
+    color: '#fff',
+    fontSize: 18,
   },
   map: {
     flex: 1,

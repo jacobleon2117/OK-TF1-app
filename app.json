@@ -10,11 +10,19 @@
       "supportsTablet": true
     },
     "android": {
-  "adaptiveIcon": {
-    "backgroundColor": "#000000"
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "package": "com.anonymous.OKTF1app"
+    },
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "mapboxAccessToken": "pk.eyJ1IjoiYWRlbGtub2RlIiwiYSI6ImNtOWpkaWc3MzBiZWYybHB0YjY0ejEwdjUifQ.6TDz0lDslKBf6lDCpRvOkQ"
+        }
+      ]
+    ],
+    "web": {}
   }
-},
-"web": {
-}
-}
 }
