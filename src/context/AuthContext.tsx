@@ -60,14 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Diagnostic Login Check Started');
       console.log('Email:', email);
 
-      // Validate input
       if (!email || !password) {
         console.error('Email or password is empty');
         setError('Email and password are required');
         return false;
       }
 
-      // Check email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         console.error('Invalid email format');
@@ -76,7 +74,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        // Check sign-in methods
         const methods = await fetchSignInMethodsForEmail(auth, email);
         console.log('Available Sign-in Methods:', methods);
 
@@ -95,7 +92,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log('User UID:', userCredential.user.uid);
 
-        // Check Firestore user document
         const userDocRef = doc(db, 'users', userCredential.user.uid);
         const userDoc = await getDoc(userDocRef);
 
@@ -242,7 +238,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Verify organization code (if needed)
       if (!verifyOrganizationCode(organizationCode)) {
         console.log('Organization Code Verification Failed');
         setError('Invalid organization code');
@@ -250,7 +245,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Additional logic after successful login
       console.log('Login successful');
       setLoading(false);
     } catch (err: any) {
@@ -262,7 +256,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setLoading(false);
 
-      // If an error wasn't set by diagnoseLogin, set a generic error
       if (!error) {
         setError('Login failed. Please try again.');
       }
