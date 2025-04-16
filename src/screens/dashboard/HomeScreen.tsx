@@ -1,12 +1,14 @@
 import React from 'react';
-import { StyleSheet, View, Text, StatusBar, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
+import { useAuth } from '../../context/AuthContext';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { BottomNavigation } from '@/components/common/dashboard';
 import { DASHBOARD_NAV_ITEMS } from '@/constants/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -17,7 +19,7 @@ const HomeScreen = () => {
 
   const handleNotificationPress = () => {
     // Navigate to notifications screen or show notifications overlay
-    navigation.navigate('Notifications');
+    // navigation.navigate('Notifications');
   };
 
   const navigateToMessages = () => {
@@ -29,48 +31,52 @@ const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Top Navigation Bar */}
-      <View style={styles.topNav}>
+      {/* Welcome Header */}
+      <View style={styles.welcomeHeader}>
         <View>
           <Text style={styles.welcomeText}>Welcome back,</Text>
           <Text style={styles.userName}>{firstName}</Text>
         </View>
-        <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationButton}>
+        <TouchableOpacity onPress={handleNotificationPress}>
           <Ionicons name="notifications-outline" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Main Content */}
-      <View style={styles.content}>
+      <View style={styles.cardsContainer}>
         {/* Recent Messages Card */}
-        <TouchableOpacity style={styles.card} onPress={navigateToMessages}>
-          <View style={styles.cardHeader}>
-            <FontAwesome name="comments" size={22} color="white" />
-            <Text style={styles.cardTitle}>Recent Messages</Text>
+        <TouchableOpacity style={styles.messageCard} onPress={navigateToMessages}>
+          <View style={styles.cardContent}>
+            <View style={styles.iconTextRow}>
+              <FontAwesome name="comments" size={22} color="white" />
+              <Text style={styles.cardTitle}>Recent Messages</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="white" />
           </View>
-          <Ionicons name="chevron-forward" size={20} color="white" style={styles.cardArrow} />
         </TouchableOpacity>
 
         {/* Upcoming Shifts Card */}
-        <TouchableOpacity style={styles.card} onPress={navigateToShifts}>
-          <View style={styles.cardHeader}>
-            <FontAwesome name="clock-o" size={22} color="white" />
-            <Text style={styles.cardTitle}>Upcoming Shifts</Text>
+        <TouchableOpacity style={styles.shiftsCard} onPress={navigateToShifts}>
+          <View style={styles.cardContent}>
+            <View style={styles.iconTextRow}>
+              <FontAwesome name="clock-o" size={22} color="white" />
+              <Text style={styles.cardTitle}>Upcoming Shifts</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="white" />
           </View>
-          <Ionicons name="chevron-forward" size={20} color="white" style={styles.cardArrow} />
         </TouchableOpacity>
 
         {/* Quick Action Buttons */}
-        <View style={styles.quickActionContainer}>
-          <TouchableOpacity style={styles.quickActionButton}>
+        <View style={styles.actionButtonsRow}>
+          <TouchableOpacity style={styles.actionButton}>
             <View style={[styles.iconCircle, { backgroundColor: '#8B5A2B' }]}>
               <FontAwesome name="user" size={24} color="white" />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionButton}>
+          <TouchableOpacity style={styles.actionButton}>
             <View style={[styles.iconCircle, { backgroundColor: '#1E5C97' }]}>
               <FontAwesome name="bar-chart" size={24} color="white" />
             </View>
@@ -79,37 +85,8 @@ const HomeScreen = () => {
       </View>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNavContainer}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="home" size={24} color="#FF8C00" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Calendar')}>
-            <FontAwesome name="calendar" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Messages')}>
-            <FontAwesome name="comments" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Map')}>
-            <FontAwesome name="map" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate('MissionReports')}
-          >
-            <FontAwesome name="file-text-o" size={22} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-            <FontAwesome name="user" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
+      <BottomNavigation navigation={navigation} currentScreen="Home" items={DASHBOARD_NAV_ITEMS} />
+    </View>
   );
 };
 
@@ -118,13 +95,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  topNav: {
+  welcomeHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginTop: 40,
+    marginTop: 50,
+    marginBottom: 15,
   },
   welcomeText: {
     fontSize: 16,
@@ -136,23 +113,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  notificationButton: {
-    padding: 8,
-  },
-  content: {
+  cardsContainer: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 80, // Space for bottom navigation
   },
-  card: {
+  messageCard: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    padding: 18,
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     marginBottom: 16,
+    height: 70,
+  },
+  shiftsCard: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    height: 180,
+  },
+  cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cardHeader: {
+  iconTextRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -160,21 +147,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
-    marginLeft: 10,
+    marginLeft: 12,
   },
-  cardArrow: {
-    opacity: 0.7,
-  },
-  quickActionContainer: {
+  actionButtonsRow: {
     flexDirection: 'row',
-    marginTop: 8,
+    justifyContent: 'space-between',
+    width: '100%',
   },
-  quickActionButton: {
+  actionButton: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    height: 120,
-    flex: 1,
-    marginHorizontal: 4,
+    borderRadius: 16,
+    width: '48%',
+    aspectRatio: 1, // Perfect square
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -184,33 +168,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  bottomNavContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-  },
-  bottomNav: {
-    height: 60,
-    flexDirection: 'row',
-    backgroundColor: '#111',
-    borderRadius: 30,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 

@@ -23,6 +23,7 @@ const DashboardNavigator = () => {
       <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="MissionReports" component={MissionReportScreen} />
+      {/* Make sure all your navigation destinations are defined here */}
     </Stack.Navigator>
   );
 };
