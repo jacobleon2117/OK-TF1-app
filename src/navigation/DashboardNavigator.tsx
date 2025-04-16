@@ -1,13 +1,15 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import { RootStackParamList } from '@/types/navigation';
 
 import MessagesScreen from '@/screens/dashboard/Message/MessagesScreen';
 import ScheduleScreen from '@/screens/dashboard/Schedule/ScheduleScreen';
-import MissionReportScreen from '@/screens/dashboard/Mission/MissionReportScreen';
+import MissionReportsScreen from '@/screens/dashboard/Profile/ProfileScreen';
 import ProfileScreen from '@/screens/dashboard/Profile/ProfileScreen';
 import HomeScreen from '@/screens/dashboard/HomeScreen';
+import MapScreen from '@/screens/dashboard/Map/MapScreen';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const DashboardNavigator = () => {
   return (
@@ -19,11 +21,15 @@ const DashboardNavigator = () => {
       }}
     >
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Dashboard" component={HomeScreen} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="MissionReports" component={MissionReportScreen} />
-      {/* Make sure all your navigation destinations are defined here */}
+      <Stack.Screen name="MissionReports" component={MissionReportsScreen} />
+      <Stack.Screen name="Map" component={MapScreen} />
+      <Stack.Screen name="Login" component={HomeScreen} />
+      <Stack.Screen name="Signup" component={HomeScreen} />
+      <Stack.Screen name="ForgotPassword" component={HomeScreen} />{' '}
     </Stack.Navigator>
   );
 };

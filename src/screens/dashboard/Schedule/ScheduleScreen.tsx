@@ -215,14 +215,11 @@ const ScheduleScreen = () => {
       {/* Floating Bottom Navigation */}
       <View style={styles.bottomNavContainer}>
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Dashboard')}>
+          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
             <FontAwesome name="home" size={24} color="#fff" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.navItem}
-            // already on Calendar screen
-          >
+          <TouchableOpacity style={styles.navItem}>
             <FontAwesome name="calendar" size={24} color="#FF8C00" />
           </TouchableOpacity>
 
