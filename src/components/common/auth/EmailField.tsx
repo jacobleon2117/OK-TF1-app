@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface EmailFieldProps {
+interface EmailFieldProps extends TextInputProps {
   value: string;
   onChangeText: (text: string) => void;
   error?: string;
 }
 
-const EmailField: React.FC<EmailFieldProps> = ({ value, onChangeText, error }) => {
+const EmailField: React.FC<EmailFieldProps> = ({ value, onChangeText, error, ...rest }) => {
   return (
     <View>
       <Text style={styles.label}>Email address</Text>
@@ -18,9 +18,8 @@ const EmailField: React.FC<EmailFieldProps> = ({ value, onChangeText, error }) =
           placeholder="Enter your email address"
           value={value}
           onChangeText={onChangeText}
-          autoCapitalize="none"
-          keyboardType="email-address"
           placeholderTextColor="#888"
+          {...rest}
         />
         <Ionicons name="mail-outline" size={20} color="#888" />
       </View>

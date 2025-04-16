@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 
-interface FullNameFieldProps {
+interface FullNameFieldProps extends TextInputProps {
   value: string;
   onChangeText: (text: string) => void;
   error?: string;
 }
 
-const FullNameField: React.FC<FullNameFieldProps> = ({ value, onChangeText, error }) => {
+const FullNameField: React.FC<FullNameFieldProps> = ({ value, onChangeText, error, ...rest }) => {
   return (
     <View>
       <Text style={styles.label}>Full name</Text>
@@ -18,6 +18,7 @@ const FullNameField: React.FC<FullNameFieldProps> = ({ value, onChangeText, erro
           value={value}
           onChangeText={onChangeText}
           placeholderTextColor="#888"
+          {...rest}
         />
       </View>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}

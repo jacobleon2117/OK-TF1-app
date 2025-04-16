@@ -5,12 +5,14 @@ interface OrganizationCodeFieldProps {
   value: string;
   onChangeText: (text: string) => void;
   error?: string;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 }
 
 const OrganizationCodeField: React.FC<OrganizationCodeFieldProps> = ({
   value,
   onChangeText,
   error,
+  autoCapitalize = 'none',
 }) => {
   const handleTextChange = (text: string) => {
     const digitsOnly = text.replace(/[^0-9]/g, '');
@@ -19,19 +21,20 @@ const OrganizationCodeField: React.FC<OrganizationCodeFieldProps> = ({
 
   return (
     <View>
-      <Text style={styles.label}>Organization code</Text>
+      <Text style={styles.label}>Organization Code</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your organization code"
+          placeholder="Enter your 6-digit organization code"
           value={value}
           onChangeText={handleTextChange}
           keyboardType="number-pad"
           maxLength={6}
           placeholderTextColor="#888"
+          autoCapitalize={autoCapitalize}
         />
       </View>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };

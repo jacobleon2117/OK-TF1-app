@@ -1,42 +1,82 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { RootNavigationProp } from '@/types/navigation';
 
-type FontAwesomeIconName = 'home' | 'calendar' | 'comments' | 'map' | 'file-text-o' | 'user';
-
-export type NavItem = {
-  name: string;
-  icon: FontAwesomeIconName;
-  screen: string;
-};
-
-interface BottomNavigationProps {
-  navigation: any;
-  currentScreen: string;
-  items: NavItem[];
+interface FloatingBottomNavProps {
+  currentScreen: 'Home' | 'Calendar' | 'Messages' | 'Map' | 'MissionReports' | 'Profile';
 }
 
-const BottomNavigation: React.FC<BottomNavigationProps> = ({
-  navigation,
-  currentScreen,
-  items,
-}) => {
+const FloatingBottomNav: React.FC<FloatingBottomNavProps> = ({ currentScreen }) => {
+  const navigation = useNavigation<RootNavigationProp>();
+
   return (
     <View style={styles.bottomNavContainer}>
       <View style={styles.bottomNav}>
-        {items.map(item => (
-          <TouchableOpacity
-            key={item.screen}
-            style={styles.navItem}
-            onPress={() => item.screen !== currentScreen && navigation.navigate(item.screen)}
-          >
-            <FontAwesome
-              name={item.icon}
-              size={24}
-              color={currentScreen === item.screen ? '#FF8C00' : '#fff'}
-            />
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => currentScreen !== 'Home' && navigation.navigate('Home')}
+        >
+          <FontAwesome
+            name="home"
+            size={24}
+            color={currentScreen === 'Home' ? '#FF8C00' : '#fff'}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => currentScreen !== 'Calendar' && navigation.navigate('Calendar')}
+        >
+          <FontAwesome
+            name="calendar"
+            size={24}
+            color={currentScreen === 'Calendar' ? '#FF8C00' : '#fff'}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => currentScreen !== 'Messages' && navigation.navigate('Messages')}
+        >
+          <FontAwesome
+            name="comments"
+            size={24}
+            color={currentScreen === 'Messages' ? '#FF8C00' : '#fff'}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => currentScreen !== 'Map' && navigation.navigate('Map')}
+        >
+          <FontAwesome name="map" size={24} color={currentScreen === 'Map' ? '#FF8C00' : '#fff'} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() =>
+            currentScreen !== 'MissionReports' && navigation.navigate('MissionReports')
+          }
+        >
+          <FontAwesome
+            name="file-text-o"
+            size={24}
+            color={currentScreen === 'MissionReports' ? '#FF8C00' : '#fff'}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => currentScreen !== 'Profile' && navigation.navigate('Profile')}
+        >
+          <FontAwesome
+            name="user"
+            size={24}
+            color={currentScreen === 'Profile' ? '#FF8C00' : '#fff'}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -45,7 +85,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
 const styles = StyleSheet.create({
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 50,
     left: 20,
     right: 20,
     alignItems: 'center',
@@ -72,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomNavigation;
+export default FloatingBottomNav;

@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Messages: undefined;
   Calendar: undefined;
+  AdminSchedule: undefined;
   Map: undefined;
   Profile: undefined;
   MissionReports: undefined;

@@ -1,17 +1,20 @@
-// src/navigation/AppNavigator.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
 
-// Import your screens
 import LoginScreen from '@/screens/auth/LoginScreen';
 import SignupScreen from '@/screens/auth/SignupScreen';
 import ForgotPasswordScreen from '@/screens/auth/ForgotPasswordScreen';
-import HomeScreen from '@/screens/dashboard/HomeScreen';
-import DashboardNavigator from './DashboardNavigator';
 
-// Import authentication context
+import HomeScreen from '@/screens/dashboard/HomeScreen';
+import MessagesScreen from '@/screens/dashboard/Message/MessagesScreen';
+import CalendarScreen from '@/screens/dashboard/Schedule/ScheduleScreen';
+import MapScreen from '@/screens/dashboard/Map/MapScreen';
+import MissionReportsScreen from '@/screens/dashboard/Mission/MissionReportScreen';
+import ProfileScreen from '@/screens/dashboard/Profile/ProfileScreen';
+
+import LoadingScreen from '@/components/LoadingScreen';
 import { useAuth } from '@/context/AuthContext';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -20,7 +23,7 @@ const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen visible={true} message="Loading..." />;
   }
 
   return (
@@ -30,15 +33,18 @@ const AppNavigator: React.FC = () => {
           headerShown: false,
           cardStyle: { backgroundColor: '#000' },
         }}
+        initialRouteName={user ? 'Home' : 'Login'}
       >
         {user ? (
-          // If user is authenticated, show dashboard routes
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Dashboard" component={DashboardNavigator} />
+            <Stack.Screen name="Messages" component={MessagesScreen} />
+            <Stack.Screen name="Calendar" component={CalendarScreen} />
+            <Stack.Screen name="Map" component={MapScreen} />
+            <Stack.Screen name="MissionReports" component={MissionReportsScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
-          // If user is not authenticated, show auth routes
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
@@ -49,14 +55,5 @@ const AppNavigator: React.FC = () => {
     </NavigationContainer>
   );
 };
-
-// Simple loading screen component
-const LoadingScreen: React.FC = () => (
-  <View
-    style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}
-  >
-    <ActivityIndicator size="large" color="#FF8C00" />
-  </View>
-);
 
 export default AppNavigator;

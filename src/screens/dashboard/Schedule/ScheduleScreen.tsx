@@ -20,6 +20,9 @@ import { fetchShifts, Shift } from '@/screens/dashboard/Schedule/scheduleUtils';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
 
+// Import the FloatingBottomNav component
+import FloatingBottomNav from '@/components/common/dashboard/BottomNavigation';
+
 const { height } = Dimensions.get('window');
 
 const ScheduleScreen = () => {
@@ -57,14 +60,10 @@ const ScheduleScreen = () => {
   const loadShifts = async () => {
     setIsLoading(true);
     try {
-      // TODO: JACOB: I'll need to implement user role-based shift filtering
-      // Example: I'll need to create a filter for shifts to only show shifts for the user's team or role
       const fetchedShifts = await fetchShifts(selectedDate);
       setShifts(fetchedShifts);
     } catch (error) {
       console.error('Error loading shifts:', error);
-      // TODO: JACOB: I'll need to implement user-friendly error handling
-      // I'll consider adding an error state to show in UI
     } finally {
       setIsLoading(false);
     }
@@ -91,11 +90,6 @@ const ScheduleScreen = () => {
         selectedDate.getMonth(),
         parseInt(day)
       );
-
-      // TODO: JACOB: I'll need to implement date-specific shift viewing
-      // Potential features:
-      // 1. Show detailed shifts for selected date
-      // 2. Allow shift creation/assignment
       console.log(`Selected day: ${selectedDateTime.toDateString()}`);
     }
   };
@@ -115,7 +109,6 @@ const ScheduleScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-
       {/* Top Navigation Bar */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -124,7 +117,6 @@ const ScheduleScreen = () => {
         <Text style={styles.headerTitle}>Schedule</Text>
         <View style={styles.headerRight} />
       </View>
-
       {/* Calendar Container */}
       <View style={styles.contentContainer}>
         {/* Month Selection */}
@@ -211,38 +203,8 @@ const ScheduleScreen = () => {
           )}
         </View>
       </View>
-
       {/* Floating Bottom Navigation */}
-      <View style={styles.bottomNavContainer}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-            <FontAwesome name="home" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="calendar" size={24} color="#FF8C00" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Messages')}>
-            <FontAwesome name="comments" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Map')}>
-            <FontAwesome name="map" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate('MissionReports')}
-          >
-            <FontAwesome name="file-text-o" size={22} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-            <FontAwesome name="user" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <FloatingBottomNav currentScreen="Calendar" />
     </View>
   );
 };
@@ -381,33 +343,6 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 100,
-  },
-  bottomNavContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-  },
-  bottomNav: {
-    height: 60,
-    flexDirection: 'row',
-    backgroundColor: '#111',
-    borderRadius: 30,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   loadingText: {
     color: '#fff',

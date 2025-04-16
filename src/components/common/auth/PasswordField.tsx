@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface PasswordFieldProps {
+interface PasswordFieldProps extends TextInputProps {
   label?: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -16,6 +16,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   onChangeText,
   placeholder = 'Enter your password',
   error,
+  ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,6 +31,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
           onChangeText={onChangeText}
           secureTextEntry={!showPassword}
           placeholderTextColor="#888"
+          {...rest}
         />
         <Pressable onPress={() => setShowPassword(!showPassword)}>
           <Ionicons

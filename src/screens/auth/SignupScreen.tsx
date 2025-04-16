@@ -15,8 +15,8 @@ import {
   validateEmail,
   validatePassword,
   validateFullName,
-  validateOrganizationCode,
   validateConfirmPassword,
+  validateOrganizationCode,
 } from '@/utils/validation';
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -43,9 +43,9 @@ type SignupScreenProps = {
 interface SignupFormValues {
   name: string;
   email: string;
-  organizationCode: string;
   password: string;
   confirmPassword: string;
+  organizationCode: string;
 }
 
 const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
@@ -55,9 +55,9 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
     return {
       name: validateFullName(values.name),
       email: validateEmail(values.email),
-      organizationCode: validateOrganizationCode(values.organizationCode),
       password: validatePassword(values.password),
       confirmPassword: validateConfirmPassword(values.password, values.confirmPassword),
+      organizationCode: validateOrganizationCode(values.organizationCode),
     };
   };
 
@@ -66,9 +66,9 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
       initialValues: {
         name: '',
         email: '',
-        organizationCode: '',
         password: '',
         confirmPassword: '',
+        organizationCode: '',
       },
       validate: validateForm,
       onSubmit: async formValues => {
@@ -79,7 +79,9 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
             formValues.password,
             formValues.organizationCode
           );
-          Alert.alert('Success', 'Account created successfully!');
+          Alert.alert('Success', 'Account created successfully!', [
+            { text: 'OK', onPress: () => navigateToLogin() },
+          ]);
         } catch (err) {
           Alert.alert('Signup Failed', error || 'An error occurred during signup');
         }
@@ -118,6 +120,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
                 setError(null);
               }}
               error={errors.name}
+              autoCapitalize="words"
             />
 
             <EmailField
@@ -127,15 +130,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
                 setError(null);
               }}
               error={errors.email}
-            />
-
-            <OrganizationCodeField
-              value={values.organizationCode}
-              onChangeText={text => {
-                handleChange('organizationCode', text);
-                setError(null);
-              }}
-              error={errors.organizationCode}
+              autoCapitalize="none"
             />
 
             <PasswordField
@@ -145,6 +140,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
                 setError(null);
               }}
               error={errors.password}
+              autoCapitalize="none"
             />
 
             <PasswordField
@@ -156,6 +152,17 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
               }}
               placeholder="Confirm your password"
               error={errors.confirmPassword}
+              autoCapitalize="none"
+            />
+
+            <OrganizationCodeField
+              value={values.organizationCode}
+              onChangeText={text => {
+                handleChange('organizationCode', text);
+                setError(null);
+              }}
+              error={errors.organizationCode}
+              autoCapitalize="characters"
             />
 
             {error && <Text style={styles.errorText}>{error}</Text>}

@@ -11,7 +11,6 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
-// Define a UserData interface for Firestore data
 interface UserData {
   displayName: string;
   email: string;
@@ -20,7 +19,6 @@ interface UserData {
   createdAt: Date;
 }
 
-// Define types for the AuthContext
 type AuthContextType = {
   user: User | null;
   userData: UserData | null;
@@ -31,7 +29,7 @@ type AuthContextType = {
     email: string,
     password: string,
     organizationCode: string,
-    adminCode?: string // Optional admin code for testing
+    adminCode?: string
   ) => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string, organizationCode: string) => Promise<void>;
@@ -39,10 +37,8 @@ type AuthContextType = {
   setError: (error: string | null) => void;
 };
 
-// Export the AuthContext to be used in other parts of the app
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create a custom hook for using AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -51,17 +47,15 @@ export const useAuth = () => {
   return context;
 };
 
-// The AuthProvider component provides the context value to its children
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Verify organization code
   const verifyOrganizationCode = (code: string): boolean => {
-    console.log('Verifying Organization Code:', code);
-    return code === '123456';
+    // TODO: Replace with real organization code verification logic
+    return true; // Always true for now
   };
 
   const fetchUserData = async (userId: string) => {
@@ -119,7 +113,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setUser(currentUser);
 
-        // If user is logged in, fetch their Firestore data
         if (currentUser) {
           try {
             console.log('Attempting to fetch user data for:', currentUser.uid);
@@ -157,7 +150,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
 
     try {
-      // Verify organization code with logging
       if (!verifyOrganizationCode(organizationCode)) {
         console.log('Organization Code Verification Failed');
         throw new Error('Invalid organization code');
@@ -173,7 +165,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(userCredential.user);
 
-      // Fetch user data after login
       console.log('Fetching User Data');
       await fetchUserData(userCredential.user.uid);
 
@@ -209,33 +200,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     try {
-      // Verify organization code with logging
       if (!verifyOrganizationCode(organizationCode)) {
         console.log('Organization Code Verification Failed');
         throw new Error('Invalid organization code');
       }
 
-      // Create user in Firebase Authentication
       console.log('Attempting to create user in Firebase');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Prepare user data
       const userData: UserData = {
         displayName: name,
         email: email,
         organizationCode: organizationCode,
-        role: adminCode === 'OKTask1Admin' ? 'admin' : 'employee',
+        role: adminCode?.trim() ? 'admin' : 'employee',
         createdAt: new Date(),
       };
 
       console.log('Creating User Document:', userData);
 
-      // Save user data to Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), userData);
 
       console.log('User Document Created Successfully');
 
-      // Update auth state
       setUser(userCredential.user);
       setUserData(userData);
 
@@ -253,7 +239,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout and resetPassword functions remain unchanged
   const logout = async () => {
     setError(null);
 
