@@ -1,5 +1,13 @@
-import React from 'react';
-import { StyleSheet, View, Text, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
@@ -7,6 +15,9 @@ import { useAuth } from '@/context/AuthContext';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomNavigation } from '@/components/common/dashboard';
+import NotificationsModal from '@/components/common/NotificationsModal';
+
+const { width, height } = Dimensions.get('window');
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -14,8 +25,11 @@ const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { userData } = useAuth();
   const firstName = userData?.displayName?.split(' ')[0] || 'User';
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
 
-  const handleNotificationPress = () => {};
+  const handleNotificationPress = () => {
+    setNotificationsVisible(true);
+  };
 
   const navigateToMessages = () => {
     navigation.navigate('Messages');
@@ -29,6 +43,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
+      {/* Welcome Header with properly placed notification icon */}
       <View style={styles.welcomeHeader}>
         <View>
           <Text style={styles.welcomeText}>Welcome back,</Text>
@@ -39,10 +54,11 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Main Content */}
+      {/* Main Content with adjusted heights */}
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsContainer}>
-          <TouchableOpacity style={styles.messageCard} onPress={navigateToMessages}>
+          {/* Recent Messages Card - Smaller Size */}
+          <TouchableOpacity style={[styles.card, styles.smallCard]} onPress={navigateToMessages}>
             <View style={styles.cardContent}>
               <View style={styles.iconTextRow}>
                 <FontAwesome name="comments" size={22} color="white" style={styles.cardIcon} />
@@ -52,8 +68,8 @@ const HomeScreen = () => {
             </View>
           </TouchableOpacity>
 
-          {/* Upcoming Shifts Card */}
-          <TouchableOpacity style={styles.shiftsCard} onPress={navigateToShifts}>
+          {/* Upcoming Shifts Card - Largest card */}
+          <TouchableOpacity style={[styles.card, styles.largeCard]} onPress={navigateToShifts}>
             <View style={styles.cardContent}>
               <View style={styles.iconTextRow}>
                 <FontAwesome name="clock-o" size={22} color="white" style={styles.cardIcon} />
@@ -61,13 +77,12 @@ const HomeScreen = () => {
               </View>
               <Ionicons name="chevron-forward" size={20} color="white" />
             </View>
-            <View style={styles.shiftsContentPlaceholder}>
-              <Text style={styles.emptyShiftText}>No upcoming shifts scheduled</Text>
-            </View>
+            <View style={styles.cardEmptySpace} />
           </TouchableOpacity>
 
-          {/* Action Buttons Row */}
+          {/* Action Buttons Row - Fixed Distance from Bottom Nav */}
           <View style={styles.actionButtonsRow}>
+            {/* Walking Distance Card */}
             <TouchableOpacity style={styles.actionButton}>
               <MaterialCommunityIcons
                 name="walk"
@@ -76,9 +91,10 @@ const HomeScreen = () => {
                 style={styles.actionButtonIcon}
               />
               <Text style={styles.actionButtonLabel}>Distance</Text>
-              <Text style={styles.actionButtonValue}>2.4 miles</Text>
+              <Text style={styles.actionButtonValue}>0 miles</Text>
             </TouchableOpacity>
 
+            {/* Stairs Climbed Card */}
             <TouchableOpacity style={styles.actionButton}>
               <MaterialCommunityIcons
                 name="stairs"
@@ -87,11 +103,20 @@ const HomeScreen = () => {
                 style={styles.actionButtonIcon}
               />
               <Text style={styles.actionButtonLabel}>Stairs</Text>
-              <Text style={styles.actionButtonValue}>276 steps</Text>
+              <Text style={styles.actionButtonValue}>0 steps</Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Spacer to ensure proper distance from bottom nav */}
+        <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Notifications Modal */}
+      <NotificationsModal
+        visible={notificationsVisible}
+        onClose={() => setNotificationsVisible(false)}
+      />
 
       {/* Bottom Navigation */}
       <BottomNavigation currentScreen="Home" />
@@ -108,9 +133,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginTop: 80,
-    marginBottom: 15,
+    marginBottom: 24,
   },
   welcomeText: {
     fontSize: 16,
@@ -126,25 +151,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardsContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 80,
+    paddingHorizontal: 16,
+    flex: 1,
+    justifyContent: 'space-between',
   },
-  messageCard: {
+  card: {
     backgroundColor: '#1A1A1A',
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
-    marginBottom: 16,
+    width: '100%',
   },
-  shiftsCard: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+  smallCard: {
+    height: 150,
+    marginBottom: 24,
+  },
+  largeCard: {
+    height: 250,
+    marginBottom: 24,
   },
   cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  cardEmptySpace: {
+    flex: 1,
   },
   iconTextRow: {
     flexDirection: 'row',
@@ -158,30 +189,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  shiftsContentPlaceholder: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#222',
-    borderRadius: 8,
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyShiftText: {
-    color: '#888',
-    fontStyle: 'italic',
-  },
   actionButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   actionButton: {
     backgroundColor: '#1A1A1A',
     borderRadius: 12,
     width: '48%',
-    aspectRatio: 1.5,
+    aspectRatio: 1.2,
     padding: 16,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -198,6 +216,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  bottomSpacer: {
+    height: 100,
   },
 });
 

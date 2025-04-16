@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
+  FlatList,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -47,8 +48,15 @@ import {
 import { Timestamp, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
 import { addShift, deleteShift } from '@/services/firebase/schedulingService';
+import HeaderWithNotifications from '@/components/common/HeaderWithNotifications';
+import BottomNavigation from '@/components/common/dashboard/BottomNavigation';
 
 const { height, width } = Dimensions.get('window');
+
+interface CalendarDay {
+  day: string;
+  isCurrentMonth: boolean;
+}
 
 const TimePicker = ({
   value,
@@ -99,9 +107,8 @@ const AdminScheduleScreen = () => {
 
   const [currentMonthDisplay, setCurrentMonthDisplay] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [calendarDays, setCalendarDays] = useState<
-    Array<Array<{ day: string; isCurrentMonth: boolean }>>
-  >([]);
+  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [calendarDays, setCalendarDays] = useState<Array<Array<CalendarDay>>>([]);
   const [today] = useState(new Date());
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -154,6 +161,9 @@ const AdminScheduleScreen = () => {
 
     const calendarData = generateCalendarData(date);
     setCalendarDays(calendarData);
+
+    // Set the current day as selected initially
+    setSelectedDay(date.getDate().toString());
   };
 
   const loadShifts = async () => {
@@ -201,6 +211,8 @@ const AdminScheduleScreen = () => {
 
   const handleDateSelect = (day: string, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return;
+
+    setSelectedDay(day);
 
     const selectedDateTime = new Date(
       selectedDate.getFullYear(),
@@ -472,31 +484,36 @@ const AdminScheduleScreen = () => {
 
     setEditShiftModalVisible(true);
   };
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Top Navigation Bar */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Coordinator Schedule</Text>
-
-        <TouchableOpacity style={styles.addButton} onPress={handleOpenCreateShiftModal}>
-          <Ionicons name="add-circle" size={24} color="#FF8C00" />
-        </TouchableOpacity>
-      </View>
+      <HeaderWithNotifications
+        title="Administrator Schedule"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+        rightComponent={
+          <TouchableOpacity style={styles.addButton} onPress={handleOpenCreateShiftModal}>
+            <Ionicons name="add-circle" size={24} color="#FF8C00" />
+          </TouchableOpacity>
+        }
+      />
 
       {/* Admin Badge */}
       <View style={styles.adminBadge}>
         <FontAwesome name="shield" size={12} color="#FF8C00" />
-        <Text style={styles.adminBadgeText}>Coordinator View</Text>
+        <Text style={styles.adminBadgeText}>Administrator View</Text>
       </View>
-      {/* Calendar Container */}
-      <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        {' '}
-        <View style={styles.scrollContent}>
-          {/* Month Selection */}
+
+      {/* Scrollable Main Content */}
+      <ScrollView
+        style={styles.scrollContent}
+        contentContainerStyle={styles.scrollContentContainer}
+      >
+        <View style={styles.contentContainer}>
+          {/* Calendar Container */}
           <View style={styles.calendarCard}>
+            {/* Month Selection */}
             <View style={styles.monthSelector}>
               <Text style={styles.monthText}>{currentMonthDisplay}</Text>
               <View style={styles.monthNavigation}>
@@ -529,17 +546,28 @@ const AdminScheduleScreen = () => {
 
             {/* Calendar Grid */}
             <View style={styles.calendarGrid}>
-              {calendarDays.map((week, weekIndex) => (
+              {calendarDays.map((week: Array<CalendarDay>, weekIndex: number) => (
                 <View key={weekIndex} style={styles.weekRow}>
-                  {week.map((dateObj, dayIndex) => (
+                  {week.map((dateObj: CalendarDay, dayIndex: number) => (
                     <TouchableOpacity
                       key={dayIndex}
                       style={[
                         styles.dayCell,
                         isToday(dateObj.day, dateObj.isCurrentMonth, selectedDate, today) &&
                           styles.currentDayCell,
+                        dateObj.isCurrentMonth &&
+                          dateObj.day === selectedDay &&
+                          styles.selectedDayCell,
+                        selectedDates.some(
+                          date =>
+                            date.getDate() === parseInt(dateObj.day) &&
+                            date.getMonth() === selectedDate.getMonth() &&
+                            date.getFullYear() === selectedDate.getFullYear() &&
+                            dateObj.isCurrentMonth
+                        ) && styles.multiSelectedDayCell,
                       ]}
                       onPress={() => handleDateSelect(dateObj.day, dateObj.isCurrentMonth)}
+                      disabled={!dateObj.isCurrentMonth}
                     >
                       <Text
                         style={[
@@ -547,33 +575,34 @@ const AdminScheduleScreen = () => {
                           !dateObj.isCurrentMonth && styles.adjacentMonthDay,
                           isToday(dateObj.day, dateObj.isCurrentMonth, selectedDate, today) &&
                             styles.currentDayText,
+                          dateObj.isCurrentMonth &&
+                            dateObj.day === selectedDay &&
+                            styles.selectedDayText,
+                          selectedDates.some(
+                            date =>
+                              date.getDate() === parseInt(dateObj.day) &&
+                              date.getMonth() === selectedDate.getMonth() &&
+                              date.getFullYear() === selectedDate.getFullYear() &&
+                              dateObj.isCurrentMonth
+                          ) && styles.multiSelectedDayText,
                         ]}
                       >
                         {dateObj.day}
                       </Text>
-
-                      {/* Dot indicator for days with shifts */}
-                      {shifts.some(shift => {
-                        const shiftDate = shift.startTime.toDate();
-                        return (
-                          dateObj.isCurrentMonth &&
-                          parseInt(dateObj.day) === shiftDate.getDate() &&
-                          selectedDate.getMonth() === shiftDate.getMonth() &&
-                          selectedDate.getFullYear() === shiftDate.getFullYear()
-                        );
-                      }) && <View style={styles.shiftIndicator} />}
                     </TouchableOpacity>
                   ))}
                 </View>
               ))}
             </View>
           </View>
+
           {/* Shifts Section */}
           <View style={styles.shiftCard}>
             <View style={styles.shiftHeader}>
               <FontAwesome name="clock-o" size={18} color="#fff" />
               <Text style={styles.shiftHeaderText}>Manage Shifts</Text>
             </View>
+
             <TouchableOpacity style={styles.createShiftButton} onPress={handleOpenCreateShiftModal}>
               <Text style={styles.createShiftText}>+ Create New Shift</Text>
             </TouchableOpacity>
@@ -582,45 +611,57 @@ const AdminScheduleScreen = () => {
               <ActivityIndicator size="large" color="#FF8C00" style={styles.loadingIndicator} />
             ) : shifts.length === 0 ? (
               <View style={styles.noShiftsContainer}>
-                <Text style={styles.noShiftText}>No shifts scheduled for this date</Text>
+                <Text style={styles.noShiftText}>No shifts scheduled for this month</Text>
               </View>
             ) : (
-              <View>
-                {shifts.map(shift => (
+              <FlatList
+                data={shifts}
+                keyExtractor={item => item.id || Math.random().toString()}
+                renderItem={({ item }) => (
                   <TouchableOpacity
-                    key={shift.id}
                     style={styles.shiftItem}
-                    onPress={() => handleOpenEditShiftModal(shift)}
+                    onPress={() => handleOpenEditShiftModal(item)}
                   >
+                    <View style={styles.shiftDateContainer}>
+                      <Text style={styles.shiftDate}>
+                        {item.startTime.toDate().toLocaleDateString([], {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </Text>
+                    </View>
+
                     <View style={styles.shiftItemHeader}>
-                      <Text style={styles.shiftTitle}>{shift.description}</Text>
+                      <Text style={styles.shiftTitle}>{item.description}</Text>
                       <Ionicons name="create-outline" size={18} color="#FF8C00" />
                     </View>
 
                     <Text style={styles.shiftTime}>
-                      {`${formatShiftTime(shift.startTime)} - ${formatShiftTime(shift.endTime)}`}
+                      {`${formatShiftTime(item.startTime)} - ${formatShiftTime(item.endTime)}`}
                     </Text>
 
-                    <Text style={styles.shiftLocation}>Location: {shift.location.name}</Text>
+                    <Text style={styles.shiftLocation}>Location: {item.location.name}</Text>
 
                     <View style={styles.adminShiftControls}>
-                      <Text style={styles.statusText}>Status: {shift.status}</Text>
+                      <Text style={styles.statusText}>Status: {item.status}</Text>
                       <Text style={styles.assignedText}>
-                        {shift.assignedUsers?.length || 0} team members assigned
+                        {item.assignedUsers?.length || 0} team members assigned
                       </Text>
                     </View>
                   </TouchableOpacity>
-                ))}
-              </View>
+                )}
+                style={styles.shiftList}
+                contentContainerStyle={styles.shiftListContent}
+              />
             )}
           </View>
 
-          {/* Add spacing at the bottom for the floating nav */}
+          {/* Bottom Spacer */}
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
 
-      {/* Create Shift Modal */}
       <Modal
         visible={isCreateShiftModalVisible}
         animationType="slide"
@@ -705,8 +746,12 @@ const AdminScheduleScreen = () => {
                           key={index}
                           style={[
                             styles.dateSelectionCell,
-                            selectedDates.some(date => date.getDate() === parseInt(dateObj.day)) &&
-                              styles.selectedDateCell,
+                            selectedDates.some(
+                              date =>
+                                date.getDate() === parseInt(dateObj.day) &&
+                                date.getMonth() === selectedDate.getMonth() &&
+                                date.getFullYear() === selectedDate.getFullYear()
+                            ) && styles.selectedDateCell,
                           ]}
                           onPress={() => {
                             const newDate = new Date(
@@ -715,14 +760,14 @@ const AdminScheduleScreen = () => {
                               parseInt(dateObj.day)
                             );
 
-                            const isSelected = selectedDates.some(
+                            const isDateSelected = selectedDates.some(
                               date =>
                                 date.getDate() === newDate.getDate() &&
                                 date.getMonth() === newDate.getMonth() &&
                                 date.getFullYear() === newDate.getFullYear()
                             );
 
-                            if (isSelected) {
+                            if (isDateSelected) {
                               setSelectedDates(prev =>
                                 prev.filter(
                                   date =>
@@ -738,7 +783,19 @@ const AdminScheduleScreen = () => {
                             }
                           }}
                         >
-                          <Text style={styles.dateSelectionText}>{dateObj.day}</Text>
+                          <Text
+                            style={[
+                              styles.dateSelectionText,
+                              selectedDates.some(
+                                date =>
+                                  date.getDate() === parseInt(dateObj.day) &&
+                                  date.getMonth() === selectedDate.getMonth() &&
+                                  date.getFullYear() === selectedDate.getFullYear()
+                              ) && styles.selectedDateText,
+                            ]}
+                          >
+                            {dateObj.day}
+                          </Text>
                         </TouchableOpacity>
                       )
                   )}
@@ -755,7 +812,9 @@ const AdminScheduleScreen = () => {
                     >
                       {selectedDates.map((date, index) => (
                         <View key={index} style={styles.selectedDateChip}>
-                          <Text style={styles.selectedDateText}>{date.toLocaleDateString()}</Text>
+                          <Text style={styles.selectedDateChipText}>
+                            {date.toLocaleDateString()}
+                          </Text>
                           <TouchableOpacity
                             onPress={() => {
                               setSelectedDates(prev => prev.filter((d, i) => i !== index));
@@ -921,30 +980,7 @@ const AdminScheduleScreen = () => {
         </View>
       </Modal>
 
-      {/* Floating Bottom Navigation */}
-      <View style={styles.bottomNavContainer}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="home" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="calendar" size={24} color="#FF8C00" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="comments" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="map" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <FontAwesome name="file-text-o" size={22} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <BottomNavigation currentScreen="Calendar" />
     </View>
   );
 };
@@ -953,32 +989,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-    paddingHorizontal: 16,
-  },
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 50,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   addButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    flex: 1,
+    padding: 4,
   },
   adminBadge: {
     flexDirection: 'row',
@@ -999,17 +1012,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 100,
+    paddingHorizontal: 16,
+    paddingBottom: 120,
   },
   calendarCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    marginHorizontal: 0,
+    width: '100%',
+    alignSelf: 'center',
+    overflow: 'hidden',
   },
   monthSelector: {
     flexDirection: 'row',
@@ -1035,7 +1048,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   dayHeaderContainer: {
-    width: 30,
+    width: (width - 64) / 7,
     alignItems: 'center',
   },
   dayHeaderText: {
@@ -1055,24 +1068,32 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dayCell: {
-    width: 30,
-    height: 30,
+    width: (width - 64) / 7,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
+    paddingHorizontal: 2,
   },
   currentDayCell: {
     backgroundColor: '#222',
-    borderRadius: 15,
     borderWidth: 1,
     borderColor: '#FF8C00',
   },
   selectedDayCell: {
     backgroundColor: '#333',
-    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  multiSelectedDayCell: {
+    backgroundColor: 'rgba(255, 140, 0, 0.3)',
+    borderWidth: 1,
+    borderColor: '#FF8C00',
   },
   dayText: {
     color: '#fff',
     fontSize: 14,
+    textAlign: 'center',
   },
   currentDayText: {
     color: '#FF8C00',
@@ -1082,32 +1103,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  multiSelectedDayText: {
+    color: '#FF8C00',
+    fontWeight: 'bold',
+  },
   adjacentMonthDay: {
     color: '#444',
-  },
-  shiftIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#FF8C00',
-    position: 'absolute',
-    bottom: 2,
-  },
-  selectedDateContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
   },
   shiftCard: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
-    minHeight: height * 0.25,
+    marginBottom: 120,
+    width: '100%',
   },
   shiftHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   shiftHeaderText: {
     color: '#fff',
@@ -1143,19 +1156,35 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     marginVertical: 20,
   },
+  shiftList: {
+    flex: 1,
+  },
+  shiftListContent: {
+    paddingBottom: 16,
+  },
   shiftItem: {
     backgroundColor: '#222',
-    padding: 12,
-    marginBottom: 8,
     borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: '#FF8C00',
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  shiftDateContainer: {
+    backgroundColor: '#FF8C00',
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  shiftDate: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   shiftItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    paddingTop: 8,
+    paddingHorizontal: 12,
   },
   shiftTitle: {
     color: '#fff',
@@ -1165,68 +1194,43 @@ const styles = StyleSheet.create({
   shiftTime: {
     color: '#ddd',
     fontSize: 12,
+    paddingHorizontal: 12,
     marginBottom: 4,
   },
   shiftLocation: {
     color: '#aaa',
     fontSize: 12,
+    paddingHorizontal: 12,
+    marginBottom: 8,
   },
   adminShiftControls: {
-    marginTop: 8,
+    marginTop: 4,
     paddingTop: 8,
+    paddingBottom: 8,
+    paddingHorizontal: 12,
     borderTopWidth: 1,
     borderTopColor: '#333',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   statusText: {
     color: '#FF8C00',
     fontSize: 12,
-    fontStyle: 'italic',
   },
   assignedText: {
     color: '#aaa',
     fontSize: 12,
   },
-  bottomSpacer: {
-    height: 20,
-  },
-  bottomNavContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  bottomNav: {
-    height: 60,
-    flexDirection: 'row',
-    backgroundColor: '#111',
-    borderRadius: 30,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   modalContent: {
     backgroundColor: '#111',
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     maxHeight: height * 0.8,
   },
   modalScroll: {
@@ -1236,7 +1240,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
@@ -1247,7 +1251,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modalForm: {
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   inputLabel: {
     color: '#fff',
@@ -1339,6 +1343,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginRight: 8,
+    marginBottom: 8,
   },
   selectedTeamMember: {
     backgroundColor: '#FF8C00',
@@ -1396,6 +1401,10 @@ const styles = StyleSheet.create({
   dateSelectionText: {
     color: '#fff',
   },
+  selectedDateText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
   selectedDatesContainer: {
     marginBottom: 16,
   },
@@ -1412,13 +1421,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  selectedDateText: {
+  selectedDateChipText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginRight: 4,
   },
   removeDateButton: {
     marginLeft: 4,
+  },
+  scrollContent: {
+    flex: 1,
+  },
+  scrollContentContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingBottom: 120,
+  },
+  bottomSpacer: {
+    height: 120,
   },
 });
 

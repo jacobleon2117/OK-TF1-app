@@ -1,24 +1,25 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface ProfileCardProps {
-  profileImage: any;
   displayName: string;
   role: string;
   onEditPress: () => void;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({
-  profileImage,
-  displayName,
-  role,
-  onEditPress,
-}) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ displayName, role, onEditPress }) => {
   return (
     <View style={styles.profileCard}>
       <View style={styles.profileInfo}>
-        <Image source={profileImage} style={styles.profileImage} />
+        <View style={styles.profileInitials}>
+          <Text style={styles.initialsText}>
+            {displayName
+              .split(' ')
+              .map(name => name.charAt(0))
+              .join('')}
+          </Text>
+        </View>
         <View style={styles.nameContainer}>
           <Text style={styles.profileName}>{displayName}</Text>
           <Text style={styles.profileRole}>{role}</Text>
@@ -46,10 +47,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileImage: {
+  profileInitials: {
     width: 50,
     height: 50,
     borderRadius: 25,
+    backgroundColor: '#F09737',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  initialsText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   nameContainer: {
     marginLeft: 12,

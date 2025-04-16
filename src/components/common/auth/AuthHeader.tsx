@@ -1,21 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import CircularLogo from './CircularLogo';
 
 interface AuthHeaderProps {
   title?: string;
   subtitle?: string;
-  logoSize?: number;
 }
 
 const AuthHeader: React.FC<AuthHeaderProps> = ({
-  title = 'OK-TF1',
-  subtitle = 'Urban Search and Rescue Foundation',
-  logoSize = 80,
+  title = 'TaskCom',
+  subtitle = 'Team Communication Platform',
 }) => {
   return (
     <View style={styles.container}>
-      <CircularLogo size={logoSize} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
     </View>
@@ -28,7 +24,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',

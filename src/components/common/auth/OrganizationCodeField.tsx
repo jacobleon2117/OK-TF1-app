@@ -20,9 +20,9 @@ const OrganizationCodeField: React.FC<OrganizationCodeFieldProps> = ({
   };
 
   return (
-    <View>
+    <View style={styles.fieldContainer}>
       <Text style={styles.label}>Organization Code</Text>
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, error ? styles.inputError : null]}>
         <TextInput
           style={styles.input}
           placeholder="Enter your 6-digit organization code"
@@ -34,12 +34,18 @@ const OrganizationCodeField: React.FC<OrganizationCodeFieldProps> = ({
           autoCapitalize={autoCapitalize}
         />
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      <View style={styles.errorContainer}>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  fieldContainer: {
+    marginBottom: 16,
+    height: 90, // Fixed height to prevent shifting
+  },
   label: {
     color: 'white',
     fontSize: 16,
@@ -50,16 +56,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 25,
-    marginBottom: 8,
     paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#ff6b6b',
   },
   input: {
     flex: 1,
     paddingVertical: 12,
   },
+  errorContainer: {
+    minHeight: 20, // Fixed height for error message
+    justifyContent: 'center',
+  },
   errorText: {
     color: '#ff6b6b',
-    marginBottom: 8,
+    marginTop: 4,
   },
 });
 

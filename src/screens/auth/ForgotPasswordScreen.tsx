@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,14 @@ import {
   Platform,
   ScrollView,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../../context/AuthContext';
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
 import LoadingScreen from '@/components/LoadingScreen';
-import {
-  AuthHeader,
-  FullNameField,
-  EmailField,
-  AuthButton,
-  LinkText,
-  ResetPasswordSuccess,
-} from '@/components/common/auth';
+import { EmailField, AuthButton, LinkText, ResetPasswordSuccess } from '@/components/common/auth';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -32,13 +27,11 @@ type ForgotPasswordScreenProps = {
 };
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
-  const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [nameError, setNameError] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const { resetPassword, error, setError } = useAuth();
 
@@ -51,13 +44,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   const validateForm = (): boolean => {
     let isValid = true;
-
-    if (!fullName.trim()) {
-      setNameError('Full name is required');
-      isValid = false;
-    } else {
-      setNameError('');
-    }
 
     if (!email.trim()) {
       setEmailError('Email is required');
@@ -84,63 +70,67 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   };
 
   const navigateToLogin = () => {
-    setFullName('');
     setEmail('');
     navigation.navigate('Login');
   };
 
   return (
     <BackgroundGrid>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
         >
-          <View style={styles.content}>
-            <AuthHeader />
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            scrollEnabled={false}
+          >
+            <View style={styles.content}>
+              {/* New TaskCom Title */}
+              <View style={styles.titleContainer}>
+                <Text style={styles.title}>TaskCom</Text>
+              </View>
 
-            {emailSent ? (
-              <ResetPasswordSuccess email={email} onBackToLogin={navigateToLogin} />
-            ) : (
-              <>
-                <FullNameField
-                  value={fullName}
-                  onChangeText={text => {
-                    setFullName(text);
-                    setError(null);
-                  }}
-                  error={nameError}
-                />
+              {emailSent ? (
+                <ResetPasswordSuccess email={email} onBackToLogin={navigateToLogin} />
+              ) : (
+                <>
+                  <Text style={styles.instructionText}>
+                    Enter your email address and we'll send you a link to reset your password.
+                  </Text>
 
-                <EmailField
-                  value={email}
-                  onChangeText={text => {
-                    setEmail(text);
-                    setError(null);
-                  }}
-                  error={emailError}
-                />
+                  <EmailField
+                    value={email}
+                    onChangeText={text => {
+                      setEmail(text);
+                      setError(null);
+                    }}
+                    error={emailError}
+                  />
 
-                {error && <Text style={styles.errorText}>{error}</Text>}
+                  <View style={styles.errorContainer}>
+                    {error && <Text style={styles.errorText}>{error}</Text>}
+                  </View>
 
-                <View style={styles.backContainer}>
-                  <LinkText text="Back to login" onPress={navigateToLogin} />
-                </View>
+                  <View style={styles.backContainer}>
+                    <LinkText text="Back to login" onPress={navigateToLogin} />
+                  </View>
 
-                <AuthButton
-                  title="Reset Password"
-                  onPress={handleResetPassword}
-                  isLoading={isLoading}
-                  disabled={isLoading}
-                />
-              </>
-            )}
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+                  <AuthButton
+                    title="Reset Password"
+                    onPress={handleResetPassword}
+                    isLoading={isLoading}
+                    disabled={isLoading}
+                  />
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
       <LoadingScreen visible={isLoading} message="Sending reset email..." overlay={true} />
     </BackgroundGrid>
   );
@@ -158,15 +148,35 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
   },
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+  },
+  instructionText: {
+    color: 'white',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
   backContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginTop: 8,
     marginBottom: 8,
+    height: 20, // Fixed height to prevent shifting
+  },
+  errorContainer: {
+    minHeight: 20, // Fixed height for error text to prevent shifting
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
     color: '#ff6b6b',
-    marginBottom: 10,
     textAlign: 'center',
   },
 });

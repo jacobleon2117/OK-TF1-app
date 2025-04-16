@@ -1,24 +1,29 @@
 import React from 'react';
-import { StyleSheet, View, StatusBar, ScrollView } from 'react-native';
+import { StyleSheet, View, StatusBar, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
-import { ScreenHeader, BottomNavigation } from '@/components/common/dashboard';
+import { BottomNavigation } from '@/components/common/dashboard';
 import { ProfileCard, SettingsCard } from '@/components/dashboard/profile';
-import { DASHBOARD_NAV_ITEMS } from '@/constants/navigation';
-import {
-  getSettingsItems,
-  handleSettingAction,
-  getProfileData,
-  handleEditProfile,
-} from '../Profile/profileUtils';
+import { getSettingsItems, handleSettingAction, handleEditProfile } from '../Profile/profileUtils';
+import { useAuth } from '@/context/AuthContext';
+import HeaderWithNotifications from '@/components/common/HeaderWithNotifications';
+
+const { height, width } = Dimensions.get('window');
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const profileData = getProfileData();
   const settingsItems = getSettingsItems();
+
+  // Use userData directly from auth context instead of getProfileData utility
+  const { userData } = useAuth();
+
+  const profileData = {
+    displayName: userData?.displayName || 'User',
+    role: userData?.role || 'Member',
+  };
 
   const handleBackNavigation = () => {
     navigation.goBack();
@@ -28,30 +33,34 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <ScreenHeader title="Profile" onBack={handleBackNavigation} />
+      <HeaderWithNotifications
+        title="Profile"
+        showBackButton={true}
+        onBackPress={handleBackNavigation}
+      />
 
-      <ScrollView style={styles.contentContainer}>
-        <ProfileCard
-          profileImage={profileData.profileImageSource}
-          displayName={profileData.displayName}
-          role={profileData.role}
-          onEditPress={handleEditProfile}
-        />
+      <ScrollView style={styles.scrollContent}>
+        <View style={styles.contentContainer}>
+          <ProfileCard
+            displayName={profileData.displayName}
+            role={profileData.role}
+            onEditPress={handleEditProfile}
+          />
 
-        <SettingsCard
-          title="Settings and privacy"
-          items={settingsItems}
-          onItemPress={handleSettingAction}
-        />
+          <View style={styles.spacer} />
 
-        <View style={styles.bottomSpacer} />
+          <SettingsCard
+            title="Settings and privacy"
+            items={settingsItems}
+            onItemPress={handleSettingAction}
+          />
+
+          {/* Spacer to ensure proper distance from bottom nav */}
+          <View style={styles.bottomSpacer} />
+        </View>
       </ScrollView>
 
-      <BottomNavigation
-        navigation={navigation}
-        currentScreen="Profile"
-        items={DASHBOARD_NAV_ITEMS}
-      />
+      <BottomNavigation currentScreen="Profile" />
     </View>
   );
 };
@@ -61,13 +70,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  contentContainer: {
+  scrollContent: {
     flex: 1,
+  },
+  contentContainer: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    flex: 1,
+  },
+  spacer: {
+    minHeight: 20,
+    flex: 1,
   },
   bottomSpacer: {
-    height: 100,
+    height: 120, // Increased height to ensure proper spacing from bottom nav
   },
 });
 

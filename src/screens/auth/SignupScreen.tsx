@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Platform,
   ScrollView,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../../context/AuthContext';
@@ -21,7 +23,6 @@ import {
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
-  AuthHeader,
   EmailField,
   PasswordField,
   FullNameField,
@@ -50,6 +51,7 @@ interface SignupFormValues {
 
 const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
   const { signup, error, setError } = useAuth();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const validateForm = (values: SignupFormValues) => {
     return {
@@ -102,84 +104,93 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 
   return (
     <BackgroundGrid>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
         >
-          <View style={styles.content}>
-            <AuthHeader />
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.content}>
+              {/* New TaskCom Title */}
+              <View style={styles.titleContainer}>
+                <Text style={styles.title}>TaskCom</Text>
+              </View>
 
-            <FullNameField
-              value={values.name}
-              onChangeText={text => {
-                handleChange('name', text);
-                setError(null);
-              }}
-              error={errors.name}
-              autoCapitalize="words"
-            />
+              <FullNameField
+                value={values.name}
+                onChangeText={text => {
+                  handleChange('name', text);
+                  setError(null);
+                }}
+                error={errors.name}
+                autoCapitalize="words"
+              />
 
-            <EmailField
-              value={values.email}
-              onChangeText={text => {
-                handleChange('email', text);
-                setError(null);
-              }}
-              error={errors.email}
-              autoCapitalize="none"
-            />
+              <EmailField
+                value={values.email}
+                onChangeText={text => {
+                  handleChange('email', text);
+                  setError(null);
+                }}
+                error={errors.email}
+                autoCapitalize="none"
+              />
 
-            <PasswordField
-              value={values.password}
-              onChangeText={text => {
-                handleChange('password', text);
-                setError(null);
-              }}
-              error={errors.password}
-              autoCapitalize="none"
-            />
+              <PasswordField
+                value={values.password}
+                onChangeText={text => {
+                  handleChange('password', text);
+                  setError(null);
+                }}
+                error={errors.password}
+                autoCapitalize="none"
+              />
 
-            <PasswordField
-              label="Confirm Password"
-              value={values.confirmPassword}
-              onChangeText={text => {
-                handleChange('confirmPassword', text);
-                setError(null);
-              }}
-              placeholder="Confirm your password"
-              error={errors.confirmPassword}
-              autoCapitalize="none"
-            />
+              <PasswordField
+                label="Confirm Password"
+                value={values.confirmPassword}
+                onChangeText={text => {
+                  handleChange('confirmPassword', text);
+                  setError(null);
+                }}
+                placeholder="Confirm your password"
+                error={errors.confirmPassword}
+                autoCapitalize="none"
+              />
 
-            <OrganizationCodeField
-              value={values.organizationCode}
-              onChangeText={text => {
-                handleChange('organizationCode', text);
-                setError(null);
-              }}
-              error={errors.organizationCode}
-              autoCapitalize="characters"
-            />
+              <OrganizationCodeField
+                value={values.organizationCode}
+                onChangeText={text => {
+                  handleChange('organizationCode', text);
+                  setError(null);
+                }}
+                error={errors.organizationCode}
+                autoCapitalize="characters"
+              />
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+              <View style={styles.errorContainer}>
+                {error && <Text style={styles.errorText}>{error}</Text>}
+              </View>
 
-            <View style={styles.backContainer}>
-              <LinkText text="Back to login" onPress={navigateToLogin} />
+              <View style={styles.backContainer}>
+                <LinkText text="Back to login" onPress={navigateToLogin} />
+              </View>
+
+              <AuthButton
+                title="Sign Up"
+                onPress={handleSubmit}
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              />
             </View>
-
-            <AuthButton
-              title="Sign Up"
-              onPress={handleSubmit}
-              isLoading={isSubmitting}
-              disabled={isSubmitting}
-            />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
       <LoadingScreen visible={isSubmitting} message="Creating account..." overlay={true} />
     </BackgroundGrid>
   );
@@ -197,15 +208,30 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
   },
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+  },
   backContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginTop: 8,
     marginBottom: 8,
+    height: 20, // Fixed height to prevent shifting
+  },
+  errorContainer: {
+    minHeight: 20, // Fixed height to prevent shifting
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
     color: '#ff6b6b',
-    marginBottom: 10,
     textAlign: 'center',
   },
 });

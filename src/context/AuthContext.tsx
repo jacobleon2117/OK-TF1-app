@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  fetchSignInMethodsForEmail,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
@@ -35,6 +36,7 @@ type AuthContextType = {
   resetPassword: (email: string, organizationCode: string) => Promise<void>;
   error: string | null;
   setError: (error: string | null) => void;
+  diagnoseLogin: (email: string, password: string) => Promise<boolean>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +54,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const diagnoseLogin = async (email: string, password: string): Promise<boolean> => {
+    try {
+      console.log('Diagnostic Login Check Started');
+      console.log('Email:', email);
+
+      // Validate input
+      if (!email || !password) {
+        console.error('Email or password is empty');
+        setError('Email and password are required');
+        return false;
+      }
+
+      // Check email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        console.error('Invalid email format');
+        setError('Invalid email format');
+        return false;
+      }
+
+      try {
+        // Check sign-in methods
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        console.log('Available Sign-in Methods:', methods);
+
+        if (methods.length === 0) {
+          console.error('No sign-in methods found for this email');
+          setError('No account found with this email');
+          return false;
+        }
+      } catch (emailCheckError) {
+        console.error('Email Verification Error:', emailCheckError);
+        setError('Unable to verify email');
+        return false;
+      }
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('User UID:', userCredential.user.uid);
+
+        // Check Firestore user document
+        const userDocRef = doc(db, 'users', userCredential.user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          console.log('User Document Data:', userDoc.data());
+          return true;
+        } else {
+          console.error('No user document found in Firestore');
+          setError('User document not found');
+          return false;
+        }
+      } catch (signInError: any) {
+        console.error('Sign-in Error:', {
+          code: signInError.code,
+          message: signInError.message,
+        });
+
+        const errorMessage = (() => {
+          switch (signInError.code) {
+            case 'auth/invalid-credential':
+              return 'Invalid email or password';
+            case 'auth/user-not-found':
+              return 'No user found with this email';
+            case 'auth/wrong-password':
+              return 'Incorrect password';
+            case 'auth/too-many-requests':
+              return 'Too many login attempts. Please try again later.';
+            default:
+              return 'Login failed. Please try again.';
+          }
+        })();
+
+        setError(errorMessage);
+        return false;
+      }
+    } catch (error) {
+      console.error('Diagnostic Login Error:', error);
+      setError('An unexpected error occurred during login');
+      return false;
+    }
+  };
 
   const verifyOrganizationCode = (code: string): boolean => {
     // TODO: Replace with real organization code verification logic
@@ -150,34 +235,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
 
     try {
-      if (!verifyOrganizationCode(organizationCode)) {
-        console.log('Organization Code Verification Failed');
-        throw new Error('Invalid organization code');
+      // Diagnostic check
+      const diagnosticResult = await diagnoseLogin(email, password);
+      if (!diagnosticResult) {
+        setLoading(false);
+        return;
       }
 
-      console.log('Attempting Firebase Sign In');
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Verify organization code (if needed)
+      if (!verifyOrganizationCode(organizationCode)) {
+        console.log('Organization Code Verification Failed');
+        setError('Invalid organization code');
+        setLoading(false);
+        return;
+      }
 
-      console.log('Sign In Successful:', {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-      });
-
-      setUser(userCredential.user);
-
-      console.log('Fetching User Data');
-      await fetchUserData(userCredential.user.uid);
-
+      // Additional logic after successful login
+      console.log('Login successful');
       setLoading(false);
     } catch (err: any) {
-      console.error('Login Error:', {
+      console.error('Login Method Error:', {
         code: err.code,
         message: err.message,
         stack: err.stack,
       });
 
       setLoading(false);
-      setError(err.message || 'Login failed');
+
+      // If an error wasn't set by diagnoseLogin, set a generic error
+      if (!error) {
+        setError('Login failed. Please try again.');
+      }
+
       throw err;
     }
   };
@@ -279,6 +368,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resetPassword,
     error,
     setError,
+    diagnoseLogin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
