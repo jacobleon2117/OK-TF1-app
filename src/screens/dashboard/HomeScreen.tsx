@@ -5,8 +5,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomNavigation } from '@/components/common/dashboard';
-import { DASHBOARD_NAV_ITEMS } from '@/constants/navigation';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -29,7 +29,6 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Welcome Header */}
       <View style={styles.welcomeHeader}>
         <View>
           <Text style={styles.welcomeText}>Welcome back,</Text>
@@ -43,11 +42,10 @@ const HomeScreen = () => {
       {/* Main Content */}
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsContainer}>
-          {/* Recent Messages Card */}
           <TouchableOpacity style={styles.messageCard} onPress={navigateToMessages}>
             <View style={styles.cardContent}>
               <View style={styles.iconTextRow}>
-                <FontAwesome name="comments" size={22} color="white" />
+                <FontAwesome name="comments" size={22} color="white" style={styles.cardIcon} />
                 <Text style={styles.cardTitle}>Recent Messages</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="white" />
@@ -58,7 +56,7 @@ const HomeScreen = () => {
           <TouchableOpacity style={styles.shiftsCard} onPress={navigateToShifts}>
             <View style={styles.cardContent}>
               <View style={styles.iconTextRow}>
-                <FontAwesome name="clock-o" size={22} color="white" />
+                <FontAwesome name="clock-o" size={22} color="white" style={styles.cardIcon} />
                 <Text style={styles.cardTitle}>Upcoming Shifts</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="white" />
@@ -71,34 +69,32 @@ const HomeScreen = () => {
           {/* Action Buttons Row */}
           <View style={styles.actionButtonsRow}>
             <TouchableOpacity style={styles.actionButton}>
-              <View style={[styles.iconCircle, { backgroundColor: '#8B5A2B' }]}>
-                <FontAwesome name="user" size={24} color="white" />
-              </View>
-              <Text style={styles.actionButtonText}>My Profile</Text>
+              <MaterialCommunityIcons
+                name="walk"
+                size={24}
+                color="white"
+                style={styles.actionButtonIcon}
+              />
+              <Text style={styles.actionButtonLabel}>Distance</Text>
+              <Text style={styles.actionButtonValue}>2.4 miles</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <View style={[styles.iconCircle, { backgroundColor: '#1E5C97' }]}>
-                <FontAwesome name="bar-chart" size={24} color="white" />
-              </View>
-              <Text style={styles.actionButtonText}>Mission Stats</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Additional Cards can be added here */}
-          <View style={styles.featuredCard}>
-            <View style={styles.cardHeader}>
-              <FontAwesome name="info-circle" size={22} color="#FF8C00" />
-              <Text style={styles.cardHeaderText}>Team Updates</Text>
-            </View>
-            <Text style={styles.cardText}>
-              Stay informed about the latest team activities and announcements.
-            </Text>
+            <TouchableOpacity style={styles.actionButton}>
+              <MaterialCommunityIcons
+                name="stairs"
+                size={24}
+                color="white"
+                style={styles.actionButtonIcon}
+              />
+              <Text style={styles.actionButtonLabel}>Stairs</Text>
+              <Text style={styles.actionButtonValue}>276 steps</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <BottomNavigation navigation={navigation} currentScreen="Home" items={DASHBOARD_NAV_ITEMS} />
+      <BottomNavigation currentScreen="Home" />
     </View>
   );
 };
@@ -113,7 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: 50,
+    marginTop: 80,
     marginBottom: 15,
   },
   welcomeText: {
@@ -154,11 +150,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  cardIcon: {
+    marginRight: 12,
+  },
   cardTitle: {
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
-    marginLeft: 12,
   },
   shiftsContentPlaceholder: {
     marginTop: 16,
@@ -185,42 +183,21 @@ const styles = StyleSheet.create({
     width: '48%',
     aspectRatio: 1.5,
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
-  iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  actionButtonText: {
-    color: 'white',
-    fontSize: 14,
-  },
-  featuredCard: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  actionButtonIcon: {
     marginBottom: 12,
   },
-  cardHeaderText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 12,
-  },
-  cardText: {
-    color: '#CCC',
+  actionButtonLabel: {
+    color: '#aaa',
     fontSize: 14,
-    lineHeight: 20,
+    marginBottom: 4,
+  },
+  actionButtonValue: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
