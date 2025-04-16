@@ -5,14 +5,9 @@ module.exports = {
   version: '1.0.0',
   orientation: 'portrait',
   userInterfaceStyle: 'light',
-  newArchEnabled: true,
+  newArchEnabled: false,
   plugins: [
-    [
-      '@rnmapbox/maps',
-      {
-        RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
-      },
-    ],
+    'expo-location',
   ],
   ios: {
     supportsTablet: true,
@@ -28,6 +23,11 @@ module.exports = {
     },
     permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
     package: 'com.jleon2117.OKTF1app',
+    config: {
+      googleMaps: {
+        apiKey: process.env.GOOGLE_MAPS_API_KEY
+      }
+    }
   },
   // Environment variables will be added here
   extra: {
@@ -37,5 +37,9 @@ module.exports = {
     FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
+    eas: {
+      projectId: "74992c70-fb12-43e1-870a-1785849d3265"
+    }
   },
+  scheme: 'ok-tf1-app',
 };

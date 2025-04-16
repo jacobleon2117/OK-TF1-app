@@ -27,6 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>ok-tf1-app</string>
           <string>com.jleon2117.OKTF1app</string>
         </array>
       </dict>

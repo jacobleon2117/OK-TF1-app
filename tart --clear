@@ -1,0 +1,776 @@
+[33mcommit 62283419636a526316b45133de084e7630615742[m[33m ([m[1;36mHEAD -> [m[1;32mdom/dashboard-map[m[33m, [m[1;32mFS/testing[m[33m)[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Tue Apr 15 10:46:42 2025 -0500
+
+    Update mission test files
+
+[33mcommit b0f9c85f66e591bd85bd436c7161e87c5685765e[m
+Merge: 3fe71d3 c842b0a
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 14 23:34:08 2025 -0500
+
+    Resolve merge conflicts and reorganize test files
+
+[33mcommit 3fe71d3cf16b4a06d7a145b77910f3efac416fa0[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 14 23:19:27 2025 -0500
+
+    Complete test file reorganization
+
+[33mcommit 47b89c39a0cd7418895421a39f528c8247790942[m
+Merge: 395f75c d61c3ff
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 14 23:18:12 2025 -0500
+
+    Reorganize test files into proper directories and resolve merge conflicts
+
+[33mcommit d61c3ff25bc59f2df85ceecf4def4925ffe3fefc[m[33m ([m[1;32mfeature/dashboard-messaging[m[33m)[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 14 22:45:14 2025 -0500
+
+    added messaging service file and test file. re organized the file structure of the test directory
+
+[33mcommit c842b0a182066f98971c24f33f2d73639e619e17[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 14 00:53:38 2025 -0500
+
+    removed map screen.
+
+[33mcommit 2a00a0afbad12daf0f6ef826e425df59bbb77a97[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 14 00:51:29 2025 -0500
+
+    i hate mapbox ngl..
+
+[33mcommit 8e13e3feaf2fa462888228f21f552d1d01881a63[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 22:15:02 2025 -0500
+
+    adding
+
+[33mcommit 459dca40816c26d8632a5c7048affce31d6490ed[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:53:59 2025 -0500
+
+    adding env
+
+[33mcommit 133c4d5007388a03696c05f8214ed0ffa6edd610[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:50:53 2025 -0500
+
+    adding
+
+[33mcommit 09fd1deb20f052f22c21a0fa8bc5a9f6b11efd1e[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:47:14 2025 -0500
+
+    fixing
+
+[33mcommit c46d17ecd4ad767345fce14ddc78e2d73424b51f[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:45:36 2025 -0500
+
+    adding package
+
+[33mcommit bf85fe5d0b907b4955633f2c2fbee647557d2d99[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:44:06 2025 -0500
+
+    fixing podfile
+
+[33mcommit eae5e4efd40b5855017872fcc46c0bc5b943218b[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:43:10 2025 -0500
+
+    fixing
+
+[33mcommit 95231513429589ff130024961d4257295a48b329[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:40:50 2025 -0500
+
+    fixing
+
+[33mcommit d03f6c022af20664810d69bea9b771d33bb9e362[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:39:27 2025 -0500
+
+    init
+
+[33mcommit 6e3ea55fd927b9dc7c95fc2902a3229a31ae72fe[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:32:31 2025 -0500
+
+    commit init
+
+[33mcommit 4bd7c7001a0ca936dcdcc37aa9f10ee1709b9b13[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:31:03 2025 -0500
+
+    fixing pod
+
+[33mcommit a637331c81608f07ffcd2a2fd7187a3d2553e25a[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:27:56 2025 -0500
+
+    adding
+
+[33mcommit 77abe362ed5315f974eedb811a03ea8bb58404d0[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:26:40 2025 -0500
+
+    fixing
+
+[33mcommit 7679cc948b6159a16a63189684768d326df1f1d5[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:25:44 2025 -0500
+
+    adding
+
+[33mcommit 97216ae75268886b60b2c7a0329b0c636bb3355a[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 13 21:20:27 2025 -0500
+
+    cleaning
+
+[33mcommit 6aae3f964b572c234468d142ca6a2e1ea81ecd6c[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sat Apr 12 23:05:35 2025 -0500
+
+    Cleaning up and adding all screens besides dashboard (home page)
+
+[33mcommit 7dadb722c987115a42c7a5748826dd60cec28a75[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sat Apr 12 18:19:43 2025 -0500
+
+    Delete .env
+
+[33mcommit 22d12600a1d1f50ec251d45de95889cec24dfbea[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 18:42:49 2025 -0500
+
+    adding roadmap to changes-log.md and adding utils files for screens
+
+[33mcommit 742099179eb1651d8f928a635a8b2965afc4eba6[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 18:32:17 2025 -0500
+
+    adding profile utils and moving functions/helpers
+
+[33mcommit 1e735389470973502048c0de1fcda92a8cc8a579[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 17:53:03 2025 -0500
+
+    adding new utils folder for screens
+
+[33mcommit 63a1d4684dfb537c54aa25b907169913d292c077[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 16:22:26 2025 -0500
+
+    fixing @types
+
+[33mcommit 4eb7843249c93ba4dcee24241120c3ca4304a0d0[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 15:52:08 2025 -0500
+
+    removing test file for dashboard screen
+
+[33mcommit d392ee57b91001f338b21613c8a511ee0a9357b6[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 15:50:41 2025 -0500
+
+    adding testing code
+
+[33mcommit 4ae650c46dbba750b7d7fcb193ba791edd4afa24[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Wed Apr 9 14:40:04 2025 -0500
+
+    adding pages to FS/testing for testing navigation
+
+[33mcommit 395f75c625f451fabc1b09e81b9bdb2f0f8c99c4[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 7 19:30:51 2025 -0500
+
+    Update package-lock.json
+
+[33mcommit daff3fbeb0c1307bf4a46821f410dd754410c44b[m
+Merge: fa5e3a6 280af5e
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 7 19:30:00 2025 -0500
+
+    Resolve package.json conflicts
+
+[33mcommit fa5e3a674f2e1e8c483b7c34e365dbc49c3681f0[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 7 19:28:43 2025 -0500
+
+    Update package dependencies and scheduling service
+
+[33mcommit f614d125ed7c3ae9478fc77a4df20afbee0719cb[m
+Merge: 6cb052d ff489c8
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 7 19:28:34 2025 -0500
+
+    Merge remote changes and update project structure
+
+[33mcommit 280af5ef32480a6ba983693978da9f627a98bd3e[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 15:22:24 2025 -0500
+
+    changing packages
+
+[33mcommit 6cb052d398c1846329716c6e73500e46ccc74bc9[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Mon Apr 7 14:29:06 2025 -0500
+
+    added testing files, debugged, and tested
+
+[33mcommit 6119172ad83223fe6fe77bfbad4215d9e11eddc3[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:50:33 2025 -0500
+
+    added index.ts to root
+
+[33mcommit 983174126a0ec67d083d1f609c00b421b5d297a2[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:50:10 2025 -0500
+
+    adding tsconfig.json to root
+
+[33mcommit dbaadb0efd9e9771e20f8bd796f41d78d4df68ee[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:31:29 2025 -0500
+
+    adding doc file back
+
+[33mcommit 8b150b56eab3b67500eddc142d8e4c9e9f75273f[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:30:52 2025 -0500
+
+    removed imports
+
+[33mcommit 58fd038954ccde1a45dc2f1a2c8f998a1b322784[m
+Merge: be17714 ff489c8
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:30:47 2025 -0500
+
+    Merge branch 'FS/testing' into feature/dashboard-messaging
+
+[33mcommit ff489c873f319d349ad2615d714f38dce7c2cc2d[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:28:23 2025 -0500
+
+    fixed second type in EXPO_EJECT folder in docs
+
+[33mcommit 3b86636a76c5125b53ad1fc045b216064d88d04a[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 02:27:59 2025 -0500
+
+    fixed type in docs folder EXPO_EJECT
+
+[33mcommit be177149bd56b78b1e25951fa9f69d1f55f26fda[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:56:31 2025 -0500
+
+    adding theme colors
+
+[33mcommit 6e858a10ea898342631beb096948754f963f55ed[m
+Merge: 00b0106 08f1ec8
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:54:47 2025 -0500
+
+    Merge branch 'feature/dashboard-messaging' of https://github.com/jacobleon2117/OK-TF1-app into feature/dashboard-messaging
+
+[33mcommit 00b01064b8a5dbaa2243058a0d447da17e6377f3[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:54:46 2025 -0500
+
+    adding assets
+
+[33mcommit c3234b3de0189d65e6b1c158e0f94b8c4699ddef[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:13:16 2025 -0500
+
+    adding theme colors to assets
+
+[33mcommit 0122538793caabbce9fc513f3430b569e0218a3c[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:09:44 2025 -0500
+
+    adding wireframes
+
+[33mcommit 37ad76a29d397c4916b1b7bcdb51f588b6b808f9[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:07:39 2025 -0500
+
+    removing unused file
+
+[33mcommit 3633c4df920dd43e2f8b2d63267bcfca37435034[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:07:00 2025 -0500
+
+    cleaning up
+
+[33mcommit 9bcdbd54b98aff9307de048b84942124117eb183[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 01:06:31 2025 -0500
+
+    changing md files names
+
+[33mcommit 3c087b077e57153a87c21c4d9e049c4ab58ed3f6[m
+Merge: 3238fad 900c8a6
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 00:45:21 2025 -0500
+
+    Merge branch 'feature/dashboard-scheduling' into FS/testing
+
+[33mcommit 900c8a659906191a38ddc3b23acd5cd757798291[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Apr 7 00:42:06 2025 -0500
+
+    Adding favicons for future development and more docs
+
+[33mcommit 2d99e4d6cf625fc0426d5085c222d5000eb6fd6e[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 23:44:05 2025 -0500
+
+    adding more to docs folder and cleaning up assets folder
+
+[33mcommit 3238fada23dc0a493a026c308dbdde109adb53ea[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 23:12:00 2025 -0500
+
+    fixing env imports
+
+[33mcommit a59f3201d281320e56f648f12ffa7231d5a7e9db[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 23:10:59 2025 -0500
+
+    Update babel.config.js
+
+[33mcommit 13a156ec43ff60d2f507283e05752d212ae64911[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 23:08:13 2025 -0500
+
+    fixing imports
+
+[33mcommit 978af95d75b891ed7772d9314a547e294998493d[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 23:07:49 2025 -0500
+
+    Create env.ts
+
+[33mcommit 7e21653c1dc61b88b2dddba02612a46f0b6d4142[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 23:07:02 2025 -0500
+
+    Update firebase.ts
+
+[33mcommit 4896370ebaa1d484e3c560c364466c716a0d5f91[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 23:04:54 2025 -0500
+
+    Update firebase.ts
+
+[33mcommit 58d4962d5d6837c0e8a22fb8cfb859a3923b4af5[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 23:00:21 2025 -0500
+
+    Updating AuthContext to match FS/testing and adding screen for next page to be added
+
+[33mcommit 0afe1f6a086671a8c8b2815823a36758496a7401[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:55:21 2025 -0500
+
+    removing jest from tsconfig and adding prettier
+
+[33mcommit 05da5e83d2ce16f580342912a68ad6e07e7009a3[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 22:55:03 2025 -0500
+
+    Update tsconfig.json
+    
+    removed jest
+
+[33mcommit e758f1962d1bc69ac69a221f609572113f759fd4[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:51:14 2025 -0500
+
+    updating files to match current scheduling files in FS/testing
+
+[33mcommit 79ef50b95906cb89a267d65bfa24e845d7d49e5c[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:46:57 2025 -0500
+
+    removing folder
+
+[33mcommit 543f692e3e3d7d8a2aa46a4ff210f3bc2767805a[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:45:21 2025 -0500
+
+    getting rid of test folder for now and updated packages
+
+[33mcommit 66e188b44fa77c54a2d0677479729dba28981952[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:42:44 2025 -0500
+
+    getting rid of jest....
+
+[33mcommit 77597dab721347013c91fb5b451eb85a55b43c99[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 22:19:17 2025 -0500
+
+    adding jest
+
+[33mcommit 5517bfbc8d5d7f36fb3f78c2c521b389576b53c6[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:36:54 2025 -0500
+
+    added to change log and auth
+
+[33mcommit 483c7dde69663ae47cc55823003b1bd0bc617c93[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:31:02 2025 -0500
+
+    added .env
+
+[33mcommit 0b4133dd1b0c55f06a7866084fba09b2102ef7fb[m
+Merge: c7b8cb1 3b0aee4
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:29:17 2025 -0500
+
+    Merge branch 'FS/testing' of https://github.com/jacobleon2117/OK-TF1-app into FS/testing
+
+[33mcommit c7b8cb11010d1513c586bfea4a699970113f197b[m
+Merge: c70bc5a 198d978
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:28:58 2025 -0500
+
+    Merge branch 'feature/auth' into FS/testing
+
+[33mcommit 3b0aee497fe51ca6a54b78db654ddf7895ffc89a[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 16:27:16 2025 -0500
+
+    Update App.tsx
+
+[33mcommit 17e0277b0aeac2c61fd367163415170e0c9c1444[m
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 16:26:53 2025 -0500
+
+    Update App.tsx
+
+[33mcommit 198d9781fa063994dd479bd571212f1f3336a068[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:22:13 2025 -0500
+
+    Complete authentication UI improvements
+
+[33mcommit c70bc5a9c2130c50e9278af00b102d714323ace5[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:20:44 2025 -0500
+
+    fixing typo
+
+[33mcommit c0224327f5317e5d16c59fa1aa61109ce3e1672c[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:19:42 2025 -0500
+
+    Fix navigation and implement MessagesScreen with proper path aliases
+
+[33mcommit 3439e9b8a94be04597f297307bbc499bb49308b4[m
+Merge: a7ec07d 08f1ec8
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 16:16:58 2025 -0500
+
+    Merge pull request #4 from jacobleon2117/feature/dashboard-messaging
+    
+    Adding messages screen and components
+
+[33mcommit 08f1ec8800225335240a135cad41aee217bcfada[m
+Merge: c0e3766 a7ec07d
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Sun Apr 6 16:16:49 2025 -0500
+
+    Merge branch 'FS/testing' into feature/dashboard-messaging
+
+[33mcommit c0e37661b74a832474875bc8623f472e96d68229[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sun Apr 6 16:12:01 2025 -0500
+
+    Adding messages screen and components
+
+[33mcommit c35eadabf2a5f3b607228f191b3d3a091926b3ec[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sat Apr 5 20:51:03 2025 -0500
+
+    adding comments/re-wording
+
+[33mcommit 069eaa6e58c515e65fdd2ddb6017b70d44718d01[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sat Apr 5 20:45:42 2025 -0500
+
+    adding to BUGS doc file
+
+[33mcommit 56d88575e26001634b0fcb21e0af5968d5f18cf8[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Sat Apr 5 20:45:08 2025 -0500
+
+    Added new styling to auth pages + added imgs for background
+
+[33mcommit 59224e8a87d0a41ed9b67a05c5261cc349d6451e[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Thu Apr 3 14:42:20 2025 -0500
+
+    adding to readme
+
+[33mcommit 6d161c4d329a5d9e7ad743a5e242b922dd9f2b12[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Thu Apr 3 14:31:41 2025 -0500
+
+    Added .env and updated readme
+
+[33mcommit 8bbc4ba8ebb94358091f5d55f2cfc7428ebc2d8c[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Thu Apr 3 14:28:38 2025 -0500
+
+    Adding readme to docs
+
+[33mcommit a7ec07d2bb2ba8ea87793e449024be28665a83ee[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Wed Apr 2 16:50:32 2025 -0500
+
+    empty
+
+[33mcommit 218a483d4ed1bd3fb75eef4de007fd52d7408504[m
+Merge: 8218ce7 943f9fd
+Author: dom <6157@holbertonstudents.com>
+Date:   Wed Apr 2 14:26:37 2025 -0500
+
+    Merge branch 'feature/mission-report' into FS/testing
+
+[33mcommit 943f9fdc60a14aeb81f8cd1b8618c533ce737cfa[m[33m ([m[1;32mfeature/mission-report[m[33m)[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Wed Apr 2 14:25:46 2025 -0500
+
+    created firebase sercive files for Team assignment, mission Locations and pins
+
+[33mcommit 8218ce79377fa08e6b2ec435f1a35b89b2babefa[m
+Merge: 67fbbf4 df8b874
+Author: dom <6157@holbertonstudents.com>
+Date:   Wed Apr 2 12:55:10 2025 -0500
+
+    Merge branch 'feature/mission-report' into FS/testing
+
+[33mcommit df8b874c7022e54a31e8c39b2bc050bf47d30bd4[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Wed Apr 2 12:54:13 2025 -0500
+
+    added file that creates and manages the missions collection
+
+[33mcommit 67fbbf4d3498164b11ab5ad265122f34d5798295[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Tue Apr 1 22:16:28 2025 -0500
+
+    adjusted types to firebase liking
+
+[33mcommit 46a30645db2f05d5f44982889f2902da2c3c0043[m[33m ([m[1;32mfeature/dashboard-scheduling[m[33m)[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Tue Apr 1 20:59:13 2025 -0500
+
+    converted to ts
+
+[33mcommit 9c81c62188d61de169cbf4945cea3db8bec123e2[m[33m ([m[1;31morigin/feature/mission-report[m[33m)[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Tue Apr 1 20:41:14 2025 -0500
+
+    adding DB map for missions for branch feature/mission-report
+
+[33mcommit ca534ceb057964a4d0b051c28a4ff1c6795ee062[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Tue Apr 1 19:22:45 2025 -0500
+
+    Adding new folder, "services" added auth.ts for users and added docs for changes, installs, etc
+
+[33mcommit edb481e647aca6eb2baa6842f9e5707eb35053c3[m
+Merge: 536e6ff 0fb3908
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Tue Apr 1 18:13:06 2025 -0500
+
+    Merge branch 'FS/testing' into feature/dashboard-scheduling + changing file struct
+
+[33mcommit 0fb3908e57283fde8c62583d4e53d02575e3fadb[m
+Author: dom <6157@holbertonstudents.com>
+Date:   Tue Apr 1 16:20:03 2025 -0500
+
+    created querries for scheduling db
+
+[33mcommit 299353ce639ba0f276ca9e9725f54979776f8f75[m[33m ([m[1;31morigin/ARVR/pin-management[m[33m)[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 16:12:36 2025 -0500
+
+    adding to .gitignore for .env file
+
+[33mcommit 183fbb98c5a3be759593101496eb5abb63825e85[m[33m ([m[1;31morigin/testing[m[33m, [m[1;31morigin/feature/real-time-tracking[m[33m, [m[1;31morigin/feature/map[m[33m, [m[1;31morigin/ARVR/testing[m[33m, [m[1;31morigin/ARVR/real-time-tracking[m[33m)[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 16:11:34 2025 -0500
+
+    adding to readme.md
+
+[33mcommit bd1271f79de6c2eb88cb598a9ba8168aa045f44a[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 16:08:03 2025 -0500
+
+    adding readme.md to testing branch
+
+[33mcommit 536e6ffeab9a835e44aae68057f01dbd179846de[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 16:02:19 2025 -0500
+
+    Adding map for db
+
+[33mcommit b6020d7264441bc4bfbc3e58a7f3b3e9af753c75[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 15:59:23 2025 -0500
+
+    adding to .gitignore for .env file
+
+[33mcommit 4ad41547772cd1aca9e988180ba603554f878251[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 15:57:10 2025 -0500
+
+    init
+
+[33mcommit 504efcc962edff5a855fe863699fc2f5bf273570[m
+Merge: 62e398c b017eb8
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 15:56:28 2025 -0500
+
+    Merge branch 'feature/auth' into testing
+
+[33mcommit 62e398c089cbf9acc68a4657fb67c277b15477af[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 15:55:31 2025 -0500
+
+    getting ready to merge from feature/auth
+
+[33mcommit b017eb866f5a1ac43a2788d44195fb6ef9cb96cb[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 15:51:38 2025 -0500
+
+    added auth + firebase auth
+
+[33mcommit 433d633faaa0e90361f2840c0d8eaa0cd2e15f22[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:43:22 2025 -0500
+
+    adding firebase into json
+
+[33mcommit 62a6432b5caac926fc2271b23a95303306d27f73[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:43:03 2025 -0500
+
+    adding firebase into json
+
+[33mcommit 4d3927a768dc7b139f692bb302dad647fb602bcb[m
+Merge: 295b35e 5700561
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:38:12 2025 -0500
+
+    Merge branch 'feature/auth' into testing
+
+[33mcommit 295b35eebd0d2539462d35df2f7bd2c3ce75f1d4[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:37:18 2025 -0500
+
+    cleaning up branch
+
+[33mcommit 69b98c3870a8f6c6d1e6edb7819a88223e7bd39d[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:33:55 2025 -0500
+
+    Delete old login file
+
+[33mcommit 57005616e221d30a09e3af2df58a66e0c70d75bf[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:31:54 2025 -0500
+
+    Implement complete authentication flow with login, signup, and forgot password screens
+
+[33mcommit 9f6bee8109cab6d0c75ec768f775ff777ddc866d[m
+Merge: 5863ab0 1ae8a4d
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 14:03:37 2025 -0500
+
+    Merge branch 'feature/login' into testing
+
+[33mcommit 1ae8a4d73b46af094948852dbe7268942055fb5d[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 13:59:23 2025 -0500
+
+    Implement login screen with background image and organization code input
+
+[33mcommit d431734874f989ea6e3c62996ab06de617e9ebe6[m[33m ([m[1;32mmain[m[33m)[m
+Merge: 40c0cb2 6d9bd78
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Mon Mar 31 01:02:43 2025 -0500
+
+    Merge pull request #3 from jacobleon2117/dashboard
+    
+    Dashboard
+
+[33mcommit 6d9bd7806f1e2623c3b84b1478c012ef63d74ba8[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 01:01:29 2025 -0500
+
+    adding branch
+
+[33mcommit ac8639b2545a367064b243cc1dca65a12bf76ee6[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:55:04 2025 -0500
+
+    adding dashboard branch
+
+[33mcommit b47d55110b3c170dd8520e83f46d2a9890a3d2c5[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:50:15 2025 -0500
+
+    Adding Dependencies
+
+[33mcommit 5863ab05b8d666e27fc02aa5764834a33a815780[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:49:41 2025 -0500
+
+    Adding Dependencies
+
+[33mcommit 40c0cb23f968e0433236b3efb3bf0e9fd0d23ade[m[33m ([m[1;31morigin/feature/dashboard-settings[m[33m, [m[1;32mfeature/dashboard-map[m[33m)[m
+Merge: 209a29b af5b873
+Author: Jacob Leon <143765559+jacobleon2117@users.noreply.github.com>
+Date:   Mon Mar 31 00:46:57 2025 -0500
+
+    Merge pull request #1 from jacobleon2117/dev
+    
+    Dev
+
+[33mcommit f9db5edc2c4a1c93a50cb2f42f9c1aaeed440630[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:45:49 2025 -0500
+
+    Adding Dependencies
+
+[33mcommit af5b873248011ef13fb7f132419c6c8fe4842cf0[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:45:16 2025 -0500
+
+    adding Dependencies
+
+[33mcommit f640a137e6831e2036871ce648d34fac6660b9bc[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:44:49 2025 -0500
+
+    adding Dependencies
+
+[33mcommit 209a29baaeca127abf9509fd431d86b7e03644ec[m
+Author: jacobleon2117 <jacobleon2117@gmail.com>
+Date:   Mon Mar 31 00:42:19 2025 -0500
+
+    adding expo template

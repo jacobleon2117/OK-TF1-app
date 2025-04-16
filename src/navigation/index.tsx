@@ -6,9 +6,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import LoginScreen from '@/screens/auth/LoginScreen';
 import SignupScreen from '@/screens/auth/SignupScreen';
 import ForgotPasswordScreen from '@/screens/auth/ForgotPasswordScreen';
-
 import DashboardNavigator from './DashboardNavigator';
-
 import { useAuth } from '@/context/AuthContext';
 
 const Stack = createStackNavigator();
@@ -41,7 +39,15 @@ const AppNavigator = () => {
   }
 
   return (
-    <NavigationContainer>{user ? <DashboardNavigator /> : <AuthNavigator />}</NavigationContainer>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <Stack.Screen name="Dashboard" component={DashboardNavigator} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthNavigator} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

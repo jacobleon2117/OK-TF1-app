@@ -6,6 +6,7 @@ import ScheduleScreen from '@/screens/dashboard/Schedule/ScheduleScreen';
 import MissionReportScreen from '@/screens/dashboard/Mission/MissionReportScreen';
 import ProfileScreen from '@/screens/dashboard/Profile/ProfileScreen';
 import HomeScreen from '@/screens/dashboard/HomeScreen';
+import MapScreen from '@/screens/dashboard/Map/MapScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ const DashboardNavigator = () => {
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Calendar" component={ScheduleScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Map" component={MapScreen} />
       <Stack.Screen name="MissionReports" component={MissionReportScreen} />
     </Stack.Navigator>
   );
