@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useForm } from '@/hooks/useForm';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';

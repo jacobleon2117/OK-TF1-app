@@ -18,7 +18,7 @@ import {
 import { fetchShifts, Shift } from '@/screens/dashboard/Schedule/scheduleUtils';
 
 import { Timestamp } from 'firebase/firestore';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 const { height } = Dimensions.get('window');
 

@@ -45,7 +45,7 @@ import {
 } from '@/screens/dashboard/Schedule/scheduleUtils/adminUtils';
 
 import { Timestamp, serverTimestamp } from 'firebase/firestore';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { addShift, deleteShift } from '@/services/firebase/schedulingService';
 
 const { height, width } = Dimensions.get('window');
