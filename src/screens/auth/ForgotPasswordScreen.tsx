@@ -11,7 +11,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
 import LoadingScreen from '@/components/LoadingScreen';
 import { EmailField, AuthButton, LinkText, ResetPasswordSuccess } from '@/components/common/auth';

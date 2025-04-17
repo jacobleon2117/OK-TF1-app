@@ -11,7 +11,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useForm } from '@/hooks/useForm';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import BackgroundGrid from '@/components/common/auth/BackgroundGrid';
@@ -89,7 +89,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             scrollEnabled={false}
           >
             <View style={styles.content}>
-              {/* New TaskCom Title */}
               <View style={styles.titleContainer}>
                 <Text style={styles.title}>TaskCom</Text>
               </View>
@@ -165,13 +164,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     marginTop: 8,
     marginBottom: 8,
-    height: 20, // Fixed height to prevent shifting
+    height: 20,
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 24,
-    height: 20, // Fixed height to prevent shifting
+    height: 20,
   },
   whiteText: {
     color: 'white',
@@ -180,7 +179,7 @@ const styles = StyleSheet.create({
     color: '#ff6b6b',
     marginBottom: 10,
     textAlign: 'center',
-    minHeight: 20, // Fixed height for error text to prevent shifting
+    minHeight: 20,
   },
 });
 

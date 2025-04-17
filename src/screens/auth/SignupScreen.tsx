@@ -11,7 +11,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useForm } from '@/hooks/useForm';
 import {
   validateEmail,
