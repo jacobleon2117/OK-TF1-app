@@ -1,4 +1,3 @@
-// app.config.js
 module.exports = {
   name: 'OK-TF1-app',
   slug: 'OK-TF1-app',
@@ -8,9 +7,10 @@ module.exports = {
   newArchEnabled: true,
   plugins: [
     [
-      '@rnmapbox/maps',
+      'expo-location',
       {
-        RNMapboxMapsDownloadToken: process.env.MAPBOX_DOWNLOAD_TOKEN,
+        locationWhenInUsePermission:
+          'This app needs access to your location to show it on the map.',
       },
     ],
   ],
@@ -29,7 +29,6 @@ module.exports = {
     permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
     package: 'com.jleon2117.OKTF1app',
   },
-  // Environment variables will be added here
   extra: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
     FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
