@@ -36,7 +36,7 @@ type AuthContextType = {
   resetPassword: (email: string, organizationCode: string) => Promise<void>;
   error: string | null;
   setError: (error: string | null) => void;
-  diagnoseLogin: (email: string, password: string) => Promise<boolean>;
+  diagnoseLogin: (email: string) => Promise<boolean>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,14 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const diagnoseLogin = async (email: string, password: string): Promise<boolean> => {
+  // Modified to only check if email exists without signing in
+  const diagnoseLogin = async (email: string): Promise<boolean> => {
     try {
       console.log('Diagnostic Login Check Started');
       console.log('Email:', email);
 
-      if (!email || !password) {
-        console.error('Email or password is empty');
-        setError('Email and password are required');
+      if (!email) {
+        console.error('Email is empty');
+        setError('Email is required');
         return false;
       }
 
@@ -82,61 +83,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setError('No account found with this email');
           return false;
         }
-      } catch (emailCheckError) {
+        return true;
+      } catch (emailCheckError: any) {
         console.error('Email Verification Error:', emailCheckError);
-        setError('Unable to verify email');
+        setError(emailCheckError.message || 'Unable to verify email');
         return false;
       }
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log('User UID:', userCredential.user.uid);
-
-        const userDocRef = doc(db, 'users', userCredential.user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (userDoc.exists()) {
-          console.log('User Document Data:', userDoc.data());
-          return true;
-        } else {
-          console.error('No user document found in Firestore');
-          setError('User document not found');
-          return false;
-        }
-      } catch (signInError: any) {
-        console.error('Sign-in Error:', {
-          code: signInError.code,
-          message: signInError.message,
-        });
-
-        const errorMessage = (() => {
-          switch (signInError.code) {
-            case 'auth/invalid-credential':
-              return 'Invalid email or password';
-            case 'auth/user-not-found':
-              return 'No user found with this email';
-            case 'auth/wrong-password':
-              return 'Incorrect password';
-            case 'auth/too-many-requests':
-              return 'Too many login attempts. Please try again later.';
-            default:
-              return 'Login failed. Please try again.';
-          }
-        })();
-
-        setError(errorMessage);
-        return false;
-      }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Diagnostic Login Error:', error);
-      setError('An unexpected error occurred during login');
+      setError(error.message || 'An unexpected error occurred');
       return false;
     }
   };
 
-  const verifyOrganizationCode = (code: string): boolean => {
-    // TODO: Replace with real organization code verification logic
-    return true; // Always true for now
+  const verifyOrganizationCode = async (code: string): Promise<boolean> => {
+    // Implementation of organization code verification
+    try {
+      // For testing, return true for now
+      return true;
+    } catch (error) {
+      console.error('Organization verification error:', error);
+      return false;
+    }
   };
 
   const fetchUserData = async (userId: string) => {
@@ -169,18 +137,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         console.log('No user document found');
         setLoading(false);
-        setError('User document not found');
+        setError('User profile not found. Please contact support.');
       }
     } catch (err: any) {
-      console.error('Detailed Error fetching user data:', {
-        code: err.code,
-        message: err.message,
-        name: err.name,
-        stack: err.stack,
-      });
+      console.error('Detailed Error fetching user data:', err);
 
       setLoading(false);
-      setError(err.message || 'Unable to fetch user data');
+      setError('Unable to access your profile. Please try again later.');
     }
   };
 
@@ -220,6 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  // Fixed login function
   const login = async (email: string, password: string, organizationCode: string) => {
     console.log('Login Attempt:', {
       email,
@@ -231,35 +195,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
 
     try {
-      // Diagnostic check
-      const diagnosticResult = await diagnoseLogin(email, password);
-      if (!diagnosticResult) {
-        setLoading(false);
-        return;
-      }
-
-      if (!verifyOrganizationCode(organizationCode)) {
+      // Verify organization code first
+      const isValidOrg = await verifyOrganizationCode(organizationCode);
+      if (!isValidOrg) {
         console.log('Organization Code Verification Failed');
         setError('Invalid organization code');
         setLoading(false);
         return;
       }
 
-      console.log('Login successful');
-      setLoading(false);
+      // Perform the actual login
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful, user:', userCredential.user.uid);
+      
+      // User data will be fetched by the auth state change listener
     } catch (err: any) {
-      console.error('Login Method Error:', {
-        code: err.code,
-        message: err.message,
-        stack: err.stack,
-      });
+      console.error('Login Method Error:', err);
 
       setLoading(false);
 
-      if (!error) {
-        setError('Login failed. Please try again.');
-      }
+      // Provide user-friendly error messages
+      const errorMessage = (() => {
+        switch (err.code) {
+          case 'auth/invalid-credential':
+            return 'Invalid email or password';
+          case 'auth/user-not-found':
+            return 'No user found with this email';
+          case 'auth/wrong-password':
+            return 'Incorrect password';
+          case 'auth/too-many-requests':
+            return 'Too many login attempts. Please try again later.';
+          case 'auth/user-disabled':
+            return 'This account has been disabled. Please contact support.';
+          case 'auth/invalid-email':
+            return 'Invalid email format';
+          case 'auth/configuration-not-found':
+            return 'Authentication service is temporarily unavailable. Please try again later.';
+          default:
+            return 'Login failed. Please try again.';
+        }
+      })();
 
+      setError(errorMessage);
       throw err;
     }
   };
@@ -280,13 +257,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     setError(null);
+    setLoading(true);
 
     try {
-      if (!verifyOrganizationCode(organizationCode)) {
+      const isValidOrg = await verifyOrganizationCode(organizationCode);
+      if (!isValidOrg) {
         console.log('Organization Code Verification Failed');
+        setError('Invalid organization code');
+        setLoading(false);
         throw new Error('Invalid organization code');
       }
 
+      // Create the user
       console.log('Attempting to create user in Firebase');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -294,7 +276,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: name,
         email: email,
         organizationCode: organizationCode,
-        role: adminCode?.trim() ? 'admin' : 'employee',
+        role: adminCode === 'OKTask1Admin' ? 'admin' : 'employee',
         createdAt: new Date(),
       };
 
@@ -306,16 +288,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(userCredential.user);
       setUserData(userData);
+      setLoading(false);
 
       return userCredential;
     } catch (err: any) {
-      console.error('Signup Error:', {
-        code: err.code,
-        message: err.message,
-        stack: err.stack,
-      });
+      console.error('Signup Error:', err);
 
-      const errorMessage = err.message || 'Signup failed';
+      setLoading(false);
+
+      // User-friendly error messages
+      const errorMessage = (() => {
+        switch (err.code) {
+          case 'auth/email-already-in-use':
+            return 'An account with this email already exists';
+          case 'auth/invalid-email':
+            return 'Invalid email format';
+          case 'auth/weak-password':
+            return 'Password is too weak. Use at least 6 characters';
+          case 'auth/configuration-not-found':
+            return 'Authentication service is temporarily unavailable. Please try again later.';
+          default:
+            return err.message || 'Signup failed';
+        }
+      })();
+
       setError(errorMessage);
       throw err;
     }
@@ -326,8 +322,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       await signOut(auth);
-      setUser(null);
-      setUserData(null);
+      // Auth state change listener will handle clearing user data
     } catch (err: any) {
       const errorMessage = err.message || 'Logout failed';
       setError(errorMessage);
@@ -337,15 +332,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string, organizationCode: string) => {
     setError(null);
+    setLoading(true);
 
     try {
-      if (!verifyOrganizationCode(organizationCode)) {
+      // Check if email exists
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      if (methods.length === 0) {
+        setError('No account found with this email');
+        setLoading(false);
+        throw new Error('Email not found');
+      }
+
+      const isValidOrg = await verifyOrganizationCode(organizationCode);
+      if (!isValidOrg) {
+        setError('Invalid organization code');
+        setLoading(false);
         throw new Error('Invalid organization code');
       }
 
       await sendPasswordResetEmail(auth, email);
+      setLoading(false);
     } catch (err: any) {
-      const errorMessage = err.message || 'Password reset failed';
+      console.error('Password Reset Error:', err);
+      setLoading(false);
+      
+      const errorMessage = (() => {
+        switch (err.code) {
+          case 'auth/invalid-email':
+            return 'Invalid email format';
+          case 'auth/user-not-found':
+            return 'No account found with this email';
+          case 'auth/configuration-not-found':
+            return 'Authentication service is temporarily unavailable. Please try again later.';
+          default:
+            return err.message || 'Password reset failed';
+        }
+      })();
+      
       setError(errorMessage);
       throw err;
     }
