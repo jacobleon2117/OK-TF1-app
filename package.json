@@ -44,7 +44,8 @@
     "react-native-web": "~0.19.13",
     "react-redux": "^9.2.0",
     "socket.io-client": "^4.8.1",
-    "expo-system-ui": "~4.0.9"
+    "expo-system-ui": "~4.0.9",
+    "@react-native-community/netinfo": "11.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

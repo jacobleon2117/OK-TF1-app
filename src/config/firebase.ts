@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 import {
   FIREBASE_API_KEY,
@@ -20,8 +20,19 @@ const firebaseConfig = {
   appId: FIREBASE_APP_ID,
 };
 
+console.log('Firebase Configuration:', {
+  apiKeyPresent: !!FIREBASE_API_KEY,
+  authDomainPresent: !!FIREBASE_AUTH_DOMAIN,
+  projectIdPresent: !!FIREBASE_PROJECT_ID,
+});
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+if (__DEV__) {
+  connectAuthEmulator(auth, 'http://localhost:9099');
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 export { app, auth, db };

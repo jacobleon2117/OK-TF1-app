@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import {
   User,
   UserCredential,
@@ -55,39 +56,116 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const verifyOrganizationCode = (code: string): boolean => {
+    // TODO: Replace with real organization code verification logic
+    return code === '123456'; // Example hardcoded validation
+  };
+
+  const fetchUserData = async (userId: string) => {
+    console.log('Fetching user data for userId:', userId);
+
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as UserData;
+        console.log('User Document Data:', userData);
+
+        setUserData({
+          displayName: userData.displayName,
+          email: userData.email,
+          organizationCode: userData.organizationCode,
+          role: userData.role,
+          createdAt:
+            userData.createdAt instanceof Date ? userData.createdAt : new Date(userData.createdAt),
+        });
+      } else {
+        console.error('No user document found');
+        setError('User document not found');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Unable to fetch user data');
+    }
+  };
+
   const diagnoseLogin = async (email: string, password: string): Promise<boolean> => {
     try {
-      console.log('Diagnostic Login Check Started');
-      console.log('Email:', email);
+      // Comprehensive network state logging
+      const netInfoState = await NetInfo.fetch();
+      console.log('Detailed Network Diagnostics:', {
+        isConnected: netInfoState.isConnected,
+        type: netInfoState.type,
+        details: netInfoState.details,
+      });
 
-      if (!email || !password) {
-        console.error('Email or password is empty');
-        setError('Email and password are required');
-        return false;
+      // Safer network details extraction
+      const networkDetails = {
+        ipAddress:
+          netInfoState.details && 'ipAddress' in netInfoState.details
+            ? (netInfoState.details as any).ipAddress
+            : 'Unknown',
+        carrier:
+          netInfoState.details && 'carrier' in netInfoState.details
+            ? (netInfoState.details as any).carrier
+            : 'Unknown',
+      };
+
+      console.log('Network Details:', networkDetails);
+
+      // Additional internet reachability check
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch('https://www.google.com', {
+          method: 'HEAD',
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        console.log('Internet Reachability Test:', {
+          status: response.status,
+          ok: response.ok,
+        });
+      } catch (fetchError) {
+        console.error('Internet Reachability Fetch Error:', fetchError);
       }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        console.error('Invalid email format');
-        setError('Invalid email format');
+      if (!netInfoState.isConnected) {
+        console.error('No network connection detected');
+        setError('No internet connection. Please check your network.');
         return false;
       }
 
       try {
         const methods = await fetchSignInMethodsForEmail(auth, email);
-        console.log('Available Sign-in Methods:', methods);
+        console.log('Network Request Details:', {
+          methods,
+          authDomain: auth.app.options.authDomain,
+          projectId: auth.app.options.projectId,
+        });
 
+        // If no sign-in methods found, handle accordingly
         if (methods.length === 0) {
           console.error('No sign-in methods found for this email');
-          setError('No account found with this email');
+          setError('No account found. Please sign up.');
           return false;
         }
-      } catch (emailCheckError) {
-        console.error('Email Verification Error:', emailCheckError);
-        setError('Unable to verify email');
+      } catch (emailCheckError: any) {
+        console.error('Detailed Network Error:', {
+          code: emailCheckError.code,
+          message: emailCheckError.message,
+          stack: emailCheckError.stack,
+        });
+
+        setError('Network error. Please check your connection and try again.');
         return false;
       }
 
+      // Attempt to sign in
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log('User UID:', userCredential.user.uid);
@@ -128,59 +206,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
     } catch (error) {
-      console.error('Diagnostic Login Error:', error);
-      setError('An unexpected error occurred during login');
+      console.error('Comprehensive Network Check Error:', error);
+      setError('Unable to verify network connection');
       return false;
-    }
-  };
-
-  const verifyOrganizationCode = (code: string): boolean => {
-    // TODO: Replace with real organization code verification logic
-    return true; // Always true for now
-  };
-
-  const fetchUserData = async (userId: string) => {
-    console.log('Fetching user data for userId:', userId);
-
-    try {
-      const userDocRef = doc(db, 'users', userId);
-      console.log('User Doc Reference:', userDocRef.path);
-
-      const userDoc = await getDoc(userDocRef);
-
-      console.log('User Doc Exists:', userDoc.exists());
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as UserData;
-        console.log('Raw User Data:', userData);
-
-        const completeUserData: UserData = {
-          displayName: userData.displayName || '',
-          email: userData.email || '',
-          organizationCode: userData.organizationCode || '',
-          role: userData.role || 'employee',
-          createdAt:
-            userData.createdAt instanceof Date ? userData.createdAt : new Date(userData.createdAt),
-        };
-
-        console.log('Complete User Data:', completeUserData);
-        setUserData(completeUserData);
-        setLoading(false);
-      } else {
-        console.log('No user document found');
-        setLoading(false);
-        setError('User document not found');
-      }
-    } catch (err: any) {
-      console.error('Detailed Error fetching user data:', {
-        code: err.code,
-        message: err.message,
-        name: err.name,
-        stack: err.stack,
-      });
-
-      setLoading(false);
-      setError(err.message || 'Unable to fetch user data');
     }
   };
 
